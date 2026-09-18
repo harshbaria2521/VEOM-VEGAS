@@ -1,0 +1,18 @@
+# 1️⃣ Navigate
+cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/test1/Smart Victim Intelligence (SVI)/safespace-ai-therapist"
+
+# 2️⃣ (optional) virtual env
+python3 -m venv .venv && source .venv/bin/activate
+
+# 3️⃣ Install deps
+pip install --upgrade pip
+pip install -r requirements.txt   # or: pip install uvicorn fastapi
+
+# 4️⃣ Run the backend
+python3 -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
+
+
+frontend
+::
+cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/test1/Smart Victim Intelligence (SVI)/safespace-ai-therapist/frontend"
+npm run dev
