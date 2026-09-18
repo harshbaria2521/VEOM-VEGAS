@@ -1,0 +1,544 @@
+================================================================================
+  SVI — SMART VICTIM INTELLIGENCE
+  Comprehensive Backend & Frontend Technical Analysis Report
+  Ministry of Social Justice & Empowerment | Government of India
+  National Helpline Against Atrocities (NHAA 14566) | Tele-MANAS (14416) | 112
+  SIH 2026 | Problem Statement ID: 26093 | Team: Veom Vegas
+================================================================================
+
+DOCUMENT OVERVIEW:
+This document provides an exhaustive, line-by-line and architectural breakdown
+of both the Backend and Frontend systems of the Smart Victim Intelligence (SVI)
+platform. It explains the design philosophy, file hierarchy, runtime workflows,
+component interactions, data models, error handling strategies, security & privacy
+guarantees (DPDP 2023), and current architectural limitations with clear roadmaps.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+  1. SYSTEM ARCHITECTURE & HIGH-LEVEL OVERVIEW
+  2. BACKEND SUBSYSTEM ANALYSIS
+     2.1 Entrypoint: main.py (FastAPI, Uvicorn, Fail-Safe Handlers)
+     2.2 Agentic Reasoning: backend/ai_agent.py (LangGraph ReAct, ChatGroq)
+     2.3 Specialized Tools: backend/tools.py (Ollama MedGemma, Twilio Voice)
+     2.4 Backend Configuration: backend/config.py & Environment Variables
+     2.5 Legacy / Standalone UI: frontend.py (Streamlit)
+  3. FRONTEND SUBSYSTEM ANALYSIS
+     3.1 Architecture: Next.js 14 (App Router), React 18 & Tailwind CSS
+     3.2 Routing & Pages Breakdown (/ , /counsellor , /admin , /login , /consent , /profile)
+     3.3 Core Interactive Components (ChatWidget, CaseQueueTable, HumanActionForm, etc.)
+     3.4 Audio Alert Subsystem (Web Audio API Synthesizer)
+     3.5 Speech Recognition Subsystem (Web Speech API - Bilingual STT)
+     3.6 Official Case Summary Print Subsystem (@media print)
+  4. STATE MANAGEMENT, API BRIDGES & DATA FLOW
+     4.1 Case Store (useCaseStore & localStorage Schema)
+     4.2 Authentication & Role Context (useAuth)
+     4.3 API Client & Proxy Layer (lib/api.js, Next.js API Routes, next.config.js)
+     4.4 End-to-End Chat Message Lifecycle
+  5. SECURITY, COMPLIANCE & PRIVACY-BY-DESIGN (DPDP 2023)
+  6. STRENGTHS, GAPS & PRODUCTION ROADMAP
+================================================================================
+
+
+================================================================================
+1. SYSTEM ARCHITECTURE & HIGH-LEVEL OVERVIEW
+================================================================================
+
+The SVI platform is split into two integrated tiers designed for real-time
+distress handling, trauma-informed conversation, case classification, and
+statutory human oversight:
+
+                       ┌────────────────────────────────┐
+                       │    Victim / Citizen Device     │
+                       └───────────────┬────────────────┘
+                                       │ (HTTP / Voice / Chat)
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                    NEXT.JS 14 FRONTEND (PORT 3000)                           │
+│                                                                              │
+│  [Victim Intake Portal]     [Counsellor Triage Queue]    [Admin Analytics]   │
+│  - app/page.js              - app/counsellor/page.js     - app/admin/page.js │
+│  - ChatWidget.js            - CaseQueueTable.js          - AnalyticsCharts   │
+│  - ConsentModal.js          - HumanActionForm.js         - DPDP Privacy View │
+│                                                                              │
+│  [Browser Web APIs]                                                          │
+│  - Web Speech API: Bilingual Speech-to-Text (hi-IN, en-IN)                   │
+│  - Web Audio API: 880Hz Oscillator Beep for Incoming Critical Cases          │
+│  - Browser Print API: Official Case Summary PDF Generation                   │
+│                                                                              │
+│  [Client Storage & Context]                                                  │
+│  - caseStore.js: Synced with localStorage ('svi_cases_state_v1')             │
+│  - authContext.js: Multi-role authentication (Victim, Counsellor, Admin)     │
+│                                                                              │
+│  [Next.js Server-Side Handlers]                                              │
+│  - /api/ask: Proxy bridge to FastAPI with timeout protection                 │
+│  - /api/nearby-support: Geolocation directory (Tavily Search / Helplines)    │
+└──────────────────────────────────────┬───────────────────────────────────────┘
+                                       │
+                                       │ POST /ask (JSON)
+                                       ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                      FASTAPI BACKEND (PORT 5500)                             │
+│                                                                              │
+│  [main.py]                                                                   │
+│  - FastAPI application entrypoint                                            │
+│  - Pydantic query model validation                                           │
+│  - Fail-safe exception handler returning India-specific crisis guidance      │
+│                                                                              │
+│  [backend/ai_agent.py]                                                       │
+│  - LangGraph ReAct Agent (create_react_agent)                                │
+│  - ChatGroq LLM Engine (openai/gpt-oss-120b, temp=0.2)                       │
+│  - Strict India Crisis System Prompt (112, NHAA 14566, Tele-MANAS 14416)     │
+│  - Stream response parser & tool invocation detection                        │
+│                                                                              │
+│  [Tools: backend/tools.py]                                                   │
+│  - Tool 1: ask_mental_health_specialist -> Ollama MedGemma 4B model          │
+│  - Tool 2: emergency_call_tool -> Twilio REST Voice Client (Auto Phone Call) │
+│  - Tool 3: find_nearby_therapists_by_location -> Docvita / Verified Clinics  │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+2. BACKEND SUBSYSTEM ANALYSIS
+================================================================================
+
+2.1 ENTRYPOINT: main.py
+--------------------------------------------------------------------------------
+File Path:
+  safespace-ai-therapist/main.py
+
+Key Responsibilities:
+  - Initializes FastAPI application instance.
+  - Exposes HTTP POST /ask endpoint to process user queries.
+  - Implements request validation using Pydantic BaseModel.
+  - Orchestrates LangGraph execution stream and parses tool results.
+  - Ensures a crash-proof fail-safe response so a distressed victim is NEVER
+    stranded with an unhandled HTTP 500 error or connection refusal.
+
+Code Logic & Detailed Explanation:
+  - The Query model specifies:
+      class Query(BaseModel):
+          message: str
+  - In the /ask handler:
+      inputs = {"messages": [("system", SYSTEM_PROMPT), ("user", query.message)]}
+      stream = graph.stream(inputs, stream_mode="updates")
+      tool_called_name, final_response = parse_response(stream)
+  - If the agent fails to formulate a text response or the model hangs, it defaults
+    to:
+      "I'm here with you, though I had trouble putting a reply together.
+       If this feels urgent, please call 112 or Tele-MANAS at 14416."
+  - In case of catastrophic exceptions (e.g., API key limits, network drop,
+    Ollama service offline):
+      The try-except block intercepts the error, logs it via print statement
+      for administrator debugging, and immediately responds with HTTP 200:
+      {
+        "response": "I'm having trouble processing that right now. If you need help urgently, please call 112 or Tele-MANAS at 14416 directly.",
+        "tool_called": "None"
+      }
+
+
+2.2 AGENTIC REASONING: backend/ai_agent.py
+--------------------------------------------------------------------------------
+File Path:
+  safespace-ai-therapist/backend/ai_agent.py
+
+Key Responsibilities:
+  - Instantiates LangGraph ReAct agent using `create_react_agent`.
+  - Configures ChatGroq using high-speed `openai/gpt-oss-120b` model.
+  - Enforces strict Indian regulatory and emergency hotline guidelines.
+  - Defines the 3 ReAct tools and parses execution chunks from stream.
+
+Detailed Component Breakdown:
+
+  1. Tools Exposed to Agent:
+     a) ask_mental_health_specialist(query: str):
+        Calls `query_medgemma(query)` in backend/tools.py. Invoked for all
+        general emotional, distress, psychological, and conversational queries.
+     b) emergency_call_tool():
+        Calls `call_emergency()` in backend/tools.py. Invoked when suicidal
+        ideation, intent to self-harm, or imminent physical threat is detected.
+        Triggers an actual outbound phone call via Twilio.
+     c) find_nearby_therapists_by_location(location: str):
+        Returns licensed mental health professionals and Docvita booking links
+        tailored to the user's city or state.
+
+  2. System Prompt Guardrails (SYSTEM_PROMPT):
+     - Exclusively scoped to India: Emergency 112, Tele-MANAS 14416 / 1-800-891-4416.
+     - Never mentions foreign emergency numbers (e.g., 911, 988, 999).
+     - Mandates physical de-escalation: encourage staying with a trusted person
+       and moving away from any dangerous objects.
+     - Requires that even if the emergency tool is called, the user must still
+       be explicitly advised to dial 112 themselves.
+
+  3. Stream Parser (parse_response):
+     - Iterates through the stream chunks generated by LangGraph.
+     - Inspects dictionary keys "tools" (extracting `msg.name`) and "agent"
+       (extracting `msg.content`).
+     - Returns a 2-tuple: `(tool_called_name, final_response)`.
+
+
+2.3 SPECIALIZED TOOLS: backend/tools.py
+--------------------------------------------------------------------------------
+File Path:
+  safespace-ai-therapist/backend/tools.py
+
+Detailed Tool Implementations:
+
+  1. Ollama MedGemma Integration (query_medgemma):
+     - Connects to local Ollama service running the `alibayram/medgemma:4b`
+       model (specialized fine-tuned medical variant of Google Gemma).
+     - Personified as "Dr. Emily Hartman", an experienced clinical psychologist.
+     - Prompts include 4 core pillars:
+       * Emotional attunement
+       * Gentle normalization
+       * Practical grounding guidance
+       * Strengths-focused support
+     - Hyperparameters:
+       * num_predict: 350 (adequate room for structured de-escalation)
+       * temperature: 0.7 (balanced empathy and coherence)
+       * top_p: 0.9 (vocabulary diversity)
+     - Fails gracefully with a reassuring message if Ollama is not running.
+
+  2. Twilio Outbound Telephony (call_emergency):
+     - Uses Twilio REST API client (`twilio.rest.Client`).
+     - Credentials loaded from backend/config.py:
+       * TWILIO_ACCOUNT_SID
+       * TWILIO_AUTH_TOKEN
+       * TWILIO_FROM_NUMBER
+       * EMERGENCY_CONTACT
+     - Calls `client.calls.create()` pointing to voice XML (`demo.twilio.com/docs/voice.xml`).
+     - Returns `True` if queued, `False` on credential or connection errors.
+
+
+2.4 CONFIGURATION & ENVIRONMENT: backend/config.py
+--------------------------------------------------------------------------------
+File Path:
+  safespace-ai-therapist/backend/config.py
+
+Parameters Managed:
+  - GROQ_API_KEY: Authentication for Groq cloud inference.
+  - TWILIO_ACCOUNT_SID: Twilio project account SID.
+  - TWILIO_AUTH_TOKEN: Twilio authorization token.
+  - TWILIO_FROM_NUMBER: Virtual phone number assigned by Twilio.
+  - EMERGENCY_CONTACT: Designated emergency contact phone number to ring.
+
+
+2.5 LEGACY / STANDALONE UI: frontend.py
+--------------------------------------------------------------------------------
+File Path:
+  safespace-ai-therapist/frontend.py
+
+Overview:
+  - 449-line Streamlit application providing a single-page chat interface.
+  - Styled with custom CSS, Google Fonts (Fraunces & Karla), and embedded base64
+    background graphics (`quiet_horizon_bg.png`).
+  - Connects to `http://127.0.0.1:8000/ask`.
+  - While superseded by the multi-portal Next.js application, it remains fully
+    usable as an independent demonstration tool.
+
+
+================================================================================
+3. FRONTEND SUBSYSTEM ANALYSIS
+================================================================================
+
+3.1 ARCHITECTURE & TECH STACK
+--------------------------------------------------------------------------------
+Directory:
+  safespace-ai-therapist/frontend/
+
+Key Technologies:
+  - Framework: Next.js 14.x (React 18, App Router)
+  - Styling: Vanilla Tailwind CSS with custom government color tokens
+  - Icons: Lucide React
+  - Client Network: Axios
+  - Browser APIs: Web Speech API, Web Audio API, Window Print API
+
+Design Tokens (tailwind.config.js & globals.css):
+  - gov-navy: #1B365D (Official Government Blue)
+  - gov-teal: #008069 (WhatsApp/Ministry Green)
+  - gov-tealSoft: #E4EAE5
+  - gov-cream: #FDFCF8 (Calm Background)
+  - gov-border: #E2DFD3
+
+
+3.2 ROUTING & PAGES BREAKDOWN
+--------------------------------------------------------------------------------
+
+1. Citizen / Victim Portal: app/page.js
+   - Main public-facing intake page.
+   - Header badge: "Official Ministry Portal — National Helpline Against Atrocities (14566)".
+   - Automatically checks `localStorage('svi_victim_consent')`. If missing, renders
+     the interactive `ConsentModal`.
+   - Embeds `ChatWidget` component as the primary interactive element.
+   - Includes quick-links to DPDP consent settings.
+
+2. Counsellor Triage Dashboard: app/counsellor/page.js
+   - Dedicated operational queue for helpline triage officers.
+   - Real-Time Urgent Triage Banner:
+     Alerts when Critical cases exist. Displays count of unassigned critical cases
+     with dismiss and quick-scroll controls.
+   - Critical Audio Alert Toggle:
+     Allows officers to mute/unmute audio alerts (`Bell` / `BellOff`), persisting
+     the preference across page refreshes.
+   - Embeds `CaseQueueTable` with search, risk filters, and case claim buttons.
+
+3. Case Detail & Human-in-the-Loop Override: app/counsellor/[caseId]/page.js
+   - Deep inspection view for an individual victim case.
+   - Features:
+     * Header with risk badges, channel badge, and "Print / Save as PDF" button.
+     * AI Assessment Box: displays composite risk score (0-100), AI recommended
+       pathway, and violation tags (e.g. PoA Act Sec 3(1)(r), PCR Act Sec 7).
+     * Acoustic / Vocal Signals Card: Tremor scores, pitch instability, speech rate.
+     * Sensitive Conversation Transcript: Protected by privacy toggle (`Eye`/`EyeOff`),
+       allowing officers to redact victim messages when screen is shared.
+     * `HumanActionForm`: Interface to approve, override risk level, escalate to 112,
+       or resolve the case, with mandatory reason and notes logging.
+     * Immutable Audit Trail: Chronological history of all AI and human decisions.
+
+4. Macro-Level Admin Analytics: app/admin/page.js
+   - Executive dashboard for Ministry supervisors.
+   - Privacy-by-design: Guarantees zero Personally Identifiable Information (PII)
+     is exposed in macro metrics.
+   - Embeds `AnalyticsCharts.js`.
+
+5. Multi-Role Authentication: app/login/page.js
+   - Interactive 3-way role switcher:
+     * Victim: Instant anonymous login with auto-generated ticket reference.
+     * Counsellor: Pre-filled with Officer Sharma credentials.
+     * Admin: Pre-filled with Supervisor Verma credentials.
+
+6. DPDP Consent Management: app/consent/page.js
+   - Standalone consent control center.
+   - Allows citizens to review their active consent parameters:
+     * Text conversation processing
+     * Voice / speech analysis
+     * 30-day auto-purge data retention schedule
+     * Anonymization and legal aid forwarding permissions.
+
+7. Victim Case Tracker: app/profile/page.js
+   - Citizen tracking portal showing ticket ID, submission timestamp,
+     current status, and safe logout action.
+
+
+3.3 CORE INTERACTIVE COMPONENTS
+--------------------------------------------------------------------------------
+
+1. ChatWidget.js:
+   - WhatsApp-inspired UI: Warm beige wallpaper (`#EFEAE2`) with radial dots pattern,
+     emerald green header (`#075E54`), distinct green user bubbles and white assistant
+     bubbles with delivered double checkmarks.
+   - Custom Markdown Formatter: Lightweight inline parser supporting bold, italics,
+     code, bullet lists, numbered lists, and headers without external libraries.
+   - Action Cards:
+     * Fallback helpline card with direct tel: links when network fails.
+     * Emergency alert card if `emergency_call_tool` was triggered.
+     * Support directory button if `find_nearby_therapists_by_location` was executed.
+   - Auto-scroll to latest message via `chatEndRef`.
+   - Hydration-safe timestamps with `suppressHydrationWarning`.
+
+2. CaseQueueTable.js:
+   - High-density tabular layout displaying: Case ID, Channel (Chat, Helpline, Web, IVRS),
+     Risk Level, Language, Indicators, Assigned Officer, and Status.
+   - Search bar across case IDs and indicators.
+   - Filter pills for Risk Level (All, Critical, High, Moderate, Low).
+   - "Claim Case" button triggering state mutation in `caseStore.js`.
+
+3. HumanActionForm.js:
+   - 4-way action selector:
+     * Approve AI Assessment (maintains AI score, sets status to In Review)
+     * Override Risk Level (dropdown: Low, Moderate, High, Critical)
+     * Emergency Escalation (dispatches 112 / Police, forces Critical)
+     * Resolve & Close Case (marks case Resolved)
+   - Requires officer justification (`reason`) and investigation notes.
+   - Automatically writes a timestamped record to the case's `auditTrail`.
+
+4. AnalyticsCharts.js:
+   - CSS-based responsive visualization modules:
+     * Risk level distribution bars
+     * Legal violation breakdown (PoA Act vs PCR Act)
+     * Channel intake proportions
+     * Case resolution SLA gauge.
+
+5. NearbySupportModal.js:
+   - Modal interface querying the `/api/nearby-support` route.
+   - Displays verified local NGOs, District Legal Services Authorities (DLSA),
+     and mental health clinics based on the user's city or district.
+
+
+3.4 AUDIO ALERT SUBSYSTEM (counsellor/page.js)
+--------------------------------------------------------------------------------
+Technology: Browser Web Audio API (`window.AudioContext`)
+
+Implementation Highlights:
+  - Synthetic Sound Generation: Uses an OscillatorNode configured to a pure 880Hz
+    sine wave, routed through a GainNode to `ctx.destination`.
+  - Volume Envelope: Decays smoothly from gain 0.18 to 0.001 over 0.35 seconds
+    using `exponentialRampToValueAtTime`.
+  - Privacy Guaranteed: Zero third-party audio files or cloud streaming; pure local
+    mathematical waveform synthesis.
+  - Browser Autoplay Policy Compliance: Listens for initial user interaction
+    (`click` or `keydown`) before enabling audio playback.
+  - Startup Noise Prevention: Silently pre-populates existing Critical cases into
+    an `alertedCaseIdsRef` set on initial mount so loading existing cases does not
+    trigger a loud beep.
+  - De-duplication: Plays at most once per newly arrived Critical case ID.
+
+
+3.5 SPEECH RECOGNITION SUBSYSTEM (ChatWidget.js)
+--------------------------------------------------------------------------------
+Technology: Browser Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`)
+
+Implementation Highlights:
+  - Toggle Microphone Button with pulse animation.
+  - Bilingual Support: Dynamically sets `recognition.lang` to `hi-IN` when Hindi
+    is selected, or `en-IN` when English is selected.
+  - Real-time Interim Transcription: Streams speech into the message input field
+    as the user speaks (`interimResults = true`).
+  - Error Handling: Detects unsupported browsers and gracefully advises users to
+    use Google Chrome or Microsoft Edge.
+
+
+3.6 OFFICIAL CASE SUMMARY PRINT SUBSYSTEM (counsellor/[caseId]/page.js)
+--------------------------------------------------------------------------------
+Technology: Window Print API (`window.print()`) & CSS `@media print`
+
+Implementation Highlights:
+  - Official Print Header: Emits an official header ("Ministry of Social Justice
+    & Empowerment • NHAA 14566 Official Case Summary") visible ONLY when printing.
+  - Screen Clutter Stripping: Uses `@media print { header, footer, nav, button { display: none !important; } }`.
+  - Formatting Cleanliness: Background colors stripped to pure white; dark text
+    enforced for high-contrast paper reproduction and legal archival.
+
+
+================================================================================
+4. STATE MANAGEMENT, API BRIDGES & DATA FLOW
+================================================================================
+
+4.1 CASE STORE (frontend/lib/caseStore.js)
+--------------------------------------------------------------------------------
+The SVI case management state is handled via the `useCaseStore` custom React hook:
+  - Storage Key: `localStorage('svi_cases_state_v1')`.
+  - Initialization: Loads from localStorage if present; falls back to `initialCases`
+    from `mockData.js`.
+  - Exposed Actions:
+    * `claimCase(caseId, officerName)`: Updates case status to "In Review", assigns
+      officer, and prepends audit entry.
+    * `applyHumanAction(caseId, { actionType, newRiskLevel, reason, notes, officerName })`:
+      Updates status, overrides risk score, and appends official audit justification.
+
+
+4.2 AUTH CONTEXT (frontend/lib/authContext.js)
+--------------------------------------------------------------------------------
+Provides global authentication and internationalization state:
+  - `user`: Authenticated staff object `{ role: 'counsellor' | 'admin', name: string }`.
+  - `victim`: Citizen session object `{ ticketId: 'SVI-2026-XXXX', name: string }`.
+  - `lang`: Active language selection (`'en'` or `'hi'`).
+  - `toggleLang()`: Switches language and persists choice.
+  - `logout()`: Clears credentials and redirects.
+
+
+4.3 API CLIENT & PROXY LAYER
+--------------------------------------------------------------------------------
+1. `frontend/lib/api.js`:
+   - Axios client instance with 45-second default timeout.
+   - Attaches `Authorization: Bearer <token>` interceptor for staff operations.
+   - `askTherapist(message)`: Calls `/api/ask` route handler.
+   - `searchNearbySupport(location)`: Calls `/api/nearby-support` route handler.
+
+2. Next.js API Route Handler (`frontend/app/api/ask/route.js`):
+   - Server-side Next.js route receiving chat payload.
+   - Forwards request to FastAPI backend (`http://127.0.0.1:5500/ask`).
+   - Prevents CORS issues between browser port 3000 and FastAPI port 5500.
+   - Has built-in fallback returning 200 with crisis hotline numbers if FastAPI
+     is unreachable.
+
+3. Next.js Proxy Rewrite (`frontend/next.config.js`):
+   - Configures URL rewrite rules proxying `/backend-api/:path*` directly to
+     `http://127.0.0.1:5500/:path*` during development.
+
+
+4.4 END-TO-END CHAT MESSAGE LIFECYCLE
+--------------------------------------------------------------------------------
+Step 1: Citizen types or dictates a message into `ChatWidget.js`.
+Step 2: User bubble is instantly appended to the UI; typing indicator starts.
+Step 3: `askTherapist()` dispatches POST request to `/api/ask`.
+Step 4: Next.js route forwards payload to FastAPI `http://127.0.0.1:5500/ask`.
+Step 5: FastAPI validates payload and feeds it into the LangGraph ReAct agent.
+Step 6: ChatGroq LLM evaluates the prompt against Indian crisis criteria:
+        - If suicidal/imminent threat -> calls `emergency_call_tool` (Twilio rings).
+        - If clinical psychology needed -> calls `ask_mental_health_specialist` (MedGemma).
+        - If clinic search requested -> calls `find_nearby_therapists_by_location`.
+Step 7: `parse_response()` extracts text and tool name, returning JSON to Next.js.
+Step 8: Next.js returns response to `ChatWidget.js`.
+Step 9: `ChatWidget.js` renders formatted assistant bubble, plays deliver checkmark,
+        and displays specialized emergency or directory cards if tools were triggered.
+
+
+================================================================================
+5. SECURITY, COMPLIANCE & PRIVACY-BY-DESIGN (DPDP 2023)
+================================================================================
+
+1. Digital Personal Data Protection Act (DPDP 2023) Alignment:
+   - Explicit Granular Consent: Citizens must review and agree to text and voice
+     processing before chat intake begins.
+   - Revocable Consent: Citizens can visit `/consent` anytime to review or withdraw
+     data retention permissions.
+   - Anonymized Citizen Identity: Victims receive pseudo-random ticket identifiers
+     (e.g., SVI-2026-9041) without requiring Aadhaar, phone OTP, or real names.
+
+2. Screen-Sharing & Workplace Redaction:
+   - Case details contain an `Eye`/`EyeOff` toggle that blurs sensitive distress
+     transcripts so triage officers can collaborate without exposing victim details.
+
+3. De-Identified Macro Analytics:
+   - Admin analytics view strips all personal identifiers, displaying only aggregate
+     district statistics, violation distributions, and triage turnaround times.
+
+
+================================================================================
+6. STRENGTHS, GAPS & PRODUCTION ROADMAP
+================================================================================
+
+6.1 CURRENT STRENGTHS
+--------------------------------------------------------------------------------
+- Dual-Model AI Hierarchy: Combines the lightning speed of Groq (120B) for triage
+  with a locally hosted medical model (MedGemma 4B) for clinical guidance.
+- Autonomous Telephony: Capable of triggering automated real-world phone calls via
+  Twilio during imminent crisis.
+- Strict Geographic & Regulatory Alignment: Explicitly built for India's legal
+  and emergency ecosystem (112, NHAA 14566, Tele-MANAS 14416, PoA Act, PCR Act).
+- Resilient Fallback Architecture: Triple-tier safety (LangGraph -> FastAPI catch ->
+  Next.js route catch -> Client UI fallback) guarantees the victim is never stranded.
+- Native Browser API Leverage: Zero-dependency voice recognition, Web Audio synthesis,
+  and PDF print formatting.
+
+6.2 IDENTIFIED GAPS & PRODUCTION ROADMAP
+--------------------------------------------------------------------------------
+1. Database Persistence Layer:
+   - Current State: Cases and audit logs reside in browser `localStorage`.
+   - Production Need: Deploy a relational database (PostgreSQL with SQLAlchemy or
+     Prisma ORM) to persist cases, audit trails, and officer assignments across devices.
+
+2. Comprehensive Backend CRUD Routes:
+   - Current State: FastAPI only has `POST /ask`.
+   - Production Need: Implement REST routes on FastAPI:
+     * `GET /api/cases` (list queue)
+     * `POST /api/cases` (intake from chat)
+     * `PATCH /api/cases/{id}` (human override)
+     * `GET /api/analytics` (aggregated metrics)
+
+3. Cryptographic Authentication & RBAC:
+   - Current State: Role switching is simulated in `authContext.js`.
+   - Production Need: Implement secure JWT bearer authentication with bcrypt password
+     hashing and role-based access control (RBAC).
+
+4. Real Acoustic Emotion Extraction:
+   - Current State: Vocal tremor scores in mock cases are simulated indicators.
+   - Production Need: Stream raw audio (WAV) to a Python service running Librosa
+     or a Hugging Face Speech Emotion Recognition (SER) model to compute live pitch
+     instability and tremor scores.
+
+================================================================================
+  END OF REPORT
+  Smart Victim Intelligence (SVI) — Team Veom Vegas | SIH 2026
+================================================================================

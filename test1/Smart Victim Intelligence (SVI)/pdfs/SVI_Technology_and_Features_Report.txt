@@ -1,0 +1,382 @@
+================================================================================
+  SVI — SMART VICTIM INTELLIGENCE
+  Technology Stack & Feature Inventory Report
+  Ministry of Social Justice & Empowerment | NHAA 14566
+  Generated: 14 September 2026
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 1 — FULL TECHNOLOGY STACK
+────────────────────────────────────────────────────────────────────────────────
+
+  ┌─ FRONTEND FRAMEWORK ───────────────────────────────────────────────────────┐
+  │  • Next.js 16.3.5 (App Router, SSR + SSG, Dynamic Routes)                 │
+  │  • React 18.3.1 (Client Components, Server Components, Hooks)              │
+  │  • React DOM 18.3.1                                                        │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ STYLING ──────────────────────────────────────────────────────────────────┐
+  │  • Tailwind CSS 3.4.17 (Utility-first CSS)                                 │
+  │  • PostCSS 8.5.1 (CSS processing pipeline)                                 │
+  │  • Autoprefixer 10.4.20 (Cross-browser CSS compatibility)                  │
+  │  • Custom CSS @keyframes (svi-msg-in: fade-in + slide-up animation)        │
+  │  • CSS @media print (print-specific layout and hiding rules)               │
+  │  • CSS @media (prefers-reduced-motion) (accessibility: reduced motion)     │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ ICON LIBRARY ─────────────────────────────────────────────────────────────┐
+  │  • Lucide React 0.475.0                                                    │
+  │    Icons used: ArrowLeft, ShieldAlert, AlertTriangle, Eye, EyeOff,        │
+  │    Activity, Mic, Clock, UserCheck, CheckCircle2, FileCheck, HelpCircle,  │
+  │    PhoneCall, Printer, Bell, BellOff, Shield, Phone, ExternalLink,        │
+  │    BarChart3, MessageSquare, Lock, LogOut, RefreshCw, AlertOctagon,       │
+  │    FileText, Send, ShieldCheck                                             │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ BROWSER APIs (No external libraries) ─────────────────────────────────────┐
+  │  • Web Speech API — Bilingual voice recognition (hi-IN, en-IN)             │
+  │    SpeechRecognition / webkitSpeechRecognition                             │
+  │  • Web Audio API — Critical case alert beep (no npm package)              │
+  │    AudioContext / webkitAudioContext, OscillatorNode, GainNode             │
+  │  • window.print() — Native browser Print / Save as PDF                    │
+  │  • localStorage — Consent persistence, alert-toggle preference             │
+  │  • Fetch API / Axios 1.7.9 — Backend API communication                    │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ REACT PATTERNS & HOOKS ───────────────────────────────────────────────────┐
+  │  • useState — UI state (messages, typing, filters, consent, modals)        │
+  │  • useEffect — Side effects (speech, audio events, data fetching)          │
+  │  • useRef — Non-rendering refs (alerted case IDs, interactionflag,        │
+  │             speech recognition instance, scroll anchor)                   │
+  │  • useCallback — Memoised playAlertBeep function                           │
+  │  • useContext — AuthContext (user, lang, victim session)                   │
+  │  • useParams / useRouter — Next.js dynamic routing                         │
+  │  • usePathname — Active route detection in Navbar                          │
+  │  • suppressHydrationWarning — Fix toLocaleTimeString SSR/client mismatch  │
+  │  • React Context API — AuthProvider (global auth + language state)         │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ BACKEND FRAMEWORK ────────────────────────────────────────────────────────┐
+  │  • FastAPI 0.116.1+ (Python REST API, async endpoints)                    │
+  │  • Uvicorn 0.35.0+ (ASGI server, --reload mode for development)           │
+  │  • Python 3.9+ (main runtime)                                              │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ AI / LLM STACK ───────────────────────────────────────────────────────────┐
+  │  • LangChain 0.3.27+ (LLM orchestration framework)                        │
+  │  • LangGraph 0.6.0+ (Stateful AI agent graph architecture)                │
+  │  • LangChain-Groq 0.3.8+ (Groq API integration)                          │
+  │  • LangChain-OpenAI 0.3.28+ (OpenAI-compatible model interface)           │
+  │  • Groq API — Model: openai/gpt-oss-120b (AI stress/trauma assessment)    │
+  │  • Ollama 0.5.1+ (local model support)                                    │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ DATA VALIDATION & BACKEND UTILITIES ──────────────────────────────────────┐
+  │  • Pydantic 2.11.7+ (Request/Response validation)                         │
+  │  • Requests 2.32.4+ (HTTP client for backend tool calls)                  │
+  │  • Twilio 9.7.0+ (Emergency call escalation via telephony)                │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ SEARCH & EXTERNAL DATA ───────────────────────────────────────────────────┐
+  │  • Tavily Search API — Nearby support resource lookup                      │
+  │    (Server-side only via Next.js API route, key never exposed to client)  │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ CONFIGURATION & TOOLING ──────────────────────────────────────────────────┐
+  │  • npm / Node.js — Frontend package management                             │
+  │  • uv / pyproject.toml / uv.lock — Python dependency management           │
+  │  • pip / requirements.txt — Alternative Python install method              │
+  │  • Git — Version control                                                   │
+  │  • GitHub CLI (gh) — Repository creation and push automation               │
+  │  • .gitignore — Protects .env, node_modules, .next, .venv, __pycache__   │
+  │  • .env (local) / .env.local — Secret key storage (never committed)       │
+  │  • os.getenv() — Secure environment variable loading in backend            │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+  ┌─ COMPLIANCE & STANDARDS ───────────────────────────────────────────────────┐
+  │  • DPDP Act (Digital Personal Data Protection) — Consent modal             │
+  │  • GIGW (Guidelines for Indian Government Websites) — UI/A11y compliance  │
+  │  • WCAG Accessibility — ARIA labels, focus-visible, keyboard navigation   │
+  │  • WAI-ARIA — aria-label, aria-expanded, aria-pressed, aria-hidden        │
+  └────────────────────────────────────────────────────────────────────────────┘
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 2 — FULL FEATURE & MODULE INVENTORY
+────────────────────────────────────────────────────────────────────────────────
+
+  ── A. VICTIM CHAT PORTAL  (Route: /) ─────────────────────────────────────
+
+  Feature 1: WhatsApp-Style Chat UI
+    Component : frontend/components/ChatWidget.js
+    Technology: React, Tailwind CSS, Lucide React
+    Details   : Dark green header (#075E54), beige wallpaper (#EFEAE2),
+                user bubbles (#D9FDD3), blue double ticks (✓✓),
+                white AI bubbles, pill-shaped input bar
+
+  Feature 2: Bilingual Voice Input
+    Component : frontend/components/ChatWidget.js
+    Technology: Web Speech API (SpeechRecognition / webkitSpeechRecognition)
+    Languages : Hindi (hi-IN), English (en-IN)
+    Details   : Microphone toggle, interim + final transcript, graceful
+                fallback for unsupported browsers
+
+  Feature 3: New Chat Reset
+    Component : frontend/components/ChatWidget.js
+    Technology: React useState
+    Details   : Resets conversation state without page reload
+
+  Feature 4: Typing Indicator
+    Component : frontend/components/ChatWidget.js
+    Technology: React useState, Tailwind CSS animate-bounce
+    Details   : 3-dot animated bouncing indicator while AI is processing
+
+  Feature 5: Crisis Top Ribbon
+    Component : frontend/app/page.js
+    Technology: React, Tailwind CSS, HTML <a href="tel:">
+    Details   : Direct tap-to-call 112 (Emergency) and 14566 (NHAA)
+
+  Feature 6: Graceful Server Fallback
+    Component : frontend/components/ChatWidget.js
+    Technology: Axios, React useState
+    Details   : Calm fallback message + helpline buttons if backend unavailable
+
+  Feature 7: Chat Bubble Fade-in / Slide-up Animation  [TASK 2 — AUTHORIZED]
+    Files     : frontend/app/globals.css,
+                frontend/components/ChatWidget.js
+    Technology: CSS @keyframes (svi-msg-in), CSS class .svi-msg-animate,
+                CSS @media (prefers-reduced-motion)
+    Details   : Soft 200ms ease-out fade-in + 6px slide-up on each new
+                message bubble; animation disabled for reduced-motion users
+
+  Feature 8: Timestamp Hydration Fix
+    Component : frontend/components/ChatWidget.js
+    Technology: React suppressHydrationWarning, toLocaleTimeString()
+    Details   : Resolves SSR/client locale mismatch (server UTC vs IST)
+
+
+  ── B. PRIVACY, CONSENT & AUTHENTICATION ──────────────────────────────────
+
+  Feature 9: One-Time DPDP Consent Modal
+    Component : frontend/components/ConsentModal.js
+    Technology: React useState, localStorage
+    Details   : First-visit consent modal, persisted to prevent re-prompting
+
+  Feature 10: Consent Management Page
+    Route     : /consent
+    Technology: React, Next.js App Router, localStorage
+    Details   : View, modify, or revoke consent
+
+  Feature 11: 3-Way Login System
+    Route     : /login
+    Component : frontend/lib/authContext.js
+    Technology: React Context API, localStorage
+    Details   : Victim (no OTP, auto Ticket ID), Counsellor, Admin logins
+
+  Feature 12: Victim Profile Page
+    Route     : /profile
+    Technology: React, AuthContext
+    Details   : Ticket number, submitted details, safe logout
+
+
+  ── C. COUNSELLOR PORTAL  (Route: /counsellor) ───────────────────────────
+
+  Feature 13: Real-Time Urgent Triage Banner
+    Component : frontend/app/counsellor/page.js
+    Technology: React useState, Tailwind CSS
+    Details   : Live critical case counter, dismissible alert banner
+
+  Feature 14: Case Queue with 5-Category Filters
+    Component : frontend/components/CaseQueueTable.js
+    Technology: React useState, Tailwind CSS
+    Filters   : Risk Level, Channel, Language, Time Range, Status
+
+  Feature 15: Legal Violation Tags
+    Component : frontend/components/CaseQueueTable.js
+    Technology: React, Tailwind CSS
+    Tags      : PoA Act Sec 3(1)(r), PCR Act Sec 7
+
+  Feature 16: Audio Alert Beep with Toggle  [TASK 3 — AUTHORIZED]
+    Component : frontend/app/counsellor/page.js
+    Technology: Web Audio API (AudioContext, OscillatorNode, GainNode),
+                React useRef, useCallback, useEffect, useState,
+                localStorage (preference persistence),
+                Lucide React (Bell / BellOff icons)
+    Details   : Beep fires only for newly-arriving Critical cases (not on
+                page load); respects browser autoplay policy; user-controlled
+                On/Off toggle with persistent localStorage preference
+
+
+  ── D. CASE DETAIL PAGE  (Route: /counsellor/[caseId]) ──────────────────
+
+  Feature 17: Case Header Card
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React, Tailwind CSS, Lucide React
+    Details   : Case ID, risk badge, status, channel, language, flagged time
+
+  Feature 18: AI Suggested Pathway Card
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React, Tailwind CSS
+    Details   : Non-diagnostic, risk-based action-oriented AI suggestion;
+                always marked "Suggestion Only"
+
+  Feature 19: Contributing Indicators Card
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React, Tailwind CSS
+    Details   : AI-detected stress/trauma indicators with confidence %
+
+  Feature 20: Acoustic / Speech Emotion Indicators (Consent-Gated)
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React conditional rendering (voiceConsented check)
+    Indicators: Vocal Tremor, Pitch Stability, Speech Cadence
+
+  Feature 21: Gated Sensitive Transcript
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React useState (showSensitiveTranscript), Tailwind CSS
+    Details   : Privacy-gated; access logged; not auto-exposed
+
+  Feature 22: Gated Audio Playback
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: HTML5 <audio> element, React conditional (voiceConsented)
+    Details   : Audio only available if voice consent was given;
+                audio element hidden in print output
+
+  Feature 23: Human Override with Mandatory Justification
+    Component : frontend/components/HumanActionForm.js
+    Technology: React useState, React form, Tailwind CSS, Lucide React
+    Actions   : Approve, Override (requires written reason), Escalate
+    Details   : Officer name logged; mandatory justification enforced
+                for overrides; AI decisions remain reversible
+
+  Feature 24: Officer Audit Trail
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: React, Tailwind CSS, lib/caseStore.js (Zustand-style store)
+    Details   : Timestamped log of all officer actions per case
+
+  Feature 25: Print / Download Case Summary  [TASK 1 — AUTHORIZED]
+    Component : frontend/app/counsellor/[caseId]/page.js
+    Technology: window.print() (browser-native, no PDF library),
+                CSS @media print, Tailwind CSS print: variants,
+                Lucide React Printer icon,
+                React dangerouslySetInnerHTML (inline print CSS)
+    Details   : Button triggers native browser print dialog / Save as PDF;
+                hides navbar, footer, interactive controls, print button
+                itself, audio player, transcript toggle, HumanActionForm;
+                reveals print-only official case summary header;
+                transcript max-height removed in print for full visibility;
+                privacy gates remain fully intact
+
+
+  ── E. ADMIN DASHBOARD  (Route: /admin) ──────────────────────────────────
+
+  Feature 26: KPI Cards
+    Component : frontend/app/admin/page.js
+    Technology: React, Tailwind CSS
+    KPIs      : Total Cases, Latency, High Risk %, Override Rate,
+                Resolution Rate
+
+  Feature 27: Visual Analytics
+    Component : frontend/components/AnalyticsCharts.js
+    Technology: React, Tailwind CSS
+    Charts    : Risk Distribution, Channel Intake, Language Breakdown,
+                Weekly Trends
+
+  Feature 28: Anonymised CSV Export
+    Component : frontend/components/AnalyticsCharts.js
+    Technology: JavaScript Blob API, URL.createObjectURL()
+    Details   : Compliance dataset download; no PII exposed
+
+
+  ── F. GLOBAL / LAYOUT FEATURES ──────────────────────────────────────────
+
+  Feature 29: MoSJE Tricolor Government Strip
+    Component : frontend/components/Navbar.js
+    Technology: Tailwind CSS gradient (#FF9933 → white → #138808)
+
+  Feature 30: Emergency Helpline Badges (Header + Footer)
+    Component : frontend/components/Navbar.js, frontend/app/layout.js
+    Technology: HTML <a href="tel:">, Tailwind CSS
+    Numbers   : 14566 (NHAA), 14416 (Tele-MANAS), 112 (Emergency)
+
+  Feature 31: Bilingual Language Switcher (EN / हिन्दी)
+    Component : frontend/components/LanguageSwitcher.js
+    Technology: React, AuthContext, lib/translations.js
+    Details   : Works across all relevant pages; translation key lookup
+
+  Feature 32: Accessibility
+    Component : All components
+    Technology: ARIA (aria-label, aria-expanded, aria-pressed, aria-hidden),
+                Tailwind focus:ring-2, semantic HTML (h1-h3, nav, button),
+                WCAG focus-visible outline styles in globals.css
+
+  Feature 33: Nearby Support Modal
+    Component : frontend/components/NearbySupportModal.js
+    Technology: React, Tailwind CSS, Next.js API route (/api/nearby-support),
+                Tavily Search API (server-side)
+
+  Feature 34: Backend AI Agent
+    Files     : backend/ai_agent.py, main.py, backend/config.py
+    Technology: FastAPI, LangGraph, LangChain, LangChain-Groq,
+                Groq API (openai/gpt-oss-120b), Pydantic, Uvicorn,
+                os.getenv() for secure key loading from .env
+
+  Feature 35: Emergency Call Tool
+    Files     : backend/tools.py
+    Technology: Twilio SDK (twilio 9.7.0+)
+    Details   : Triggered by AI agent for critical escalation;
+                calls pre-configured emergency contact
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 3 — AUTHORIZED TASKS SUMMARY
+────────────────────────────────────────────────────────────────────────────────
+
+  TASK 1 — Print / Download Case Summary
+    Route    : /counsellor/[caseId]
+    File     : frontend/app/counsellor/[caseId]/page.js
+    Tech     : window.print(), CSS @media print, Tailwind print: variants,
+               Lucide Printer icon, dangerouslySetInnerHTML (inline CSS)
+    Scope    : Additive only — no backend, no npm, no redesign
+
+  TASK 2 — Subtle Message Animations
+    Files    : frontend/app/globals.css,
+               frontend/components/ChatWidget.js
+    Tech     : CSS @keyframes (svi-msg-in), .svi-msg-animate class,
+               @media (prefers-reduced-motion)
+    Scope    : Additive only — 1 CSS class added to existing bubble wrapper
+
+  TASK 3 — Audio Alert Beep with Toggle
+    File     : frontend/app/counsellor/page.js
+    Tech     : Web Audio API (AudioContext, OscillatorNode, GainNode),
+               React useRef, useCallback, useEffect, useState,
+               localStorage, Lucide Bell / BellOff icons
+    Scope    : Additive only — no npm, no backend, no redesign
+
+  BUGFIX — Hydration Error (Timestamp Mismatch)
+    File     : frontend/components/ChatWidget.js (line 466)
+    Tech     : React suppressHydrationWarning prop
+    Cause    : toLocaleTimeString() produced UTC time on server, IST on client
+    Fix      : suppressHydrationWarning on timestamp <span> — 1 attribute added
+
+
+────────────────────────────────────────────────────────────────────────────────
+SECTION 4 — PROJECT REPOSITORY
+────────────────────────────────────────────────────────────────────────────────
+
+  GitHub  : https://github.com/harshbaria2521/smart-victim-intelligence-svi
+  Branch  : main
+  Pushed  : 14 September 2026
+
+  Protected from commit:
+    • .env / .env.local (API keys)
+    • frontend/node_modules/
+    • frontend/.next/ (build output)
+    • .venv/ (Python virtual environment)
+    • __pycache__/
+    • .DS_Store
+
+================================================================================
+  END OF REPORT
+  SVI — Smart Victim Intelligence | NHAA 14566
+  Ministry of Social Justice & Empowerment, Government of India
+================================================================================
