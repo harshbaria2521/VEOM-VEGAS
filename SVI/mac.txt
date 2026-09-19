@@ -12,3 +12,7 @@ python3 -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
 cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/SVI/frontend"
 npm run dev
 
+
+
+
+hellooo
