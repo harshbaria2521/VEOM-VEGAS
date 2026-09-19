@@ -321,6 +321,26 @@ with st.sidebar:
         st.session_state.chat_history = []
         st.rerun()
 
+    lang_options = [
+        ("English", "en", "English"),
+        ("Hindi (हिन्दी)", "hi", "हिन्दी"),
+        ("Marathi (मराठी)", "mr", "मराठी"),
+        ("Gujarati (ગુજરાતી)", "gu", "ગુજરાતી"),
+        ("Tamil (தமிழ்)", "ta", "தமிழ்"),
+        ("Bengali (বাংলা)", "bn", "বাংলা"),
+        ("Telugu (తెలుగు)", "te", "తెలుగు"),
+        ("Kannada (ಕನ್ನಡ)", "kn", "ಕನ್ನಡ"),
+        ("Malayalam (മലയാളം)", "ml", "മലയാളം"),
+        ("Punjabi (ਪੰਜਾਬੀ)", "pa", "ਪੰਜਾਬੀ"),
+    ]
+    selected_lang_idx = st.selectbox(
+        "Language / भाषा चुनें",
+        range(len(lang_options)),
+        format_func=lambda i: lang_options[i][0],
+        key="sf_lang"
+    )
+    chosen_lang_name, chosen_lang_code, chosen_native_name = lang_options[selected_lang_idx]
+
     st.markdown(
         """
         <div class="sf-side-block">
@@ -427,7 +447,16 @@ if user_input:
 
     with st.spinner("SVI is taking a moment..."):
         try:
-            resp = requests.post(BACKEND_URL, json={"message": user_input}, timeout=30)
+            resp = requests.post(
+                BACKEND_URL,
+                json={
+                    "message": user_input,
+                    "language": chosen_lang_name.split(" ")[0],
+                    "lang_code": chosen_lang_code,
+                    "native_name": chosen_native_name,
+                },
+                timeout=30,
+            )
             resp.raise_for_status()
             data = resp.json()
             reply = (

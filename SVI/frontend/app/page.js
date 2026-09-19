@@ -59,9 +59,9 @@ export default function HomePage() {
             {t.portalTitle}
           </h1>
           <p className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-            {lang === 'hi'
+            {t.portalDescription || (lang === 'hi'
               ? "यदि आप या आपका कोई परिचित किसी भेदभाव, उत्पीड़न या संकट का सामना कर रहा है, तो SVI आपको तत्काल मनोवैज्ञानिक सहायता और उचित अधिकारियों से जोड़ने में मदद करता है।"
-              : "A dedicated, confidential support channel providing real-time emotional triage, legal aid connection, and trauma-informed care for victims."}
+              : "A dedicated, confidential support channel providing real-time emotional triage, legal aid connection, and trauma-informed care for victims.")}
           </p>
         </div>
 

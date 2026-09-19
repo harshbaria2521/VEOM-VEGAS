@@ -1,7 +1,20 @@
+# Environment credentials
+.env
+.env*.local
+*.env
+
+# Dependencies & Build artifacts
 node_modules/
+.next/
 .venv/
-.venv.zip
-.DS_Store
 __pycache__/
 *.pyc
-.env
+*.pyo
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Archives
+*.zip

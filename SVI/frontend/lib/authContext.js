@@ -23,6 +23,11 @@ export function AuthProvider({ children }) {
       }
       if (storedLang) {
         setLang(storedLang);
+        if (typeof document !== 'undefined') {
+          const isRtl = ['ur', 'sd', 'ks'].includes(storedLang);
+          document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+          document.documentElement.lang = storedLang;
+        }
       }
     } catch (err) {
       console.warn('Could not read auth/lang from storage', err);
@@ -30,6 +35,14 @@ export function AuthProvider({ children }) {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const isRtl = ['ur', 'sd', 'ks'].includes(lang);
+      document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+      document.documentElement.lang = lang;
+    }
+  }, [lang]);
 
   const loginStaff = (role = 'counsellor', officerName = 'Officer Sharma (ID: 4120)') => {
     const newUser = {
@@ -94,6 +107,7 @@ export function AuthProvider({ children }) {
         logoutVictim,
         lang,
         changeLanguage,
+        isRtl: ['ur', 'sd', 'ks'].includes(lang),
         isLoading,
       }}
     >

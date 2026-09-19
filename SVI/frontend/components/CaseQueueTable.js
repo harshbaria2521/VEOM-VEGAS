@@ -46,6 +46,9 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
       } else if (timeRangeFilter === 'today') {
         const isToday = flagged.includes('min') || flagged.includes('sec') || flagged.includes('hour') || flagged.includes('today');
         if (!isToday) return false;
+      } else if (timeRangeFilter === 'week') {
+        const isWeek = flagged.includes('min') || flagged.includes('sec') || flagged.includes('hour') || flagged.includes('today') || flagged.includes('yesterday') || flagged.includes('day') || (flagged.includes('week') && (flagged.includes('1 week') || flagged.includes('this week')));
+        if (!isWeek) return false;
       }
     }
 

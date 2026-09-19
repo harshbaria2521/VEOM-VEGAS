@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-// In browser during local dev, use relative /backend-api rewrite to avoid CORS.
-// In SSR or production, fall back to NEXT_PUBLIC_API_BASE_URL.
+// In browser, use relative paths so Next.js API routes and /backend-api rewrites work seamlessly.
+// In SSR or node environment, fall back to NEXT_PUBLIC_API_BASE_URL.
 const BASE_URL = typeof window !== 'undefined'
-  ? '/backend-api'
+  ? ''
   : (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5500');
 
 export const apiClient = axios.create({
@@ -35,11 +35,18 @@ apiClient.interceptors.request.use((config) => {
 /**
  * Send victim message to FastAPI backend (/ask endpoint)
  * @param {string} message - User query or distress statement
+ * @param {object} languageMeta - Selected language details { language, languageCode, nativeName }
  * @returns {Promise<{response: string, tool_called: string}>}
  */
-export async function askTherapist(message) {
+export async function askTherapist(message, languageMeta = {}) {
   try {
-    const response = await axios.post('/api/ask', { message }, { timeout: 60000 });
+    const payload = {
+      message,
+      language: languageMeta?.language || 'English',
+      lang_code: languageMeta?.languageCode || 'en',
+      native_name: languageMeta?.nativeName || 'English'
+    };
+    const response = await apiClient.post('/api/ask', payload, { timeout: 60000 });
     return response.data;
   } catch (error) {
     console.error('SVI API Error:', error);
@@ -56,7 +63,7 @@ export async function askTherapist(message) {
  */
 export async function searchNearbySupport(location) {
   try {
-    const response = await axios.get('/api/nearby-support', {
+    const response = await apiClient.get('/api/nearby-support', {
       params: { location },
     });
     return response.data;

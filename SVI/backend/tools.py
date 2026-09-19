@@ -44,7 +44,7 @@ def query_medgemma(prompt: str) -> str:
         )
         return response["message"]["content"].strip()
     except Exception:
-        return f"I'm having technical difficulties, but I want you to know your feelings matter. Please try again shortly."
+        return "I'm having technical difficulties, but I want you to know your feelings matter. Please try again shortly."
 
 
 # Step2: Setup Twilio calling API tool

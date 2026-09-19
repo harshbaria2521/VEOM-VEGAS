@@ -138,6 +138,11 @@ export default function CounsellorDashboardPage() {
                 <span className="bg-red-200 dark:bg-red-900 text-red-900 dark:text-red-100 text-[10px] px-2 py-0.5 rounded-full font-extrabold">
                   {criticalCount} Critical • {highCount} High Priority
                 </span>
+                {newCriticalAlertCount > 0 && (
+                  <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
+                    {newCriticalAlertCount} New Unassigned
+                  </span>
+                )}
               </span>
               <p className="text-xs text-red-800 dark:text-red-300 font-medium mt-0.5">
                 Immediate officer review required for severe trauma / atrocity flagged cases.

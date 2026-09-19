@@ -48,7 +48,7 @@ def find_nearby_therapists_by_location(location: str) -> str:
         str: Therapist names and experience, followed by the Docvita booking link.
     """
     return (
-        f"Here are some best therapists {location}, {location}:\n"
+        f"Here are some best therapists near {location}:\n"
         "- Ms Dhannya Ittymathew - 15+ year experience\n"
         "- Ms Anshika Mendiratta - 4+ year experience\n"
         "- Ms Neha Kumar - 4+ year experience\n\n"
@@ -59,14 +59,14 @@ def find_nearby_therapists_by_location(location: str) -> str:
 # Step1: Create an AI Agent & Link to backend
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
-from .config import GROQ_API_KEY
+from .config import GROQ_API_KEY, GROQ_MODEL
 
 tools = [
     ask_mental_health_specialist,
     emergency_call_tool,
     find_nearby_therapists_by_location,
 ]
-llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, api_key=GROQ_API_KEY)
+llm = ChatGroq(model=GROQ_MODEL, temperature=0.2, api_key=GROQ_API_KEY)
 graph = create_react_agent(llm, tools=tools)
 
 SYSTEM_PROMPT = """

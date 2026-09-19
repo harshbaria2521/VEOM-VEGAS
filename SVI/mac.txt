@@ -1,0 +1,14 @@
+# 1️⃣ Navigate to Project Root
+cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/SVI"
+
+# 2️⃣ Activate virtual environment
+source .venv/bin/activate
+
+# 3️⃣ Run the backend (FastAPI)
+python3 -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
+
+# ----------------------------------------------------
+# 4️⃣ Run the frontend (Next.js) in a second terminal:
+cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/SVI/frontend"
+npm run dev
+

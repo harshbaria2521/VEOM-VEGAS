@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { askTherapist } from '../lib/api';
 import { useAuth } from '../lib/authContext';
-import { translations } from '../lib/translations';
+import { translations, supportedLanguages, getSpeechRecognitionLang } from '../lib/translations';
 import NearbySupportModal from './NearbySupportModal';
 import { Send, PhoneCall, HeartHandshake, MapPin, Mic, MicOff, AlertTriangle, ShieldCheck, UserCheck, RotateCcw } from 'lucide-react';
 
@@ -145,18 +145,30 @@ export default function ChatWidget() {
   const { lang, victim } = useAuth();
   const t = translations[lang] || translations.en;
 
-  const getInitialGreeting = () => [
+  const getInitialGreeting = useCallback(() => [
     {
       id: 1,
       sender: 'assistant',
-      text: lang === 'hi' 
+      text: t.initialGreeting || (lang === 'hi' 
         ? "नमस्ते। यह राष्ट्रीय अत्याचार विरोधी हेल्पलाइन (NHAA 14566) का सुरक्षित एवं गोपनीय सहायता केंद्र है। आप अपनी समस्या बिना किसी हिचकिचाहट के साझा कर सकते हैं। हम आपकी सहायता के लिए उपस्थित हैं।"
-        : "Welcome to the National Helpline Against Atrocities (NHAA 14566) confidential support portal. Please feel free to share what is on your mind. We are here to listen and help you navigate safety and support.",
+        : "Welcome to the National Helpline Against Atrocities (NHAA 14566) confidential support portal. Please feel free to share what is on your mind. We are here to listen and help you navigate safety and support."),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
-  ];
+  ], [lang, t.initialGreeting]);
 
-  const [messages, setMessages] = useState(getInitialGreeting());
+  const [messages, setMessages] = useState(getInitialGreeting);
+
+  // Dynamically update greeting when language changes if no user messages sent yet
+  useEffect(() => {
+    setMessages((prev) => {
+      const hasUserMessage = prev.some((m) => m.sender === 'user');
+      if (!hasUserMessage) {
+        return getInitialGreeting();
+      }
+      return prev;
+    });
+  }, [lang, t.initialGreeting]);
+
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -203,9 +215,19 @@ export default function ChatWidget() {
     setInputMessage('');
     setIsTyping(true);
 
+    const currentLangObj = supportedLanguages.find((l) => l.code === lang) || {
+      name: 'English',
+      nativeName: 'English',
+      code: 'en',
+    };
+
     try {
-      // Call FastAPI backend /ask endpoint
-      const result = await askTherapist(trimmed);
+      // Call FastAPI backend /ask endpoint with user selected language
+      const result = await askTherapist(trimmed, {
+        language: currentLangObj.name,
+        languageCode: currentLangObj.code,
+        nativeName: currentLangObj.nativeName,
+      });
       
       const replyMsg = {
         id: Date.now() + 1,
@@ -224,9 +246,9 @@ export default function ChatWidget() {
           id: Date.now() + 1,
           sender: 'assistant',
           isFallback: true,
-          text: lang === 'hi'
+          text: t.networkError || (lang === 'hi'
             ? "हमें आपसे कनेक्ट करने में थोड़ा समय लग रहा है। सहायता के लिए आप सीधे हमारी 24x7 राष्ट्रीय हेल्पलाइन 14566 या आपातकालीन 112 पर तुरंत कॉल कर सकते हैं।"
-            : "We are experiencing a temporary network delay. For immediate confidential support, please call our 24x7 toll-free helpline 14566 or emergency 112 directly.",
+            : "We are experiencing a temporary network delay. For immediate confidential support, please call our 24x7 toll-free helpline 14566 or emergency 112 directly."),
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }
       ]);
@@ -240,9 +262,9 @@ export default function ChatWidget() {
     const escalationMsg = {
       id: Date.now(),
       sender: 'assistant',
-      text: lang === 'hi'
+      text: t.humanEscalationMsg || (lang === 'hi'
         ? "हमने आपके अनुरोध को प्राथमिकता पर दर्ज कर लिया है। आप तुरंत हमारे प्रशिक्षित अधिकारी से 14566 पर बात कर सकते हैं, या निकटतम सहायता केंद्र की जानकारी ले सकते हैं।"
-        : "A human counsellor connection has been initiated. For immediate 1-on-1 voice assistance, please call our 24x7 toll-free helpline 14566, or select a nearby support center below.",
+        : "A human counsellor connection has been initiated. For immediate 1-on-1 voice assistance, please call our 24x7 toll-free helpline 14566, or select a nearby support center below."),
       isEscalation: true,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
@@ -265,16 +287,28 @@ export default function ChatWidget() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert(
-        lang === 'hi'
+        t.speechNotSupported ||
+        (lang === 'hi'
           ? 'आपके ब्राउज़र में वॉइस रिकग्निशन समर्थित नहीं है। कृपया क्रोम या एज ब्राउज़र का उपयोग करें।'
-          : 'Speech recognition is not supported in your browser. Please use Chrome or Edge.'
+          : 'Speech recognition is not supported in your browser. Please use Chrome or Edge.')
+      );
+      return;
+    }
+
+    const speechCode = getSpeechRecognitionLang(lang);
+    if (!speechCode) {
+      alert(
+        t.speechLangUnavailable ||
+        (lang === 'hi'
+          ? 'इस भाषा के लिए वर्तमान में वॉइस रिकग्निशन समर्थित नहीं है। कृपया चैट बॉक्स में संदेश टाइप करें।'
+          : 'Voice input is not currently supported for this language. Please type your message in the chat box.')
       );
       return;
     }
 
     try {
       const recognition = new SpeechRecognition();
-      recognition.lang = lang === 'hi' ? 'hi-IN' : 'en-IN';
+      recognition.lang = speechCode;
       recognition.continuous = false;
       recognition.interimResults = true;
 
@@ -335,12 +369,12 @@ export default function ChatWidget() {
           <button
             type="button"
             onClick={handleNewChat}
-            aria-label={lang === 'hi' ? 'नई चैट प्रारंभ करें' : 'Start Fresh Chat Session'}
-            title={lang === 'hi' ? 'नई चैट प्रारंभ करें' : 'Start Fresh Chat Session'}
+            aria-label={t.newChatAria || (lang === 'hi' ? 'नई चैट प्रारंभ करें' : 'Start Fresh Chat Session')}
+            title={t.newChatAria || (lang === 'hi' ? 'नई चैट प्रारंभ करें' : 'Start Fresh Chat Session')}
             className="flex items-center gap-1 text-xs bg-white/10 hover:bg-white/20 text-white font-medium px-2.5 py-1.5 rounded-full transition-colors border border-white/20 focus:ring-2 focus:ring-white"
           >
             <RotateCcw className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
-            <span className="hidden sm:inline">{lang === 'hi' ? 'नई चैट' : 'New Chat'}</span>
+            <span className="hidden sm:inline">{t.newChat || (lang === 'hi' ? 'नई चैट' : 'New Chat')}</span>
           </button>
           <button
             type="button"
@@ -390,6 +424,7 @@ export default function ChatWidget() {
 
       {/* WhatsApp Chat Body */}
       <div
+        dir="ltr"
         className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 bg-[#EFEAE2] dark:bg-[#0b141a] text-slate-400 dark:text-slate-600 transition-colors"
         style={{
           backgroundImage: 'radial-gradient(currentColor 0.75px, transparent 0.75px)',
@@ -402,6 +437,7 @@ export default function ChatWidget() {
             className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} svi-msg-animate`}
           >
             <div
+              dir="auto"
               className={`max-w-[85%] sm:max-w-[75%] p-3 text-xs sm:text-sm leading-relaxed shadow-xs ${
                 msg.sender === 'user'
                   ? 'bg-[#D9FDD3] dark:bg-[#005c4b] text-[#111B21] dark:text-emerald-50 rounded-2xl rounded-tr-xs'

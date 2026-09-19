@@ -29,10 +29,17 @@ export function saveStoredCases(cases) {
 }
 
 export function useCaseStore() {
-  const [cases, setCases] = useState(initialCases);
+  const [cases, setCases] = useState(() => getStoredCases());
 
   useEffect(() => {
     setCases(getStoredCases());
+    const handleStorage = (e) => {
+      if (e.key === STORAGE_KEY) {
+        setCases(getStoredCases());
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   const claimCase = (caseId, officerName = 'Officer Sharma') => {
