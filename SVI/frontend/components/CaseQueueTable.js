@@ -221,8 +221,8 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
         </div>
       </div>
 
-      {/* Case Table */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+      {/* Case Table (Desktop & Tablet) */}
+      <div className="hidden md:block bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-gov-cream dark:bg-slate-800/90 border-b border-gov-border dark:border-slate-700 text-gov-navy dark:text-slate-200 font-bold text-xs uppercase tracking-wider">
@@ -345,6 +345,104 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
 
         {sortedCases.length === 0 && (
           <div className="py-12 text-center text-gov-textMuted text-xs">
+            No cases match the selected filter criteria.
+          </div>
+        )}
+      </div>
+
+      {/* Mobile Case Cards (Mobile Screens < md) */}
+      <div className="md:hidden space-y-3">
+        {sortedCases.map((c) => (
+          <div
+            key={`mob-${c.id}`}
+            className={`p-4 rounded-xl border shadow-xs transition-colors bg-white dark:bg-slate-900 ${
+              c.riskLevel === 'Critical'
+                ? 'border-red-300 dark:border-red-900/80 bg-red-50/30 dark:bg-red-950/20'
+                : 'border-gov-border dark:border-slate-800'
+            }`}
+          >
+            {/* Header: ID, Risk, Status */}
+            <div className="flex items-start justify-between gap-2 mb-2.5">
+              <div>
+                <span className="font-mono font-bold text-xs text-gov-navy dark:text-slate-100 block">
+                  {c.id}
+                </span>
+                <div className="flex items-center gap-1.5 text-[11px] text-gov-textMuted dark:text-slate-400 mt-0.5">
+                  <Clock className="w-3 h-3 text-slate-400" />
+                  <span>{c.flaggedAt}</span>
+                  <span>•</span>
+                  <span>{c.language}</span>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                {getRiskBadge(c.riskLevel, c.riskScore)}
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                    c.status === 'New'
+                      ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                      : c.status === 'In Review'
+                      ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
+                      : c.status === 'Escalated'
+                      ? 'bg-red-50 dark:bg-red-950/60 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800'
+                      : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
+                  }`}
+                >
+                  {c.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Channel & Violation Tags */}
+            <div className="space-y-1.5 py-2 border-t border-b border-gov-border/60 dark:border-slate-800 my-2.5">
+              <div className="flex items-center gap-1.5 text-xs text-gov-textMain dark:text-slate-300">
+                {getChannelIcon(c.channel)}
+                <span className="font-medium">{c.channel}</span>
+              </div>
+              {Array.isArray(c.violationTags) && c.violationTags.length > 0 && (
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {c.violationTags.map((tag, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-block text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-between gap-2 pt-1">
+              <div>
+                {c.assignedTo ? (
+                  <span className="text-xs font-semibold text-gov-navy dark:text-slate-200 flex items-center gap-1">
+                    <User className="w-3.5 h-3.5 text-gov-teal dark:text-teal-400" />
+                    <span className="truncate max-w-[120px]">{c.assignedTo}</span>
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => onClaimCase(c.id, user?.name || 'Officer Sharma')}
+                    className="text-xs bg-gov-tealSoft dark:bg-teal-950/60 hover:bg-gov-teal hover:text-white text-gov-teal dark:text-teal-300 border border-gov-teal/30 dark:border-teal-700 px-3 py-1.5 rounded-lg font-bold transition-colors min-h-[36px]"
+                  >
+                    {t.claimCase}
+                  </button>
+                )}
+              </div>
+
+              <Link
+                href={`/counsellor/${c.id}`}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gov-navy dark:bg-teal-800 hover:bg-gov-teal dark:hover:bg-teal-700 text-white text-xs font-bold rounded-lg shadow-sm active:scale-95 transition-all min-h-[36px]"
+              >
+                <span>{t.viewDetails}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        ))}
+
+        {sortedCases.length === 0 && (
+          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 text-gov-textMuted text-xs">
             No cases match the selected filter criteria.
           </div>
         )}

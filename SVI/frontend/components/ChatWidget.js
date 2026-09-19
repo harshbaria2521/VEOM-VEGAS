@@ -341,7 +341,7 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="flex flex-col h-[78vh] sm:h-[82vh] bg-white dark:bg-[#111b21] rounded-2xl shadow-xl border border-gov-border dark:border-slate-800 overflow-hidden transition-colors">
+    <div className="flex flex-col h-[calc(100dvh-180px)] sm:h-[82vh] min-h-[460px] bg-white dark:bg-[#111b21] rounded-2xl shadow-xl border border-gov-border dark:border-slate-800 overflow-hidden transition-colors">
       {/* WhatsApp Style Top Chat Bar */}
       <div className="bg-[#075E54] dark:bg-[#064e46] text-white p-3.5 sm:px-6 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
@@ -531,7 +531,7 @@ export default function ChatWidget() {
             onClick={toggleVoice}
             aria-label={isRecording ? t.voiceInputListening : t.voiceInputStart}
             title={isRecording ? t.voiceInputListening : t.voiceInputStart}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-xs focus:ring-2 focus:ring-[#008069] ${
+            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all shadow-xs focus:ring-2 focus:ring-[#008069] flex-shrink-0 ${
               isRecording
                 ? 'bg-red-500 text-white animate-pulse'
                 : 'bg-white dark:bg-[#2a3942] text-[#54656F] dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#32444f] border border-slate-300 dark:border-slate-700'
@@ -547,7 +547,7 @@ export default function ChatWidget() {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder={isRecording ? t.voiceInputListening : t.chatPlaceholder}
-            className="flex-1 bg-white dark:bg-[#2a3942] border border-slate-300 dark:border-slate-700 rounded-full px-5 py-2.5 text-xs sm:text-sm text-[#111B21] dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#008069] shadow-xs transition-all"
+            className="flex-1 bg-white dark:bg-[#2a3942] border border-slate-300 dark:border-slate-700 rounded-full px-4 sm:px-5 py-2.5 sm:py-2.5 text-sm text-[#111B21] dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#008069] shadow-xs transition-all"
           />
 
           {/* Send Button */}
@@ -555,7 +555,7 @@ export default function ChatWidget() {
             type="submit"
             aria-label="Send message"
             disabled={!inputMessage.trim() || isTyping}
-            className="w-10 h-10 rounded-full bg-[#008069] hover:bg-[#075E54] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm flex-shrink-0 focus:ring-2 focus:ring-[#075E54]"
+            className="w-11 h-11 rounded-full bg-[#008069] hover:bg-[#075E54] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm flex-shrink-0 focus:ring-2 focus:ring-[#075E54]"
           >
             <Send className="w-4 h-4 ml-0.5" aria-hidden="true" />
           </button>
