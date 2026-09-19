@@ -1,0 +1,59 @@
+{
+  "name": "Smart Victim Intelligence",
+  "short_name": "SVI",
+  "description": "AI-Based Real-Time Stress & Trauma Assessment Module for National Helpline Against Atrocities (14566), Ministry of Social Justice & Empowerment, Government of India.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FAF8F5",
+  "theme_color": "#0B2545",
+  "lang": "en",
+  "categories": [
+    "government",
+    "health",
+    "social"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Emergency Support",
+      "short_name": "Emergency",
+      "description": "Call National Helpline Against Atrocities 14566",
+      "url": "tel:14566",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Consent Settings",
+      "short_name": "Consent",
+      "description": "Manage your DPDP data and AI consent",
+      "url": "/consent",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

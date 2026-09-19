@@ -15,4 +15,7 @@ npm run dev
 
 
 
-hellooo
+git add .
+git commit -m "Describe what you changed here"
+
+git push origin main
