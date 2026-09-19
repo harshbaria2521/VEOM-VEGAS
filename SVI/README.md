@@ -1,62 +1,52 @@
-# 🛡️ SVI (Smart Victim Intelligence) — SafeSpace AI
+AI Mental Health Therapist – SafeSpace
 
-An AI-driven grievance redressal, trauma-informed assessment, and emergency escalation platform supporting the National Helpline Against Atrocities (NHAA 14566) initiative.
+Your compassionate AI companion for emotional support, built with care and real-world tools. SafeSpace listens, understands, and responds with empathy — and knows when to escalate to emergency help.
 
----
+Equipped with an AI agent architecture, specialist healthcare models (MedGemma), and life-saving tools like emergency calling via Twilio, SafeSpace is designed to support mental well-being — safely and responsibly.
 
-## 🌟 Features
+🚀 Quick Start
 
-- **Empathetic AI Conversational Agent:** Powered by LangChain, LangGraph, and Groq high-speed LLM inference (`openai/gpt-oss-120b`).
-- **Emergency Helpline Escalation:** Automatic protocol escalation with Twilio telephony integration and 112 / Tele-MANAS (14416) safety recommendations.
-- **Multilingual Support:** English, Hindi (हिंदी), Gujarati (ગુજરાતી), Marathi (मराठी), and more.
-- **Nearby Support Service Discovery:** Live search for verified local NGOs, trauma counsellors, and legal aid cells via Tavily.
-- **Counsellor Triage Dashboard:** Real-time queue, risk prioritization (Critical, High, Moderate, Low), audio signal analysis, and case claim audit trails.
+Clone the repo and run:
 
----
+```
+git clone https://github.com/harshbaria2521/VEOM-VEGAS
+```
 
-## 🚀 Quick Start
 
-### 1. Prerequisites
-- Python 3.9+
-- Node.js 18+ and npm
+Start the backend in one terminal:
 
-### 2. Backend Setup
-```bash
-# Navigate to SVI directory
-cd SVI
+# 1. Navigate
 
-# Create and activate virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+cd "xyz\VEOM VEGAS\test1\Smart Victim Intelligence (SVI)\safespace-ai-therapist"
 
-# Install dependencies
+# 2. Create virtual environment
+
+python -m venv .venv
+
+# 3. Activate it
+
+.venv\Scripts\Activate.ps1
+
+# 4. Install dependencies
+
+python -m pip install --upgrade pip
+
 pip install -r requirements.txt
 
-# Configure environment
-cp .env.example .env
-# Edit .env and add your GROQ_API_KEY
+# 5. Run backend
 
-# Start backend server (Port 5500)
-python3 -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
-```
+python -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
 
-### 3. Frontend Setup
-```bash
-# In a new terminal, navigate to the frontend directory
-cd SVI/frontend
+Start the  frontend in a second terminal:
 
-# Install dependencies
-npm install
+# 1. Navigate
+cd "C:\Users\Rahul\Desktop\VEOM VEGAS\test1\Smart Victim Intelligence (SVI)\safespace-ai-therapist\frontend"
 
-# Configure environment
-cp .env.example .env.local
-# Add your TAVILY_API_KEY in .env.local
-
-# Start Next.js development server (Port 3000)
+# 2. Run
 npm run dev
-```
 
-### 4. Access the Applications
-- **Victim Support Portal & Chat:** [http://localhost:3000](http://localhost:3000)
-- **Counsellor Triage Dashboard:** [http://localhost:3000/counsellor](http://localhost:3000/counsellor)
-- **FastAPI Interactive API Docs:** [http://127.0.0.1:5500/docs](http://127.0.0.1:5500/docs)
+That’s it. This command:
+
+Creates a virtual environment (if needed)
+Installs all dependencies from uv.lock
+Sets up the full environment exactly as intended

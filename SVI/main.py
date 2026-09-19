@@ -48,7 +48,7 @@ async def ask(query: Query):
             enhanced_system_prompt = SYSTEM_PROMPT + multilingual_rule
 
         inputs = {"messages": [("system", enhanced_system_prompt), ("user", query.message)]}
-        stream = graph.stream(inputs, stream_mode="updates")
+        stream = graph.stream(inputs, stream_mode="updates", config={"recursion_limit": 6})
         tool_called_name, final_response = parse_response(stream)
         if not final_response:
             if lang_code == "hi":
@@ -100,4 +100,4 @@ async def ask(query: Query):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=5500, reload=True)
+    uvicorn.run("main:app", host="127.0.0.1", port=5500, reload=True)

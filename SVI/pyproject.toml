@@ -19,3 +19,7 @@ dependencies = [
     "twilio>=9.7.0",
     "uvicorn>=0.35.0",
 ]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

@@ -35,32 +35,8 @@ export default function NearbySupportModal({ isOpen, onClose }) {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        try {
-          const { latitude, longitude } = pos.coords;
-          let detectedCity = 'Local Support Centers';
-          try {
-            const geoRes = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            if (geoRes.ok) {
-              const geoData = await geoRes.json();
-              detectedCity =
-                geoData.address?.city ||
-                geoData.address?.town ||
-                geoData.address?.district ||
-                geoData.address?.state_district ||
-                geoData.address?.state ||
-                'Local Support Centers';
-              setLocationInput(detectedCity);
-            }
-          } catch (geoErr) {
-            console.warn('Reverse geocoding fallback:', geoErr);
-          }
-          await handleSearch(detectedCity);
-        } catch (err) {
-          console.error(err);
-          setLoading(false);
-        }
+        // Use generic coords or default city search
+        handleSearch('Local Support Centers');
       },
       (err) => {
         setLoading(false);

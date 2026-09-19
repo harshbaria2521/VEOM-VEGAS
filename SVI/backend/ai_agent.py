@@ -48,7 +48,7 @@ def find_nearby_therapists_by_location(location: str) -> str:
         str: Therapist names and experience, followed by the Docvita booking link.
     """
     return (
-        f"Here are some best therapists near {location}:\n"
+        f"Here are some recommended licensed therapists in {location}:\n"
         "- Ms Dhannya Ittymathew - 15+ year experience\n"
         "- Ms Anshika Mendiratta - 4+ year experience\n"
         "- Ms Neha Kumar - 4+ year experience\n\n"
@@ -59,14 +59,14 @@ def find_nearby_therapists_by_location(location: str) -> str:
 # Step1: Create an AI Agent & Link to backend
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
-from .config import GROQ_API_KEY, GROQ_MODEL
+from .config import GROQ_API_KEY
 
 tools = [
     ask_mental_health_specialist,
     emergency_call_tool,
     find_nearby_therapists_by_location,
 ]
-llm = ChatGroq(model=GROQ_MODEL, temperature=0.2, api_key=GROQ_API_KEY)
+llm = ChatGroq(model="openai/gpt-oss-120b", temperature=0.2, api_key=GROQ_API_KEY)
 graph = create_react_agent(llm, tools=tools)
 
 SYSTEM_PROMPT = """
@@ -85,11 +85,14 @@ India-specific crisis guidance:
 
 You have access to three tools:
 
-1. `ask_mental_health_specialist`: Use this tool to answer all emotional or psychological queries with therapeutic guidance.
+1. `ask_mental_health_specialist`: Use this tool to answer emotional or psychological queries with therapeutic guidance.
 2. `find_nearby_therapists_by_location`: Use this when the user asks about a therapist, reports persistent or intense negative thoughts, or would benefit from professional support. If no location is provided, use `India`.
 3. `emergency_call_tool`: Use this immediately if the user expresses current suicidal thoughts, self-harm intentions, has a plan or means, or is in immediate danger. After emergency escalation, also use `find_nearby_therapists_by_location` to provide ongoing-care resources when appropriate.
 
-Safety priority: do not replace emergency escalation with therapist recommendations when there is imminent danger. Encourage the user to call 112 and stay with a trusted person while providing the therapist booking link. Always tell the user to call 112 themselves even if the emergency call tool reports it could not place the call.
+CRITICAL TOOL CALLING RULES:
+- Never call the same tool more than once in a single turn.
+- If `ask_mental_health_specialist` indicates that the specialist/MedGemma is offline or unavailable, DO NOT retry it. Immediately formulate and return a warm, compassionate, evidence-based therapeutic response directly to the user as Dr. Emily Hartman.
+- Safety priority: do not replace emergency escalation with therapist recommendations when there is imminent danger. Encourage the user to call 112 and stay with a trusted person while providing the therapist booking link. Always tell the user to call 112 themselves even if the emergency call tool reports it could not place the call.
 
 Always take necessary action. Respond kindly, clearly, and supportively.
 """

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { askTherapist } from '../lib/api';
 import { useAuth } from '../lib/authContext';
 import { translations, supportedLanguages, getSpeechRecognitionLang } from '../lib/translations';
@@ -145,7 +145,7 @@ export default function ChatWidget() {
   const { lang, victim } = useAuth();
   const t = translations[lang] || translations.en;
 
-  const getInitialGreeting = useCallback(() => [
+  const getInitialGreeting = () => [
     {
       id: 1,
       sender: 'assistant',
@@ -154,7 +154,7 @@ export default function ChatWidget() {
         : "Welcome to the National Helpline Against Atrocities (NHAA 14566) confidential support portal. Please feel free to share what is on your mind. We are here to listen and help you navigate safety and support."),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
-  ], [lang, t.initialGreeting]);
+  ];
 
   const [messages, setMessages] = useState(getInitialGreeting);
 

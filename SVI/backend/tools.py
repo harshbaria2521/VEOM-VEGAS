@@ -44,7 +44,11 @@ def query_medgemma(prompt: str) -> str:
         )
         return response["message"]["content"].strip()
     except Exception:
-        return "I'm having technical difficulties, but I want you to know your feelings matter. Please try again shortly."
+        return (
+            "Specialized MedGemma service is currently offline. "
+            "Please directly formulate and return your own warm, empathetic, and evidence-based "
+            "therapeutic response to the user as Dr. Emily Hartman. Do NOT call this tool again."
+        )
 
 
 # Step2: Setup Twilio calling API tool
