@@ -11,10 +11,9 @@ __pycache__/
 *.pyc
 *.pyo
 
-# OS & Editor Files
+# OS Files
 .DS_Store
 Thumbs.db
-.vscode/
 
 # Archives
 *.zip
