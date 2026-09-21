@@ -1,4 +1,5 @@
 import './globals.css';
+import Script from 'next/script';
 import { AuthProvider } from '../lib/authContext';
 import { ThemeProvider } from '../lib/themeContext';
 import Navbar from '../components/Navbar';
@@ -42,7 +43,9 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SVI" />
-        <script
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
