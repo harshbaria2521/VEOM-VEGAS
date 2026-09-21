@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCaseStore } from '../../../lib/caseStore';
@@ -33,6 +33,12 @@ export default function CaseDetailPage() {
   const t = translations[lang] || translations.en;
 
   const [showSensitiveTranscript, setShowSensitiveTranscript] = useState(false);
+
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
 
   const currentCase = cases.find((c) => c.id === caseId) || cases[0];
 
@@ -81,32 +87,28 @@ export default function CaseDetailPage() {
   return (
     <div className="space-y-6">
       {/* Official Case Summary Header for Print Only */}
-      <div className="hidden print:block border-b-2 border-gov-navy pb-3 mb-4">
+      <div className="hidden print:block border-b-2 border-gov-navy dark:border-slate-700 pb-3 mb-4">
         <div className="flex justify-between items-start">
           <div>
-            <h2 className="text-base font-bold uppercase tracking-wider text-gov-navy">
+            <h2 className="text-base font-bold uppercase tracking-wider text-gov-navy dark:text-teal-400">
               Smart Victim Intelligence (SVI) — Official Case Summary
             </h2>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               Ministry of Social Justice & Empowerment • National Helpline Against Atrocities (14566)
             </p>
           </div>
-          <div className="text-right text-xs text-slate-600 font-mono">
-            <div>Case Reference: <strong>{currentCase.id}</strong></div>
-            <div>Status: <strong>{currentCase.status}</strong></div>
+          <div className="text-right text-xs text-slate-600 dark:text-slate-300 font-mono">
+            <div>Case Reference: <strong className="text-slate-900 dark:text-slate-100">{currentCase.id}</strong></div>
+            <div>Status: <strong className="text-slate-900 dark:text-slate-100">{currentCase.status}</strong></div>
           </div>
         </div>
       </div>
 
-      {/* Minimal Print Specific Styling */}
+      {/* Print Specific Styling: Faithfully preserves the active mode (Dark or Light) without switching */}
       <style dangerouslySetInnerHTML={{ __html: `
         @media print {
-          header, footer {
+          header, footer, nav, button, .print\\:hidden {
             display: none !important;
-          }
-          body {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
           }
           main {
             padding: 0 !important;
@@ -116,6 +118,18 @@ export default function CaseDetailPage() {
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+          }
+          /* Dark mode print: 100% dark background and light text */
+          html.dark, html.dark body, .dark body {
+            background-color: #0b141a !important;
+            color: #f1f5f9 !important;
+            color-scheme: dark !important;
+          }
+          /* Light mode print: 100% light background and dark text */
+          html:not(.dark), html:not(.dark) body {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            color-scheme: light !important;
           }
         }
       ` }} />
@@ -134,7 +148,7 @@ export default function CaseDetailPage() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => typeof window !== 'undefined' && window.print()}
+            onClick={handlePrint}
             aria-label="Print or Save Case Summary as PDF"
             className="inline-flex items-center gap-1.5 text-xs font-bold bg-white dark:bg-slate-800 hover:bg-gov-cream dark:hover:bg-slate-700 text-gov-navy dark:text-slate-100 border border-gov-border dark:border-slate-700 hover:border-gov-teal/50 px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-gov-teal print:hidden"
           >
@@ -230,23 +244,23 @@ export default function CaseDetailPage() {
               {(currentCase.indicators || []).map((ind, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 bg-gov-cream rounded-lg border border-gov-border flex items-center justify-between"
+                  className="p-3.5 bg-gov-cream dark:bg-slate-800/70 rounded-lg border border-gov-border dark:border-slate-700/80 flex items-center justify-between transition-colors"
                 >
                   <div>
-                    <span className="font-bold text-xs text-gov-navy block">
+                    <span className="font-bold text-xs text-gov-navy dark:text-slate-100 block">
                       {ind.name}
                     </span>
-                    <span className="text-[11px] text-gov-textMuted">
+                    <span className="text-[11px] text-gov-textMuted dark:text-slate-400">
                       AI Confidence: {ind.confidence}%
                     </span>
                   </div>
                   <span
-                    className={`text-[11px] font-bold px-2 py-0.5 rounded uppercase ${
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded uppercase border ${
                       ind.severity === 'critical'
-                        ? 'bg-red-100 text-red-800'
+                        ? 'bg-red-100 dark:bg-red-950/60 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800'
                         : ind.severity === 'high'
-                        ? 'bg-rose-100 text-rose-800'
-                        : 'bg-amber-100 text-amber-800'
+                        ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-800'
+                        : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800'
                     }`}
                   >
                     {ind.severity}
@@ -257,15 +271,15 @@ export default function CaseDetailPage() {
 
             {/* Vocal Signals (If consented) */}
             {currentCase.voiceConsented && currentCase.vocalSignals && (
-              <div className="mt-4 pt-3 border-t border-gov-border space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-gov-navy">
-                  <Mic className="w-4 h-4 text-purple-600" />
+              <div className="mt-4 pt-3 border-t border-gov-border dark:border-slate-800 space-y-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-gov-navy dark:text-slate-100">
+                  <Mic className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   <span>Acoustic / Speech Emotion Indicators (Consented)</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-xs">
-                  <div className="p-2.5 bg-purple-50 rounded border border-purple-200">
-                    <span className="text-[10px] text-purple-700 block">Vocal Tremor</span>
-                    <span className="font-bold text-purple-900">{currentCase.vocalSignals.tremorScore}</span>
+                  <div className="p-2.5 bg-purple-50 dark:bg-purple-950/30 rounded border border-purple-200 dark:border-purple-800/40">
+                    <span className="text-[10px] text-purple-700 dark:text-purple-300 block">Vocal Tremor</span>
+                    <span className="font-bold text-purple-900 dark:text-purple-200">{currentCase.vocalSignals.tremorScore}</span>
                   </div>
                   <div className="p-2.5 bg-purple-50 dark:bg-purple-950/30 rounded border border-purple-200 dark:border-purple-800/40">
                     <span className="text-[10px] text-purple-700 dark:text-purple-300 block">Pitch Stability</span>
@@ -281,7 +295,7 @@ export default function CaseDetailPage() {
           </div>
 
           {/* Gated Sensitive Content / Transcript Card */}
-          <div className="bg-white dark:bg-slate-800/90 rounded-xl border border-gov-border dark:border-slate-700 shadow-sm p-5 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 shadow-sm p-5 space-y-4 transition-colors">
             <div className="flex items-center justify-between border-b border-gov-border dark:border-slate-700 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400" />
@@ -380,8 +394,8 @@ export default function CaseDetailPage() {
           </div>
 
           {/* Audit Trail Card */}
-          <div className="bg-white dark:bg-slate-800/90 rounded-xl border border-gov-border dark:border-slate-700 shadow-sm p-5 space-y-4">
-            <div className="flex items-center gap-2 border-b border-gov-border dark:border-slate-700 pb-3">
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 shadow-sm p-5 space-y-4 transition-colors">
+            <div className="flex items-center gap-2 border-b border-gov-border dark:border-slate-800 pb-3">
               <Clock className="w-5 h-5 text-gov-teal dark:text-teal-400" />
               <h3 className="font-bold text-sm sm:text-base text-gov-navy dark:text-slate-100">
                 {t.auditTrail}
@@ -392,7 +406,7 @@ export default function CaseDetailPage() {
               {(currentCase.auditTrail || []).map((log, idx) => (
                 <div
                   key={idx}
-                  className="p-3 bg-gov-cream dark:bg-slate-900/50 rounded-lg border border-gov-border dark:border-slate-700 text-xs space-y-1"
+                  className="p-3 bg-gov-cream dark:bg-slate-800/60 rounded-lg border border-gov-border dark:border-slate-700/80 text-xs space-y-1 transition-colors"
                 >
                   <div className="flex items-center justify-between font-bold text-gov-navy dark:text-slate-200">
                     <span>{log.action}</span>

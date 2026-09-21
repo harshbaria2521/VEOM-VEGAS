@@ -13,7 +13,8 @@ cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/SVI/frontend"
 npm run dev
 
 
-
+At start first do :
+git pull origin main
 
 git add .
 git commit -m "Describe what you changed here"

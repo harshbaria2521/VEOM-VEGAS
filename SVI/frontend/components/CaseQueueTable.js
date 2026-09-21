@@ -344,7 +344,7 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
         </div>
 
         {sortedCases.length === 0 && (
-          <div className="py-12 text-center text-gov-textMuted text-xs">
+          <div className="py-12 text-center text-gov-textMuted dark:text-slate-400 text-xs">
             No cases match the selected filter criteria.
           </div>
         )}
@@ -442,7 +442,7 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
         ))}
 
         {sortedCases.length === 0 && (
-          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 text-gov-textMuted text-xs">
+          <div className="p-8 text-center bg-white dark:bg-slate-900 rounded-xl border border-gov-border dark:border-slate-800 text-gov-textMuted dark:text-slate-400 text-xs">
             No cases match the selected filter criteria.
           </div>
         )}

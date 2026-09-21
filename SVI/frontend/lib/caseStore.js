@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { initialCases } from './mockData';
 
-const STORAGE_KEY = 'svi_cases_state_v1';
+const STORAGE_KEY = 'svi_cases_state_v2';
 
 export function getStoredCases() {
   if (typeof window === 'undefined') return initialCases;
@@ -13,7 +13,10 @@ export function getStoredCases() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(initialCases));
       return initialCases;
     }
-    return JSON.parse(data);
+    const parsed = JSON.parse(data);
+    const parsedMap = new Map(parsed.map((c) => [c.id, c]));
+    const merged = initialCases.map((c) => parsedMap.get(c.id) || c);
+    return merged;
   } catch (e) {
     return initialCases;
   }

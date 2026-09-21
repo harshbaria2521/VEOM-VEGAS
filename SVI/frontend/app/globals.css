@@ -112,3 +112,24 @@ html {
   }
 }
 
+/* Global Print Stylesheet: Preserves the active theme without mode switching */
+@media print {
+  header, footer, nav {
+    display: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html.dark, html.dark body, .dark body {
+    background-color: #0b141a !important;
+    color: #f1f5f9 !important;
+    color-scheme: dark !important;
+  }
+  html:not(.dark), html:not(.dark) body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    color-scheme: light !important;
+  }
+}
+

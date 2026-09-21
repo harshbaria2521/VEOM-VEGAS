@@ -175,13 +175,56 @@ export default function ChatWidget() {
   const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
   const [humanRequested, setHumanRequested] = useState(false);
 
-  const chatEndRef = useRef(null);
+  const chatContainerRef = useRef(null);
+  const widgetRef = useRef(null);
+  const isInitialMount = useRef(true);
 
-  const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (behavior = 'smooth') => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
   };
 
+  // Align screen bottom to the bottom of the chat bot shape
   useEffect(() => {
+    const alignScreenBottomToChatbot = (behavior = 'instant') => {
+      if (widgetRef.current) {
+        const rect = widgetRef.current.getBoundingClientRect();
+        const chatBottomInDoc = window.scrollY + rect.bottom;
+        const targetScrollY = Math.max(0, chatBottomInDoc - window.innerHeight);
+
+        const prevBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = behavior;
+        window.scrollTo({
+          top: targetScrollY,
+          behavior,
+        });
+        document.documentElement.style.scrollBehavior = prevBehavior;
+      }
+    };
+
+    const timer1 = setTimeout(() => alignScreenBottomToChatbot('instant'), 50);
+    const timer2 = setTimeout(() => alignScreenBottomToChatbot('instant'), 200);
+    const handleResize = () => alignScreenBottomToChatbot('instant');
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Prevent scrolling on initial page load / entry so it stays at the chatbot
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
     scrollToBottom();
     try {
       if (messages.length > 1) {
@@ -341,7 +384,10 @@ export default function ChatWidget() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-180px)] sm:h-[82vh] min-h-[460px] bg-white dark:bg-[#111b21] rounded-2xl shadow-xl border border-gov-border dark:border-slate-800 overflow-hidden transition-colors">
+    <div
+      ref={widgetRef}
+      className="flex flex-col h-[calc(100dvh-180px)] sm:h-[82vh] min-h-[460px] bg-white dark:bg-[#111b21] rounded-2xl shadow-xl border border-gov-border dark:border-slate-800 overflow-hidden transition-colors"
+    >
       {/* WhatsApp Style Top Chat Bar */}
       <div className="bg-[#075E54] dark:bg-[#064e46] text-white p-3.5 sm:px-6 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
@@ -424,6 +470,7 @@ export default function ChatWidget() {
 
       {/* WhatsApp Chat Body */}
       <div
+        ref={chatContainerRef}
         dir="ltr"
         className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3 bg-[#EFEAE2] dark:bg-[#0b141a] text-slate-400 dark:text-slate-600 transition-colors"
         style={{
@@ -519,7 +566,8 @@ export default function ChatWidget() {
           </div>
         )}
 
-        <div ref={chatEndRef} />
+        {/* Bottom spacer for message list */}
+        <div />
       </div>
 
       {/* WhatsApp Style Bottom Input Bar */}
