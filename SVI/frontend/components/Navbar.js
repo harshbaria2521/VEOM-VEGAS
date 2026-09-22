@@ -7,7 +7,7 @@ import { useAuth } from '../lib/authContext';
 import { translations } from '../lib/translations';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeToggle from './ThemeToggle';
-import { Shield, PhoneCall, UserCheck, BarChart3, MessageSquare, Lock, LogOut } from 'lucide-react';
+import { Shield, PhoneCall, UserCheck, BarChart3, MessageSquare, Lock, LogOut, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -40,6 +40,18 @@ export default function Navbar() {
             <span className="hidden md:inline">
               Emergency: <a href="tel:112" className="underline font-bold">112</a>
             </span>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('svi-replay-welcome'));
+                }
+              }}
+              className="inline-flex items-center gap-1 text-[11px] bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 hover:text-white px-2 py-0.5 rounded border border-amber-400/30 transition-all font-semibold cursor-pointer ml-1"
+              title="Replay 3-Second Welcome Animation"
+            >
+              <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+              <span>Welcome Intro</span>
+            </button>
           </div>
         </div>
       </div>

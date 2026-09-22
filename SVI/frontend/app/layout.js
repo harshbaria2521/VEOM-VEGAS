@@ -5,6 +5,7 @@ import { ThemeProvider } from '../lib/themeContext';
 import Navbar from '../components/Navbar';
 import MobileBottomNav from '../components/MobileBottomNav';
 import PWAInstallPrompt from '../components/PWAInstallPrompt';
+import WelcomeSplash from '../components/WelcomeSplash';
 import { Shield, Phone, ExternalLink } from 'lucide-react';
 
 export const metadata = {
@@ -68,6 +69,7 @@ export default function RootLayout({ children }) {
       <body className="bg-gov-cream dark:bg-slate-950 min-h-screen flex flex-col antialiased text-gov-textMain dark:text-slate-100 selection:bg-gov-tealSoft selection:text-gov-teal transition-colors duration-200">
         <ThemeProvider>
           <AuthProvider>
+            <WelcomeSplash />
             <PWAInstallPrompt />
             <Navbar />
             <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">

@@ -1,12 +1,30 @@
 # Step1: Setup Ollama with Medgemma tool
+import socket
 import ollama
+
+
+def _is_ollama_ready() -> bool:
+    """Checks in under 200ms if local Ollama daemon is reachable."""
+    try:
+        with socket.create_connection(("127.0.0.1", 11434), timeout=0.2):
+            return True
+    except (OSError, socket.timeout):
+        return False
 
 
 def query_medgemma(prompt: str) -> str:
     """
     Calls MedGemma model with a therapist personality profile.
     Returns responses as an empathic mental health professional.
+    Falls back instantly without blocking if Ollama daemon is offline.
     """
+    if not _is_ollama_ready():
+        return (
+            "Specialized MedGemma service is currently offline. "
+            "Please formulate and return your own warm, empathetic, and evidence-based "
+            "therapeutic response to the user as Dr. Emily Hartman. Do NOT call this tool again."
+        )
+
     system_prompt = """You are Dr. Emily Hartman, a warm and experienced clinical psychologist. 
     Respond to patients with:
 
