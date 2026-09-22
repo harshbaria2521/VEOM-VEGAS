@@ -60,6 +60,14 @@ export default function RootLayout({ children }) {
                     document.documentElement.classList.remove('dark');
                     document.documentElement.style.colorScheme = 'light';
                   }
+
+                  // If user manually reloads/refreshes the website, start a fresh new chat session
+                  var nav = window.performance && window.performance.getEntriesByType ? window.performance.getEntriesByType('navigation') : [];
+                  var isReload = nav && nav.length > 0 ? nav[0].type === 'reload' : (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
+                  if (isReload) {
+                    localStorage.removeItem('svi_active_chat_history');
+                    sessionStorage.removeItem('svi_reload_chat_cleared');
+                  }
                 } catch (e) {}
               })();
             `,

@@ -437,6 +437,35 @@ export default function ChatWidget() {
 
   const [messages, setMessages] = useState(getInitialGreeting);
 
+  // Restore ongoing active chat history across page navigations (Consent, Track Grievance, etc.)
+  // If the user manually reloads the browser, a fresh session starts
+  useEffect(() => {
+    try {
+      const nav = typeof window !== 'undefined' && window.performance?.getEntriesByType ? window.performance.getEntriesByType('navigation') : [];
+      const isManualReload = nav && nav.length > 0 ? nav[0].type === 'reload' : (window.performance?.navigation?.type === 1);
+
+      if (isManualReload && !sessionStorage.getItem('svi_reload_chat_cleared')) {
+        sessionStorage.setItem('svi_reload_chat_cleared', 'true');
+        localStorage.removeItem('svi_active_chat_history');
+        return;
+      }
+
+      const saved = localStorage.getItem('svi_active_chat_history');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed.some((m) => m.sender === 'user')) {
+          setMessages(parsed);
+          if (parsed.some((m) => m.isEscalation)) {
+            setHumanRequested(true);
+          }
+          setTimeout(() => scrollToBottom('instant'), 150);
+        }
+      }
+    } catch (e) {
+      console.warn('Could not restore chat history:', e);
+    }
+  }, []);
+
   // Dynamically update greeting when language changes if no user messages sent yet
   useEffect(() => {
     setMessages((prev) => {
@@ -506,7 +535,8 @@ export default function ChatWidget() {
 
     scrollToBottom();
     try {
-      if (messages.length > 1) {
+      const hasUser = messages.some((m) => m.sender === 'user');
+      if (hasUser) {
         localStorage.setItem('svi_active_chat_history', JSON.stringify(messages));
       }
     } catch (e) {}
