@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../lib/authContext';
 import { translations } from '../lib/translations';
-import { MessageSquare, Lock, PhoneCall, UserCheck, BarChart3, User, LogIn } from 'lucide-react';
+import { MessageSquare, Lock, PhoneCall, UserCheck, BarChart3, User, LogIn, Search } from 'lucide-react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
@@ -67,23 +67,23 @@ export default function MobileBottomNav() {
           <span className="text-[10px] mt-0.5 tracking-tight">Chat</span>
         </Link>
 
-        {/* 2. Consent */}
+        {/* 2. Track Grievance */}
         <Link
-          href="/consent"
+          href="/track"
           className={`flex-1 flex flex-col items-center justify-center py-1 min-w-[56px] transition-colors ${
-            isConsent
+            pathname === '/track'
               ? 'text-gov-teal dark:text-teal-400 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
-          aria-label="Consent & Privacy"
+          aria-label="Track Grievance"
         >
           <div className="relative">
-            <Lock className={`w-5 h-5 ${isConsent ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
-            {isConsent && (
+            <Search className={`w-5 h-5 ${pathname === '/track' ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+            {pathname === '/track' && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gov-teal dark:bg-teal-400" />
             )}
           </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Consent</span>
+          <span className="text-[10px] mt-0.5 tracking-tight">Track</span>
         </Link>
 
         {/* 3. Call 14566 Emergency Trigger (Center Action) */}

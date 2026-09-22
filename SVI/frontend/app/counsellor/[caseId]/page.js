@@ -21,8 +21,10 @@ import {
   FileCheck,
   HelpCircle,
   PhoneCall,
-  Printer
+  Printer,
+  Download
 } from 'lucide-react';
+import { generateGrievancePDF } from '../../../lib/pdfGenerator';
 
 export default function CaseDetailPage() {
   const params = useParams();
@@ -148,12 +150,22 @@ export default function CaseDetailPage() {
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
+            onClick={() => generateGrievancePDF(currentCase)}
+            aria-label="Download Official Grievance Docket PDF"
+            className="inline-flex items-center gap-1.5 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500 print:hidden cursor-pointer"
+          >
+            <Download className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
+            <span>Official Grievance Docket (PDF)</span>
+          </button>
+
+          <button
+            type="button"
             onClick={handlePrint}
             aria-label="Print or Save Case Summary as PDF"
-            className="inline-flex items-center gap-1.5 text-xs font-bold bg-white dark:bg-slate-800 hover:bg-gov-cream dark:hover:bg-slate-700 text-gov-navy dark:text-slate-100 border border-gov-border dark:border-slate-700 hover:border-gov-teal/50 px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-gov-teal print:hidden"
+            className="inline-flex items-center gap-1.5 text-xs font-bold bg-white dark:bg-slate-800 hover:bg-gov-cream dark:hover:bg-slate-700 text-gov-navy dark:text-slate-100 border border-gov-border dark:border-slate-700 hover:border-gov-teal/50 px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-gov-teal print:hidden cursor-pointer"
           >
             <Printer className="w-3.5 h-3.5 text-gov-teal dark:text-teal-400" aria-hidden="true" />
-            <span>Print / Download Case Summary</span>
+            <span>Print Summary</span>
           </button>
 
           <div className="flex items-center gap-2 text-xs text-gov-textMuted dark:text-slate-400">

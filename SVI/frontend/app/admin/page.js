@@ -2,6 +2,7 @@
 
 import React from 'react';
 import AnalyticsCharts from '../../components/AnalyticsCharts';
+import VulnerabilityHeatmap from '../../components/VulnerabilityHeatmap';
 import { useAuth } from '../../lib/authContext';
 import { translations } from '../../lib/translations';
 import { BarChart3, ShieldCheck, Lock } from 'lucide-react';
@@ -27,6 +28,9 @@ export default function AdminDashboardPage() {
 
       {/* Main Charts Component */}
       <AnalyticsCharts />
+
+      {/* National GIS Vulnerability Heatmap */}
+      <VulnerabilityHeatmap />
     </div>
   );
 }

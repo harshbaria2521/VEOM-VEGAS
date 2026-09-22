@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCaseStore } from '../../lib/caseStore';
 import CaseQueueTable from '../../components/CaseQueueTable';
+import VulnerabilityHeatmap from '../../components/VulnerabilityHeatmap';
 import { useAuth } from '../../lib/authContext';
 import { translations } from '../../lib/translations';
-import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff } from 'lucide-react';
+import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff, MapPin, ListFilter } from 'lucide-react';
 
 export default function CounsellorDashboardPage() {
   const { cases, claimCase } = useCaseStore();
@@ -13,6 +14,7 @@ export default function CounsellorDashboardPage() {
   const t = translations[lang] || translations.en;
 
   const [showAlertBanner, setShowAlertBanner] = useState(true);
+  const [dashboardTab, setDashboardTab] = useState('queue'); // 'queue' or 'heatmap'
   const [newCriticalAlertCount, setNewCriticalAlertCount] = useState(0);
   const prevCriticalCountRef = useRef(0);
 
@@ -237,8 +239,43 @@ export default function CounsellorDashboardPage() {
         </div>
       </div>
 
-      {/* Main Filterable Queue Table */}
-      <CaseQueueTable cases={cases} onClaimCase={claimCase} />
+      {/* View Mode Tab Switcher */}
+      <div className="flex items-center gap-2 border-b border-gov-border dark:border-slate-800 pb-2">
+        <button
+          onClick={() => setDashboardTab('queue')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            dashboardTab === 'queue'
+              ? 'bg-gov-navy dark:bg-teal-700 text-white shadow-sm'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-gov-navy'
+          }`}
+        >
+          <ListFilter className="w-4 h-4" />
+          <span>Priority Case Queue ({cases.length})</span>
+        </button>
+
+        <button
+          onClick={() => setDashboardTab('heatmap')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            dashboardTab === 'heatmap'
+              ? 'bg-gov-navy dark:bg-teal-700 text-white shadow-sm'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-gov-navy'
+          }`}
+        >
+          <MapPin className="w-4 h-4 text-red-500" />
+          <span>National Vulnerability Heatmap (GIS)</span>
+        </button>
+      </div>
+
+      {/* Main View: Queue Table OR GIS Heatmap */}
+      {dashboardTab === 'queue' ? (
+        <CaseQueueTable cases={cases} onClaimCase={claimCase} />
+      ) : (
+        <VulnerabilityHeatmap
+          onSelectDistrict={(districtName) => {
+            setDashboardTab('queue');
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { useAuth } from '../lib/authContext';
 import { translations } from '../lib/translations';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeToggle from './ThemeToggle';
-import { Shield, PhoneCall, UserCheck, BarChart3, MessageSquare, Lock, LogOut, Sparkles } from 'lucide-react';
+import { Shield, PhoneCall, UserCheck, BarChart3, MessageSquare, Lock, LogOut, Sparkles, Search } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -104,6 +104,18 @@ export default function Navbar() {
             >
               <Lock className="w-4 h-4" />
               <span>{t.navConsent}</span>
+            </Link>
+
+            <Link
+              href="/track"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                pathname === '/track'
+                  ? 'bg-gov-teal text-white'
+                  : 'text-gov-textMain dark:text-slate-200 hover:bg-gov-sand/60 dark:hover:bg-slate-800'
+              }`}
+            >
+              <Search className="w-4 h-4 text-amber-500" />
+              <span>Track Grievance</span>
             </Link>
 
             {/* Counsellor Link */}

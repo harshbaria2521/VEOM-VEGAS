@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Sparkles, ArrowRight, Lock, PhoneCall, CheckCircle2 } from 'lucide-react';
 
 export default function WelcomeSplash() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [progress, setProgress] = useState(0);
   const [timeLeft, setTimeLeft] = useState(3);
-  const [statusStage, setStatusStage] = useState(0);
+  const [statusStage, setStatusStage] = useState(1);
 
   // Check if splash should run
   useEffect(() => {
-    // Show splash on load
+    // Ensure splash is visible
     setIsVisible(true);
 
     const DURATION = 3000; // 3 seconds

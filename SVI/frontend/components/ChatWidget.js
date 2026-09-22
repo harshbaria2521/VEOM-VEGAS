@@ -5,7 +5,10 @@ import { askTherapist } from '../lib/api';
 import { useAuth } from '../lib/authContext';
 import { translations, supportedLanguages, getSpeechRecognitionLang } from '../lib/translations';
 import NearbySupportModal from './NearbySupportModal';
-import { Send, PhoneCall, HeartHandshake, MapPin, Mic, MicOff, AlertTriangle, ShieldCheck, UserCheck, RotateCcw } from 'lucide-react';
+import { generateGrievancePDF } from '../lib/pdfGenerator';
+import { registerNewComplaint } from '../lib/caseStore';
+import { assessComplaint } from '../lib/sviScoring';
+import { Send, PhoneCall, HeartHandshake, MapPin, Mic, MicOff, AlertTriangle, ShieldCheck, UserCheck, RotateCcw, FileText, Activity, X, Sparkles } from 'lucide-react';
 
 // Helper to format inline markdown elements: bold (**...**), italic (*...*), and code (`...`)
 function formatInlineText(text) {
@@ -615,13 +618,66 @@ export default function ChatWidget() {
     }
   };
 
+  const handleDownloadChatPDF = () => {
+    // 1. Gather all user messages
+    const userTexts = messages
+      .filter((m) => m.sender === 'user')
+      .map((m) => m.text)
+      .join(' ')
+      .trim();
+
+    // STRICT CHECK: PDF will NOT generate until a complaint has been typed/filed!
+    if (!userTexts) {
+      const alertMsg = {
+        id: Date.now(),
+        sender: 'assistant',
+        text: lang === 'hi'
+          ? "⚠️ **शिकायत विवरण आवश्यक है!**\n\nआधिकारिक Grievance PDF तभी जनरेट होगी जब आप अपनी घटना, समस्या या शिकायत का विवरण चैट बॉक्स में लिखेंगे।\n\nकृपया नीचे अपनी शिकायत का विवरण भेजें, ताकि उसके आधार पर सही कानूनी धाराएं (PoA/PCR Act) एवं मुआवजा (Compensation) तय करके आधिकारिक PDF तैयार की जा सके।"
+          : "⚠️ **Complaint Details Required!**\n\nAn official Grievance PDF can only be generated after you describe your incident or complaint in the chat.\n\nPlease describe your incident in the chat box below so appropriate statutory sections and compensation price can be accurately determined.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      };
+      setMessages((prev) => [...prev, alertMsg]);
+      return;
+    }
+
+    // 2. Register complaint with real assessment
+    const { newCase, assessment } = registerNewComplaint({
+      complaintText: userTexts,
+      victimName: victim?.name || 'Anonymous Complainant',
+      district: 'Hathras',
+      state: 'Uttar Pradesh',
+      channel: 'Chatbot',
+      preferredLanguage: lang === 'hi' ? 'Hindi' : 'English',
+    });
+
+    // 3. Attach full transcript to case
+    newCase.transcript = messages.map((m) => ({
+      sender: m.sender === 'user' ? 'Victim' : 'SVI AI',
+      text: m.text,
+    }));
+
+    // 4. Generate PDF with the real calculated sections and compensation entitlement
+    generateGrievancePDF(newCase);
+
+    // 5. Provide feedback in chat
+    const alertMsg = {
+      id: Date.now(),
+      sender: 'assistant',
+      text: lang === 'hi'
+        ? `📄 **आपकी शिकायत आधिकारिक रूप से दर्ज कर ली गई है!**\n• डॉकेट नंबर: **${newCase.id}**\n• लागू वैधानिक धाराएं: ${assessment.sections.join(', ')}\n• मुआवजा / राहत राशि पात्रता: **${assessment.reliefEntitlement}**\n\nआप इस डॉकेट नंबर से **Track Grievance** पेज पर कभी भी लाइव स्थिति ट्रैक कर सकते हैं।`
+        : `📄 **Your grievance docket has been officially generated!**\n• Docket ID: **${newCase.id}**\n• Statutory Sections: ${assessment.sections.join(', ')}\n• Relief Compensation Entitlement: **${assessment.reliefEntitlement}**\n\nYou can track its live redressed status anytime on the **Track Grievance** portal.`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    };
+    setMessages((prev) => [...prev, alertMsg]);
+  };
+
   const handleTalkToHuman = () => {
     setHumanRequested(true);
     const escalationMsg = {
       id: Date.now(),
       sender: 'assistant',
       text: t.humanEscalationMsg || (lang === 'hi'
-        ? "\u0939\u092E\u0928\u0947 \u0906\u092A\u0915\u0947 \u0905\u0928\u0941\u0930\u094B\u0927 \u0915\u094B \u092A\u094D\u0930\u093E\u0925\u092E\u093F\u0915\u0924\u093E \u092A\u0930 \u0926\u0930\u094D\u091C \u0915\u0930 \u0932\u093F\u092F\u093E \u0939\u0948\u0964 \u0906\u092A \u0924\u0941\u0930\u0902\u0924 \u0939\u092E\u093E\u0930\u0947 \u092A\u094D\u0930\u0936\u093F\u0915\u094D\u0937\u093F\u0924 \u0905\u0927\u093F\u0915\u093E\u0930\u0940 \u0938\u0947 14566 \u092A\u0930 \u092C\u093E\u0924 \u0915\u0930 \u0938\u0915\u0924\u0947 \u0939\u0948\u0902, \u092F\u093E \u0928\u093F\u0915\u091F\u0924\u092E \u0938\u0939\u093E\u092F\u0924\u093E \u0915\u0947\u0902\u0926\u094D\u0930 \u0915\u0940 \u091C\u093E\u0928\u0915\u093E\u0930\u0940 \u0932\u0947 \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964"
+        ? "\u0939\u092E\u0928\u0947 \u0906\u092A\u0915\u0947 \u0905\u0928\u0941\u0930\u094B\u0927 \u0915\u094B \u092A\u094D\u0930\u093E\u0925\u092E\u093F\u0915\u0924\u093E \u092A\u0930 \u0926\u0930\u094D\u091C \u0915\u0930 \u0932\u093F\u092F\u093E \u0939\u0948\u0964 \u0906\u092A \u0924\u0941\u0930\u0902\u0924 \u0939\u092E\u093E\u0930\u0947 \u092A\u094D\u0930\u0936\u093F\u0915\u094D\u0937\u093F\u0924 \u0905\u0927\u093F\u0915\u093E\u0930\u0940 \u0938\u0947 14566 \u092A\u0930 \u092C\u093E\u0924 \u0915\u0930 \u0938\u0915\u0924\u0947 \u0939\u0948\u0902, \u092F\u093E \u0928\u093F\u0915\u091F\u092E \u0938\u0939\u093E\u092F\u0924\u093E \u0915\u0947\u0902\u0926\u094D\u0930 \u0915\u0940 \u091C\u093E\u0928\u0915\u093E\u0930\u0940 \u0932\u0947 \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964"
         : "A human counsellor connection has been initiated. For immediate 1-on-1 voice assistance, please call our 24x7 toll-free helpline 14566, or select a nearby support center below."),
       isEscalation: true,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -630,6 +686,8 @@ export default function ChatWidget() {
   };
 
   const recognitionRef = useRef(null);
+
+  const hasUserComplaint = messages.some((m) => m.sender === 'user' && m.text?.trim());
 
   const toggleVoice = () => {
     if (isRecording) {
@@ -737,6 +795,21 @@ export default function ChatWidget() {
             <RotateCcw className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
             <span className="hidden sm:inline">{t.newChat || (lang === 'hi' ? '\u0928\u0908 \u091A\u0948\u091F' : 'New Chat')}</span>
           </button>
+          <button
+            type="button"
+            onClick={handleDownloadChatPDF}
+            aria-label="Download Grievance Docket (PDF)"
+            title={hasUserComplaint ? "Download Grievance Docket (PDF)" : (lang === 'hi' ? "पहले चैट में अपनी शिकायत लिखें" : "Please describe your incident in chat first")}
+            className={`flex items-center gap-1 text-xs font-medium px-2.5 py-1.5 rounded-full transition-all border focus:ring-2 focus:ring-white cursor-pointer ${
+              hasUserComplaint
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-400/50 shadow-sm animate-pulse'
+                : 'bg-white/10 hover:bg-white/20 text-white/80 border-white/20'
+            }`}
+          >
+            <FileText className={`w-3.5 h-3.5 ${hasUserComplaint ? 'text-amber-300' : 'text-slate-300'}`} aria-hidden="true" />
+            <span className="hidden sm:inline">Grievance PDF</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsSupportModalOpen(true)}
