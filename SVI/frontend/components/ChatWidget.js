@@ -152,7 +152,7 @@ function FormattedMessage({ text }) {
 const EMERGENCY_KEYWORDS = [
   // -- English --
   'suicide', 'kill myself', 'kill me', 'killing myself', 'want to die', 'wanna die',
-  'end my life', 'end it all', 'take my life', 'i want to die', 'i will die',
+  'end my life', 'ending my life', 'end it all', 'ending it all', 'take my life', 'i want to die', 'i will die',
   'murder', 'murdered', 'murdering', 'being killed', 'someone killed',
   'kill', 'killed', 'killing', 'stabbed', 'stabbing',
   'attack', 'attacked', 'attacking', 'ongoing attack', 'being attacked',
