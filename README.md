@@ -1,4 +1,4 @@
-# Smart Victim Intelligence (SVI)
+<h1 align="center"> Smart Victim Intelligence (SVI) </h1>
 
 <p align="center">
   <img src="./assets/svi-dashboard.png" alt="Smart Victim Intelligence workflow" width="100%">
