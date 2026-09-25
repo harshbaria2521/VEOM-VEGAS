@@ -21,12 +21,22 @@ app.add_middleware(
 
 from typing import Optional
 
+
 # Step2: Receive and validate request from Frontend
 class Query(BaseModel):
     message: str
     language: Optional[str] = "English"
     lang_code: Optional[str] = "en"
     native_name: Optional[str] = None
+
+
+@app.get("/")
+async def root():
+    return {
+        "status": "online",
+        "service": "Smart Victim Intelligence (SVI)",
+        "message": "SVI API is running successfully",
+    }
 
 
 @app.post("/ask")
@@ -58,8 +68,12 @@ async def ask(query: Query):
             )
             enhanced_system_prompt = SYSTEM_PROMPT + multilingual_rule
 
-        inputs = {"messages": [("system", enhanced_system_prompt), ("user", query.message)]}
-        stream = graph.stream(inputs, stream_mode="updates", config={"recursion_limit": 6})
+        inputs = {
+            "messages": [("system", enhanced_system_prompt), ("user", query.message)]
+        }
+        stream = graph.stream(
+            inputs, stream_mode="updates", config={"recursion_limit": 6}
+        )
         tool_called_name, final_response = parse_response(stream)
         if not final_response:
             if lang_code == "hi":
@@ -113,4 +127,3 @@ async def ask(query: Query):
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5500))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
-
