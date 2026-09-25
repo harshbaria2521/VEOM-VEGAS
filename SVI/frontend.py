@@ -9,7 +9,7 @@ from pathlib import Path
 import streamlit as st
 import requests
 
-BACKEND_URL = "http://127.0.0.1:8000/ask"
+BACKEND_URL = "https://svi-8pm5.onrender.com/ask"
 BG_IMAGE_PATH = Path(__file__).parent / "quiet_horizon_bg.png"
 LOGO_PATH = Path(__file__).parent / "svi_logo.png"
 
@@ -337,9 +337,11 @@ with st.sidebar:
         "Language / भाषा चुनें",
         range(len(lang_options)),
         format_func=lambda i: lang_options[i][0],
-        key="sf_lang"
+        key="sf_lang",
     )
-    chosen_lang_name, chosen_lang_code, chosen_native_name = lang_options[selected_lang_idx]
+    chosen_lang_name, chosen_lang_code, chosen_native_name = lang_options[
+        selected_lang_idx
+    ]
 
     st.markdown(
         """
