@@ -1,0 +1,42 @@
+# ====================================================
+# SVI (Smart Victim Intelligence) - Run Commands
+# ====================================================
+
+# ----------------------------------------------------
+# 🔵 TERMINAL 1: BACKEND (FastAPI - Port 5500)
+# ----------------------------------------------------
+# 1. Project root par jaayein:
+cd "d:\svi\Harsh's SIH\VEOM-VEGAS\SVI"
+
+# 2. Virtual Environment activate karein (PowerShell):
+.venv\Scripts\Activate.ps1
+# (Agar CMD use kar rahe hain: .venv\Scripts\activate.bat)
+
+# 3. Backend start karein:
+python -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
+
+
+# ----------------------------------------------------
+# 🟢 TERMINAL 2: FRONTEND (Next.js - Port 3000)
+# ----------------------------------------------------
+# 1. Frontend folder par jaayein:
+cd "d:\svi\Harsh's SIH\VEOM-VEGAS\SVI\frontend"
+
+# 2. Frontend server start karein:
+npm run dev
+
+
+# ----------------------------------------------------
+# 🚀 GIT WORKFLOW (Pull, Commit & Push Changes)
+# ----------------------------------------------------
+# 1. Latest changes pull karne ke liye:
+git pull origin main
+
+# 2. Saare modified files stage karein:
+git add .
+
+# 3. Commit karein:
+git commit -m "Removed Modi and MoSJE images from welcome splash, updated navbar and main page government branding, removed old PDF summary feature while keeping Grievance PDF docket"
+
+# 4. Push to GitHub:
+git push origin main
