@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: 16in 9in;
+    margin: 0;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background: #e2e8f0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .slide {
+    width: 16in;
+    height: 9in;
+    page-break-after: always;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+    padding: 0.45in 0.75in;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1.05in;
+    margin-bottom: 0.25in;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 0.12in;
+  }
+
+  .header-logo-left {
+    height: 0.75in;
+    object-fit: contain;
+  }
+
+  .header-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 30pt;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: #0f172a;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .header-logo-right {
+    height: 0.75in;
+    object-fit: contain;
+  }
+
+  /* Slide 1 - Title Slide */
+  .title-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.6in 0.9in;
+    background: radial-gradient(circle at 80% 20%, #eff6ff 0%, #ffffff 60%);
+  }
+
+  .sih-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sih-main-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 42pt;
+    font-weight: 800;
+    color: #1d4ed8;
+    letter-spacing: 1px;
+  }
+
+  .title-content-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr;
+    gap: 0.8in;
+    align-items: center;
+    flex: 1;
+    margin-top: 0.35in;
+  }
+
+  .title-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10pt;
+  }
+
+  .info-item {
+    font-size: 14.5pt;
+    line-height: 1.4;
+    color: #1e293b;
+  }
+
+  .info-item strong {
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  .team-card-title {
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 14pt 18pt;
+    margin-top: 8pt;
+  }
+
+  .team-card-title h3 {
+    font-size: 14pt;
+    color: #1e3a8a;
+    margin-bottom: 8pt;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .team-members-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6pt 16pt;
+    font-size: 11.5pt;
+    color: #334155;
+  }
+
+  .brain-logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .brain-logo {
+    max-height: 4in;
+    object-fit: contain;
+  }
+
+  /* General Grid Layouts */
+  .two-col-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 0.45in;
+    flex: 1;
+  }
+
+  .card-box {
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16pt 20pt;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-box-accent {
+    border-color: #cbd5e1;
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .card-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 17pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 10pt;
+    display: flex;
+    align-items: center;
+    gap: 8pt;
+  }
+
+  .bullet-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9pt;
+    font-size: 13pt;
+    line-height: 1.45;
+  }
+
+  .bullet-list li {
+    position: relative;
+    padding-left: 22pt;
+    color: #334155;
+  }
+
+  .bullet-list li::before {
+    content: "➤";
+    position: absolute;
+    left: 0;
+    color: #2563eb;
+    font-weight: bold;
+  }
+
+  /* Slide 3 Workflow */
+  .workflow-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+  }
+
+  .workflow-img {
+    max-width: 95%;
+    max-height: 6.8in;
+    object-fit: contain;
+    border-radius: 10px;
+  }
+
+  /* Slide 5 Impact */
+  .impact-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 0.45in;
+    flex: 1;
+    align-items: center;
+  }
+
+  .impact-chain-img {
+    max-width: 100%;
+    max-height: 6.8in;
+    object-fit: contain;
+  }
+
+  /* Diagram Elements */
+  .diagram-container {
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 16pt;
+    display: flex;
+    flex-direction: column;
+    gap: 10pt;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+  }
+
+  /* UI Mockup Styling */
+  .mockup-window {
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07);
+    height: 100%;
+  }
+
+  .mockup-header {
+    background: #0f172a;
+    color: #ffffff;
+    padding: 8pt 14pt;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11pt;
+    font-weight: 600;
+  }
+
+  .mockup-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .control-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+  .dot-green { background: #10b981; }
+
+  .mockup-body {
+    padding: 14pt 16pt;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10pt;
+    background: #f8fafc;
+  }
+
+  /* Flow Steps */
+  .flow-step {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10pt 12pt;
+    display: flex;
+    align-items: center;
+    gap: 12pt;
+  }
+
+  .flow-step-num {
+    width: 28pt;
+    height: 28pt;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 13pt;
+    flex-shrink: 0;
+  }
+
+  .flow-step-text h4 {
+    font-size: 12.5pt;
+    color: #0f172a;
+    margin-bottom: 2pt;
+  }
+
+  .flow-step-text p {
+    font-size: 10.5pt;
+    color: #64748b;
+  }
+
+  .flow-arrow-down {
+    text-align: center;
+    color: #94a3b8;
+    font-weight: bold;
+    font-size: 14pt;
+    line-height: 1;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    padding: 3pt 8pt;
+    border-radius: 6px;
+    font-size: 10pt;
+    font-weight: 700;
+  }
+  .badge-red { background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5; }
+  .badge-orange { background: #ffedd5; color: #c2410c; border: 1px solid #fdba74; }
+  .badge-yellow { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+  .badge-green { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .badge-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+  /* Timeline Grid */
+  .timeline-pipeline {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10pt;
+    flex: 1;
+    margin-bottom: 0.2in;
+  }
+
+  .timeline-col {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10pt 12pt;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    position: relative;
+  }
+
+  .timeline-col-header {
+    font-size: 10pt;
+    font-weight: 800;
+    padding: 3pt 6pt;
+    border-radius: 4px;
+    margin-bottom: 8pt;
+    text-align: center;
+  }
+
+  .timeline-col h4 {
+    font-size: 11.5pt;
+    color: #0f172a;
+    margin-bottom: 6pt;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  .timeline-col ul {
+    list-style: none;
+    font-size: 9.5pt;
+    color: #475569;
+    display: flex;
+    flex-direction: column;
+    gap: 4pt;
+    line-height: 1.35;
+  }
+
+  .timeline-col ul li::before {
+    content: "• ";
+    color: #2563eb;
+    font-weight: bold;
+  }
+
+  .milestones-bar {
+    background: #0f172a;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 12pt 24pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12.5pt;
+  }
+
+  .milestone-highlight {
+    font-weight: 700;
+    color: #38bdf8;
+  }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title Slide -->
+<div class="slide title-slide">
+  <div class="sih-banner">
+    <div class="sih-main-title">SMART INDIA HACKATHON 2026</div>
+    <img src="extracted_media/image1.jpeg" style="height: 1in; object-fit: contain;">
+  </div>
+
+  <div class="title-content-grid">
+    <div class="title-info-list">
+      <div class="info-item"><strong>• Problem Statement ID:</strong> SIH26093</div>
+      <div class="info-item"><strong>• Problem Statement Title:</strong> AI-Based Real-Time Stress and Trauma Assessment Module for Victims/Complainants Accessing NHAA (14566) and Integrated Portal</div>
+      <div class="info-item"><strong>• Theme:</strong> MedTech / BioTech / HealthTech &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Category:</strong> Software</div>
+      <div class="info-item"><strong>• Team ID:</strong> [Team ID / e.g. 12345] &nbsp;&nbsp;|&nbsp;&nbsp; <strong>Team Name:</strong> Veom Vegas</div>
+      <div class="info-item"><strong>• Institution:</strong> SAGE University, Indore</div>
+
+      <div class="team-card-title">
+        <h3>👥 Team Members & Mentor:</h3>
+        <div class="team-members-grid">
+          <div><strong>1. [Member 1 (Lead)]:</strong> AI/ML Architecture</div>
+          <div><strong>2. [Member 2]:</strong> Full-Stack & FastAPI</div>
+          <div><strong>3. [Member 3]:</strong> Frontend & UI/UX</div>
+          <div><strong>4. [Member 4]:</strong> Speech Processing & NLP</div>
+          <div><strong>5. [Member 5]:</strong> Security, DB & Cloud</div>
+          <div><strong>6. [Member 6 (F)]:</strong> Data Analyst & Ethics</div>
+        </div>
+        <div style="margin-top: 8pt; font-size: 12pt; color: #1e3a8a;">
+          <strong>🎓 Mentor:</strong> [Mentor Name] — Faculty / Domain Expert, SAGE University
+        </div>
+      </div>
+    </div>
+
+    <div class="brain-logo-container">
+      <img src="extracted_media/image2.jpeg" class="brain-logo" alt="SIH Brain Logo">
+      <div style="font-family: 'Outfit', sans-serif; font-size: 18pt; font-weight: 800; color: #0f172a; margin-top: 10pt; text-align: center;">
+        SMART INDIA<br>HACKATHON
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: Idea Title -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">IDEA TITLE</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div class="two-col-grid">
+    <div class="card-box card-box-accent">
+      <div style="font-size: 17pt; font-weight: 800; color: #1e3a8a; margin-bottom: 2pt; font-family: 'Outfit', sans-serif;">
+        IDEA/SOLUTION: SVI — Smart Victim Intelligence
+      </div>
+      <div style="font-size: 14pt; font-weight: 700; color: #2563eb; margin-bottom: 12pt; font-style: italic;">
+        “From Listening to Meaningful Support”
+      </div>
+      <p style="font-size: 12.5pt; line-height: 1.45; color: #334155; margin-bottom: 12pt;">
+        <strong>SVI</strong> is an AI-powered real-time stress and trauma assessment module integrated with NHAA (14566) and its digital access channels. It analyzes voluntary interactions such as text, voice and user responses to identify indicators of emotional distress and trauma.
+      </p>
+
+      <!-- Solution Mini-Flow Diagram -->
+      <div style="display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 8pt; align-items: center; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 8pt 10pt; margin-bottom: 12pt;">
+        <div style="text-align: center;">
+          <div style="font-size: 11pt; font-weight: 700; color: #1e3a8a;">1. Interaction</div>
+          <div style="font-size: 9.5pt; color: #475569;">Voice / Chat / IVRS</div>
+        </div>
+        <div style="color: #2563eb; font-weight: bold;">➔</div>
+        <div style="text-align: center;">
+          <div style="font-size: 11pt; font-weight: 700; color: #1e3a8a;">2. Multimodal AI</div>
+          <div style="font-size: 9.5pt; color: #475569;">Prosody + NLP Score</div>
+        </div>
+        <div style="color: #2563eb; font-weight: bold;">➔</div>
+        <div style="text-align: center;">
+          <div style="font-size: 11pt; font-weight: 700; color: #1e3a8a;">3. Triage Action</div>
+          <div style="font-size: 9.5pt; color: #475569;">Human-in-Loop Support</div>
+        </div>
+      </div>
+
+      <div style="font-weight: 700; font-size: 13pt; color: #0f172a; margin-bottom: 6pt;">The proposed system will:</div>
+      <ul class="bullet-list" style="font-size: 12pt; gap: 7pt;">
+        <li>Perform real-time stress and trauma assessment using AI/ML.</li>
+        <li>Analyze textual and conversational signals to identify indicators such as distress, fear, anxiety, and hopelessness.</li>
+        <li>Use multimodal AI to combine linguistic, conversational and voice-based acoustic indicators.</li>
+        <li>Generate a non-diagnostic stress/trauma risk score and categorize cases into appropriate severity levels.</li>
+        <li>Provide early alerts and priority indicators to authorized support personnel.</li>
+        <li>Recommend appropriate support pathways (counselling, human intervention or emergency escalation).</li>
+        <li>Maintain privacy, consent and secure handling of sensitive information throughout.</li>
+      </ul>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0.25in;">
+      <div class="card-box" style="border-left: 5px solid #2563eb;">
+        <div class="card-title">Problem Resolution:</div>
+        <ul class="bullet-list" style="font-size: 12pt; gap: 7pt;">
+          <li>Detects emotional distress during the interaction itself.</li>
+          <li>Helps identify high-risk cases earlier.</li>
+          <li>Supports prioritization of cases requiring human attention.</li>
+          <li>Converts unstructured conversations into actionable assessment insights.</li>
+          <li>Enables consistent assessment across helpline and digital channels.</li>
+        </ul>
+      </div>
+
+      <div class="card-box" style="border-left: 5px solid #059669;">
+        <div class="card-title" style="color: #065f46;">Unique Value Propositions:</div>
+        <ul class="bullet-list" style="font-size: 12pt; gap: 7pt;">
+          <li>Real-time AI-assisted assessment.</li>
+          <li>Multimodal stress & trauma analysis.</li>
+          <li>Early identification of high-risk cases.</li>
+          <li>Human-in-the-loop intervention.</li>
+          <li>Multilingual and accessible design.</li>
+          <li>Privacy-first and consent-driven architecture.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: Work Flow -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">WORK FLOW</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div class="workflow-container">
+    <img src="extracted_media/image4.jpeg" class="workflow-img" alt="Work Flow Architecture">
+  </div>
+</div>
+
+<!-- SLIDE 4: Feasibility and Viability -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">FEASIBILITY AND VIABILITY</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div class="two-col-grid" style="grid-template-columns: 1fr 1fr;">
+    <div class="card-box card-box-accent">
+      <div class="card-title">Feasibility of the Idea:</div>
+      <ul class="bullet-list" style="gap: 12pt; font-size: 12.5pt;">
+        <li><strong>Technical Feasibility:</strong> Uses established AI technologies including NLP, speech processing, transformer models and classification algorithms, making real-time assessment achievable.</li>
+        <li><strong>Operational Feasibility:</strong> The module operates as an assessment layer over existing NHAA channels without requiring complete replacement of current infrastructure.</li>
+        <li><strong>Scalability Architecture:</strong>
+          <!-- Scalability Diagram -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8pt 10pt; margin: 4pt 0;">
+            <span class="badge badge-blue">14566 Helpline</span> ➔
+            <span class="badge badge-blue">Web Portal</span> ➔
+            <span class="badge badge-blue">Chatbot</span> ➔
+            <span class="badge badge-blue">Mobile App</span> ➔
+            <span class="badge badge-blue">IVRS</span>
+          </div>
+          API-driven microservices allow horizontal scaling to thousands of concurrent callers.
+        </li>
+        <li><strong>Economic Feasibility:</strong> Cloud-based deployment and open-source models reduce infrastructure costs while scaling dynamically with helpline call surges.</li>
+      </ul>
+    </div>
+
+    <div class="card-box card-box-accent">
+      <div class="card-title" style="color: #991b1b;">Potential Challenges, Risks & Overcomings:</div>
+      <ul class="bullet-list" style="font-size: 12pt; gap: 9pt;">
+        <li>
+          <strong>AI Bias & Accuracy:</strong><br>
+          <span style="color: #64748b;">Challenge:</span> Emotional expressions vary across languages/cultures.<br>
+          <span style="color: #059669; font-weight: 600;">❖ Solution:</span> Diverse datasets, continuous evaluation, fairness testing.
+        </li>
+        <li>
+          <strong>False Positives / False Negatives:</strong><br>
+          <span style="color: #64748b;">Challenge:</span> AI may incorrectly classify emotional states.<br>
+          <span style="color: #059669; font-weight: 600;">❖ Solution:</span> AI as a decision-support system, with human review for high-risk cases.
+        </li>
+        <li>
+          <strong>Privacy & Data Security:</strong><br>
+          <span style="color: #64748b;">Challenge:</span> Victim conversations contain sensitive info.<br>
+          <span style="color: #059669; font-weight: 600;">❖ Solution:</span> Consent-based collection, encryption, zero-storage option.
+        </li>
+        <li>
+          <strong>Multilingual & Dialect Variation:</strong><br>
+          <span style="color: #64748b;">Challenge:</span> Diverse Indian languages and regional dialects.<br>
+          <span style="color: #059669; font-weight: 600;">❖ Solution:</span> Multilingual NLP/STT models with continuous tuning.
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Impact and Benefits -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">IMPACT AND BENEFITS</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div class="impact-grid">
+    <div class="card-box card-box-accent">
+      <ul class="bullet-list" style="gap: 11pt; font-size: 12.5pt;">
+        <li>
+          <strong>Early Detection of Distress:</strong><br>
+          <span style="color: #475569;">Impact: Real-time identification of stress and trauma indicators during victim interactions.</span><br>
+          <span style="color: #059669; font-weight: 600;">Benefit: Enables earlier attention to individuals needing urgent support.</span>
+        </li>
+        <li>
+          <strong>Prioritized Human Intervention:</strong><br>
+          <span style="color: #475569;">Impact: AI-generated risk levels help authorized personnel identify critical cases.</span><br>
+          <span style="color: #059669; font-weight: 600;">Benefit: Optimal allocation of limited counselling and support resources.</span>
+        </li>
+        <li>
+          <strong>Improved Victim Support:</strong><br>
+          <span style="color: #475569;">Impact: Converts conversational information into structured support insights.</span><br>
+          <span style="color: #059669; font-weight: 600;">Benefit: More responsive assistance while reducing dependence on manual screening.</span>
+        </li>
+        <li>
+          <strong>Multilingual Accessibility:</strong><br>
+          <span style="color: #475569;">Impact: Supports interactions across diverse linguistic backgrounds.</span><br>
+          <span style="color: #059669; font-weight: 600;">Benefit: Makes AI-assisted assessment accessible to all citizens.</span>
+        </li>
+        <li>
+          <strong>Data-Driven Decision Making:</strong><br>
+          <span style="color: #475569;">Impact: Aggregated, privacy-preserving analytics reveal trauma patterns.</span><br>
+          <span style="color: #059669; font-weight: 600;">Benefit: Helps authorities plan targeted intervention strategies.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div style="display: flex; justify-content: center; align-items: center;">
+      <img src="extracted_media/image5.png" class="impact-chain-img" alt="Impact Chain Diagram">
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: Research and Technical Approach WITH ARCHITECTURE DIAGRAM -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">RESEARCH AND TECHNICAL APPROACH</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div class="two-col-grid" style="grid-template-columns: 0.95fr 1.05fr;">
+    <div style="display: flex; flex-direction: column; gap: 0.2in;">
+      <div class="card-box card-box-accent" style="padding: 12pt 16pt;">
+        <div class="card-title" style="font-size: 15pt; margin-bottom: 6pt;"># Problem & Domain Research:</div>
+        <ul class="bullet-list" style="font-size: 11.5pt; gap: 5pt;">
+          <li><strong>NHAA 14566:</strong> National Helpline Against Atrocities (nhapoa.gov.in)</li>
+          <li><strong>POA Act, 1989:</strong> Prevention of Atrocities against SC/ST</li>
+          <li><strong>PCR Act, 1955:</strong> Protection of Civil Rights Act</li>
+          <li><strong>Annual Grievance Reports:</strong> Dept. of Social Justice & Empowerment</li>
+        </ul>
+      </div>
+
+      <div class="card-box card-box-accent" style="padding: 12pt 16pt; border-left: 5px solid #0f766e;">
+        <div class="card-title" style="font-size: 15pt; color: #0f766e; margin-bottom: 6pt;"># Technology Stack:</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6pt 10pt; font-size: 11pt; color: #334155;">
+          <div><strong>Frontend:</strong> Next.js, React</div>
+          <div><strong>Backend:</strong> FastAPI, WebSockets</div>
+          <div><strong>Speech AI:</strong> Whisper STT</div>
+          <div><strong>Audio Prosody:</strong> Librosa (Pitch, Jitter)</div>
+          <div><strong>NLP Models:</strong> RoBERTa / DistilBERT</div>
+          <div><strong>Database:</strong> PostgreSQL, Redis</div>
+          <div><strong>Security:</strong> RBAC, TLS 1.3, DPDP</div>
+          <div><strong>Hosting:</strong> Docker, AWS Cloud</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TECHNICAL ARCHITECTURE DIAGRAM -->
+    <div class="diagram-container">
+      <div style="font-family: 'Outfit', sans-serif; font-size: 15pt; font-weight: 700; color: #1e3a8a; text-align: center;">
+        ⚡ MULTIMODAL AI ASSESSMENT PIPELINE
+      </div>
+
+      <!-- Diagram SVG / Flex Nodes -->
+      <div style="display: flex; flex-direction: column; gap: 6pt;">
+        <!-- Level 1: Ingestion -->
+        <div style="background: #eff6ff; border: 1.5px solid #93c5fd; border-radius: 8px; padding: 6pt 10pt; text-align: center;">
+          <strong style="color: #1e40af; font-size: 11pt;">INPUT CHANNELS:</strong>
+          <span style="font-size: 10.5pt; color: #3b82f6;"> 📞 14566 Helpline Audio (SIP) &nbsp;|&nbsp; 💬 Web Chat &nbsp;|&nbsp; 📱 Mobile App</span>
+        </div>
+
+        <div class="flow-arrow-down">▼</div>
+
+        <!-- Level 2: Dual Processing -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8pt;">
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 8px; padding: 8pt; text-align: center;">
+            <div style="font-weight: 700; color: #166534; font-size: 11pt;">🎙️ Speech Prosody Analyser</div>
+            <div style="font-size: 9.5pt; color: #475569; margin-top: 3pt;">Pitch F0 • Vocal Jitter • Shimmer • Speech Rate & Tremor</div>
+          </div>
+          <div style="background: #fdf4ff; border: 1.5px solid #f0abfc; border-radius: 8px; padding: 8pt; text-align: center;">
+            <div style="font-weight: 700; color: #86198f; font-size: 11pt;">📝 Whisper STT + NLP</div>
+            <div style="font-size: 9.5pt; color: #475569; margin-top: 3pt;">Hindi/Eng Transcription • Trauma & Distress Lexicon</div>
+          </div>
+        </div>
+
+        <div class="flow-arrow-down">▼</div>
+
+        <!-- Level 3: Multimodal Fusion -->
+        <div style="background: #fef3c7; border: 1.5px solid #fcd34d; border-radius: 8px; padding: 7pt 10pt; text-align: center;">
+          <div style="font-weight: 700; color: #92400e; font-size: 11pt;">⚙️ MULTIMODAL DECISION FUSION ENGINE</div>
+          <div style="font-size: 9.5pt; color: #78350f;">Weighted Confidence: Acoustic Features (40%) + Linguistic NLP (60%)</div>
+        </div>
+
+        <div class="flow-arrow-down">▼</div>
+
+        <!-- Level 4: Risk Scoring & Triage -->
+        <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 8pt;">
+          <div style="background: #fee2e2; border: 1.5px solid #fca5a5; border-radius: 8px; padding: 7pt; text-align: center;">
+            <div style="font-weight: 700; color: #991b1b; font-size: 11pt;">📊 Trauma Risk Score</div>
+            <div style="font-size: 9.5pt; color: #7f1d1d;">0–100 Scale (Low / Med / High / Critical)</div>
+          </div>
+          <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 7pt; text-align: center;">
+            <div style="font-weight: 700; color: #0f172a; font-size: 11pt;">🛡️ Human-in-the-Loop Triage</div>
+            <div style="font-size: 9.5pt; color: #475569;">Counselor Override • 1-Click Referral</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: Prototype / Demo Slide WITH UI MOCKUP DIAGRAMS -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">PROTOTYPE & DEMONSTRATION</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 0.35in; flex: 1;">
+    <!-- MOCKUP 1: Complainant Interface -->
+    <div class="mockup-window">
+      <div class="mockup-header">
+        <div class="mockup-controls">
+          <div class="control-dot dot-red"></div>
+          <div class="control-dot dot-yellow"></div>
+          <div class="control-dot dot-green"></div>
+        </div>
+        <div>1️⃣ Victim Complainant Interface (Web / Mobile)</div>
+        <span class="badge badge-green">● LIVE SECURE</span>
+      </div>
+
+      <div class="mockup-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6pt 10pt;">
+          <div>
+            <div style="font-size: 11pt; font-weight: 700; color: #0f172a;">NHAA 14566 Helpline Assistance</div>
+            <div style="font-size: 9pt; color: #64748b;">Zero raw audio stored • PII Encrypted</div>
+          </div>
+          <span class="badge badge-blue">✓ Consent Active</span>
+        </div>
+
+        <!-- Waveform Voice Visualizer -->
+        <div style="background: #0f172a; border-radius: 8px; padding: 10pt; text-align: center;">
+          <div style="font-size: 9.5pt; color: #94a3b8; margin-bottom: 4pt;">🎙️ LIVE VOICE STREAM (WHISPER STT)</div>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 4px; height: 32px;">
+            <div style="width: 4px; height: 12px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 24px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 30px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 16px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 28px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 32px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 18px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 26px; background: #38bdf8; border-radius: 2px;"></div>
+            <div style="width: 4px; height: 10px; background: #38bdf8; border-radius: 2px;"></div>
+          </div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 9pt; color: #a7f3d0; margin-top: 4pt;">
+            "मुझे बहुत डर लग रहा है, कृपया मदद भेजिए..."
+          </div>
+        </div>
+
+        <!-- Chat Conversation Bubble -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8pt; font-size: 10pt; color: #334155;">
+          <strong>🤖 SVI Assistant:</strong> "आप सुरक्षित हैं। आपकी कॉल को उच्च प्राथमिकता में विशेषज्ञ काउंसलर से जोड़ा जा रहा है।"
+        </div>
+
+        <!-- Emergency SOS Button -->
+        <div style="background: #ef4444; color: #ffffff; border-radius: 8px; padding: 8pt; text-align: center; font-weight: 700; font-size: 11pt; margin-top: auto;">
+          🚨 ONE-TAP EMERGENCY SOS ESCALATION
+        </div>
+      </div>
+    </div>
+
+    <!-- MOCKUP 2: Counselor Triage Dashboard -->
+    <div class="mockup-window">
+      <div class="mockup-header" style="background: #1e3a8a;">
+        <div class="mockup-controls">
+          <div class="control-dot dot-red"></div>
+          <div class="control-dot dot-yellow"></div>
+          <div class="control-dot dot-green"></div>
+        </div>
+        <div>2️⃣ Counselor Real-Time Triage Dashboard</div>
+        <span class="badge badge-yellow">3 Active Calls</span>
+      </div>
+
+      <div class="mockup-body">
+        <!-- Queue Table Mockup -->
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; background: #f1f5f9; padding: 5pt 8pt; font-size: 9.5pt; font-weight: 700; color: #475569;">
+            <div>Case ID</div>
+            <div>Channel</div>
+            <div>Risk Score</div>
+            <div>Priority</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 6pt 8pt; font-size: 9.5pt; border-bottom: 1px solid #f1f5f9; background: #fef2f2; align-items: center;">
+            <div style="font-weight: 700; color: #991b1b;">#8921</div>
+            <div>14566 Voice</div>
+            <div style="font-weight: 700; color: #b91c1c;">94 / 100</div>
+            <div><span class="badge badge-red">CRITICAL</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 6pt 8pt; font-size: 9.5pt; border-bottom: 1px solid #f1f5f9; align-items: center;">
+            <div style="font-weight: 700;">#8922</div>
+            <div>Web Chat</div>
+            <div style="font-weight: 700; color: #c2410c;">76 / 100</div>
+            <div><span class="badge badge-orange">HIGH</span></div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; padding: 6pt 8pt; font-size: 9.5pt; align-items: center;">
+            <div style="font-weight: 700;">#8923</div>
+            <div>IVRS Portal</div>
+            <div style="font-weight: 700; color: #854d0e;">42 / 100</div>
+            <div><span class="badge badge-yellow">MODERATE</span></div>
+          </div>
+        </div>
+
+        <!-- Case Detail Gauge -->
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8pt 10pt;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4pt;">
+            <span style="font-size: 10pt; font-weight: 700; color: #0f172a;">Active Case #8921 Acoustic Trauma Gauge:</span>
+            <span style="font-weight: 800; color: #dc2626; font-size: 11pt;">94% SEVERE</span>
+          </div>
+          <div style="width: 100%; height: 10px; background: #e2e8f0; border-radius: 5px; overflow: hidden;">
+            <div style="width: 94%; height: 100%; background: linear-gradient(to right, #facc15, #f97316, #dc2626);"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 8.5pt; color: #64748b; margin-top: 4pt;">
+            <span>Pitch Variance: +38%</span>
+            <span>Vocal Tremor: HIGH</span>
+            <span>Trigger: Physical Threat</span>
+          </div>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6pt; margin-top: auto;">
+          <div style="background: #dc2626; color: #ffffff; border-radius: 6px; padding: 6pt; text-align: center; font-size: 9.5pt; font-weight: 700;">
+            🚨 Police Dispatch
+          </div>
+          <div style="background: #2563eb; color: #ffffff; border-radius: 6px; padding: 6pt; text-align: center; font-size: 9.5pt; font-weight: 700;">
+            📞 Connect Counselor
+          </div>
+          <div style="background: #475569; color: #ffffff; border-radius: 6px; padding: 6pt; text-align: center; font-size: 9.5pt; font-weight: 700;">
+            ✏️ Override Score
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: 36-Hour Hackathon Timeline WITH SPRINT ROADMAP DIAGRAM -->
+<div class="slide">
+  <div class="slide-header">
+    <img src="extracted_media/image3.jpeg" class="header-logo-left">
+    <div class="header-title">36-HOUR TIMELINE & EXECUTION PLAN</div>
+    <img src="extracted_media/image1.jpeg" class="header-logo-right">
+  </div>
+
+  <!-- SPRINT ROADMAP DIAGRAM PIPELINE -->
+  <div class="timeline-pipeline">
+    <div class="timeline-col" style="border-top: 4px solid #1e3a8a;">
+      <div class="timeline-col-header" style="background: #eff6ff; color: #1e3a8a;">H 00 – 06</div>
+      <h4>Streaming Gateway</h4>
+      <ul>
+        <li>FastAPI & Next.js repo</li>
+        <li>WebSocket audio pipeline</li>
+        <li>Consent gate & PII masking</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #1e3a8a; text-align: center; padding-top: 4pt;">
+        Setup Phase
+      </div>
+    </div>
+
+    <div class="timeline-col" style="border-top: 4px solid #0f766e;">
+      <div class="timeline-col-header" style="background: #f0fdf4; color: #0f766e;">H 06 – 14</div>
+      <h4>Multimodal AI</h4>
+      <ul>
+        <li>Whisper STT integration</li>
+        <li>Librosa prosody extractor</li>
+        <li>Distress NLP classifier</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #0f766e; text-align: center; padding-top: 4pt;">
+        🚩 MVP Live (H12)
+      </div>
+    </div>
+
+    <div class="timeline-col" style="border-top: 4px solid #b45309;">
+      <div class="timeline-col-header" style="background: #fffbeb; color: #b45309;">H 14 – 22</div>
+      <h4>Risk & Triage</h4>
+      <ul>
+        <li>Fusion algorithm (Text+Audio)</li>
+        <li>0-100 Trauma score</li>
+        <li>Dynamic priority queue</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #b45309; text-align: center; padding-top: 4pt;">
+        Scoring Engine
+      </div>
+    </div>
+
+    <div class="timeline-col" style="border-top: 4px solid #7c2d12;">
+      <div class="timeline-col-header" style="background: #fef2f2; color: #7c2d12;">H 22 – 28</div>
+      <h4>Dashboard UI</h4>
+      <ul>
+        <li>Live queue WebSockets</li>
+        <li>Acoustic stress gauge</li>
+        <li>1-Click referral routes</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #7c2d12; text-align: center; padding-top: 4pt;">
+        🚩 Integration (H24)
+      </div>
+    </div>
+
+    <div class="timeline-col" style="border-top: 4px solid #4338ca;">
+      <div class="timeline-col-header" style="background: #eef2ff; color: #4338ca;">H 28 – 34</div>
+      <h4>Security & Test</h4>
+      <ul>
+        <li>Bias & accent fairness</li>
+        <li>Synthetic stress testing</li>
+        <li>RBAC & zero-storage audit</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #4338ca; text-align: center; padding-top: 4pt;">
+        🚩 Demo Ready (H30)
+      </div>
+    </div>
+
+    <div class="timeline-col" style="border-top: 4px solid #065f46;">
+      <div class="timeline-col-header" style="background: #ecfdf5; color: #065f46;">H 34 – 36</div>
+      <h4>Rehearsal & Demo</h4>
+      <ul>
+        <li>End-to-end simulation</li>
+        <li>Offline fallback caching</li>
+        <li>Judge Q&A alignment</li>
+      </ul>
+      <div style="margin-top: auto; font-size: 8.5pt; font-weight: 700; color: #065f46; text-align: center; padding-top: 4pt;">
+        🏆 Grand Finale
+      </div>
+    </div>
+  </div>
+
+  <div class="milestones-bar">
+    <div style="font-weight: 800; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">
+      🎯 GRAND FINALE MILESTONE COMMITMENTS:
+    </div>
+    <div><span class="milestone-highlight">Hour 12:</span> Core Audio MVP Live</div>
+    <div>•</div>
+    <div><span class="milestone-highlight" style="color: #a7f3d0;">Hour 24:</span> Full System Integrated</div>
+    <div>•</div>
+    <div><span class="milestone-highlight" style="color: #fdba74;">Hour 30:</span> Stress-Tested & Demo Ready</div>
+    <div>•</div>
+    <div><span class="milestone-highlight" style="color: #f472b6;">Hour 36:</span> Live Pitch & Demonstration</div>
+  </div>
+</div>
+
+</body>
+</html>

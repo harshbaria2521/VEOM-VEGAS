@@ -10,6 +10,10 @@ python3 -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
 # ----------------------------------------------------
 # 4️⃣ Run the frontend (Next.js) in a second terminal:
 cd "/Users/harshbaria2521/Desktop/VEOM VEGAS/SVI/frontend"
+
+# 5️⃣ Install frontend dependencies (first time only)
+npm install jspdf
+
 npm run dev
 
 
