@@ -25,7 +25,7 @@ export async function GET(request) {
           {
             title: `Tele-MANAS National Mental Health Programme (${location})`,
             url: 'https://telemanas.mohfw.gov.in',
-            snippet: `Government of India 24/7 mental health tele-counselling network with regional language support available across ${location}.`,
+            snippet: `National 24/7 mental health tele-counselling network with regional language support available across ${location}.`,
             phone: '14416 / 1800-891-4416',
             type: 'Psychological Support',
           },

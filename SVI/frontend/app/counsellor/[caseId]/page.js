@@ -21,7 +21,6 @@ import {
   FileCheck,
   HelpCircle,
   PhoneCall,
-  Printer,
   Download
 } from 'lucide-react';
 import { generateGrievancePDF } from '../../../lib/pdfGenerator';
@@ -36,11 +35,6 @@ export default function CaseDetailPage() {
 
   const [showSensitiveTranscript, setShowSensitiveTranscript] = useState(false);
 
-  const handlePrint = () => {
-    if (typeof window !== 'undefined') {
-      window.print();
-    }
-  };
 
   const currentCase = cases.find((c) => c.id === caseId) || cases[0];
 
@@ -88,53 +82,6 @@ export default function CaseDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Official Case Summary Header for Print Only */}
-      <div className="hidden print:block border-b-2 border-gov-navy dark:border-slate-700 pb-3 mb-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-base font-bold uppercase tracking-wider text-gov-navy dark:text-teal-400">
-              Smart Victim Intelligence (SVI) — Official Case Summary
-            </h2>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-              Ministry of Social Justice & Empowerment • National Helpline Against Atrocities (14566)
-            </p>
-          </div>
-          <div className="text-right text-xs text-slate-600 dark:text-slate-300 font-mono">
-            <div>Case Reference: <strong className="text-slate-900 dark:text-slate-100">{currentCase.id}</strong></div>
-            <div>Status: <strong className="text-slate-900 dark:text-slate-100">{currentCase.status}</strong></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Print Specific Styling: Faithfully preserves the active mode (Dark or Light) without switching */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        @media print {
-          header, footer, nav, button, .print\\:hidden {
-            display: none !important;
-          }
-          main {
-            padding: 0 !important;
-            margin: 0 !important;
-            max-width: 100% !important;
-          }
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          /* Dark mode print: 100% dark background and light text */
-          html.dark, html.dark body, .dark body {
-            background-color: #0b141a !important;
-            color: #f1f5f9 !important;
-            color-scheme: dark !important;
-          }
-          /* Light mode print: 100% light background and dark text */
-          html:not(.dark), html:not(.dark) body {
-            background-color: #ffffff !important;
-            color: #0f172a !important;
-            color-scheme: light !important;
-          }
-        }
-      ` }} />
 
       {/* Top Breadcrumb / Back Navigation & Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -152,20 +99,10 @@ export default function CaseDetailPage() {
             type="button"
             onClick={() => generateGrievancePDF(currentCase)}
             aria-label="Download Official Grievance Docket PDF"
-            className="inline-flex items-center gap-1.5 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500 print:hidden cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-bold bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-emerald-500 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-amber-300" aria-hidden="true" />
             <span>Official Grievance Docket (PDF)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handlePrint}
-            aria-label="Print or Save Case Summary as PDF"
-            className="inline-flex items-center gap-1.5 text-xs font-bold bg-white dark:bg-slate-800 hover:bg-gov-cream dark:hover:bg-slate-700 text-gov-navy dark:text-slate-100 border border-gov-border dark:border-slate-700 hover:border-gov-teal/50 px-3 py-1.5 rounded-lg shadow-sm transition-colors focus:ring-2 focus:ring-gov-teal print:hidden cursor-pointer"
-          >
-            <Printer className="w-3.5 h-3.5 text-gov-teal dark:text-teal-400" aria-hidden="true" />
-            <span>Print Summary</span>
           </button>
 
           <div className="flex items-center gap-2 text-xs text-gov-textMuted dark:text-slate-400">
@@ -182,7 +119,7 @@ export default function CaseDetailPage() {
         <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
         <div className="text-xs text-amber-950 dark:text-amber-200">
           <span className="font-bold block uppercase tracking-wider text-[11px] text-amber-900 dark:text-amber-300">
-            Decision Support Notice (MoSJE Protocol)
+            Decision Support Notice (NHAA Protocol)
           </span>
           <p className="mt-0.5 leading-relaxed font-medium">
             {t.nonDiagnosticWarning} All routing decisions and risk determinations must be validated by an authorized officer.

@@ -54,7 +54,7 @@ export default function ConsentModal({ onConsentComplete, isOpen = true }) {
             </div>
             <div>
               <h3 className="font-bold text-base sm:text-lg">{t.consentTitle}</h3>
-              <p className="text-xs text-slate-300 dark:text-slate-400 font-medium">{t.ministry}</p>
+              <p className="text-xs text-slate-300 dark:text-slate-400 font-medium">National Helpline Against Atrocities (14566)</p>
             </div>
           </div>
         </div>

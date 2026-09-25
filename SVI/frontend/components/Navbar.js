@@ -23,9 +23,9 @@ export default function Navbar() {
       <div className="bg-gov-navyDark dark:bg-slate-950 text-slate-100 text-xs py-1.5 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-1">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-amber-300 tracking-wide">{t.govIndia}</span>
-            <span className="text-slate-400">|</span>
-            <span className="text-slate-200">{t.ministry}</span>
+            <span className="font-semibold text-amber-300 tracking-wide">National Helpline Against Atrocities</span>
+            <span className="hidden sm:inline text-slate-400">|</span>
+            <span className="hidden sm:inline text-slate-200">SVI Portal (14566)</span>
           </div>
           <div className="flex items-center gap-3 text-amber-200 font-medium">
             <span className="flex items-center gap-1">

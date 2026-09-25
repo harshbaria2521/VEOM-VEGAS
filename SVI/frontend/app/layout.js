@@ -10,7 +10,7 @@ import { Shield, Phone, ExternalLink } from 'lucide-react';
 
 export const metadata = {
   title: 'SVI — Smart Victim Intelligence | NHAA 14566',
-  description: 'AI-Based Real-Time Stress & Trauma Assessment Module for National Helpline Against Atrocities (14566), Ministry of Social Justice & Empowerment, Government of India.',
+  description: 'AI-Based Real-Time Stress & Trauma Assessment Module for National Helpline Against Atrocities (14566), Smart Victim Intelligence.',
   manifest: '/manifest.webmanifest',
   icons: {
     icon: '/icon-192.png',
@@ -94,7 +94,7 @@ export default function RootLayout({ children }) {
                   <span>National Helpline Against Atrocities (NHAA)</span>
                 </div>
                 <p className="text-slate-400 leading-relaxed text-xs">
-                  A flagship grievance redressal and victim intelligence initiative by the Ministry of Social Justice and Empowerment, Government of India.
+                  A dedicated grievance redressal and victim intelligence initiative for citizen safety and trauma-informed support.
                 </p>
                 <p className="text-[11px] text-slate-500">
                   Operated under the Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act & Protection of Civil Rights Act.
@@ -127,7 +127,7 @@ export default function RootLayout({ children }) {
                   Compliant with Guidelines for Indian Government Websites (GIGW) and Digital Personal Data Protection (DPDP) Act. All AI assessments are non-diagnostic decision-support signals.
                 </p>
                 <div className="pt-1 text-[11px] text-slate-500">
-                  © 2026 Government of India. All Rights Reserved.
+                  © 2026 SVI Portal. All Rights Reserved.
                 </div>
               </div>
             </div>

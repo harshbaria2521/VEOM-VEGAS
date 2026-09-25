@@ -43,7 +43,7 @@ export default function LoginPage() {
             {lang === 'hi' ? 'SVI पहचान एवं लॉगिन पोर्टल' : 'SVI Access & Login Portal'}
           </h1>
           <p className="text-xs text-slate-300 dark:text-slate-400">
-            Ministry of Social Justice & Empowerment • NHAA 14566
+            National Support Portal • NHAA 14566
           </p>
         </div>
 

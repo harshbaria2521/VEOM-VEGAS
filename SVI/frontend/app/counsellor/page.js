@@ -166,7 +166,7 @@ export default function CounsellorDashboardPage() {
               NHAA 14566 Triage
             </span>
             <span className="text-xs text-gov-textMuted dark:text-slate-400">
-              Ministry of Social Justice &amp; Empowerment
+              National Helpline Against Atrocities
             </span>
           </div>
           <h1 className="text-xl sm:text-2xl font-bold text-gov-navy dark:text-slate-100 mt-1">

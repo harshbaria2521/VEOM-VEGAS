@@ -1071,7 +1071,7 @@ export default function ChatWidget() {
             AI Real-Time Trauma Triage {'\u2022'} 256-bit Encrypted & Confidential
           </span>
           <span className="hidden md:inline font-medium">
-            Ministry of Social Justice & Empowerment (14566)
+            National Helpline Against Atrocities (14566)
           </span>
         </div>
       </div>

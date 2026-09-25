@@ -49,7 +49,7 @@ export default function HomePage() {
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-widest bg-amber-400 text-gov-navyDark px-2.5 py-0.5 rounded">
-              Official Ministry Portal
+              Official Support Portal
             </span>
             <span className="text-xs text-amber-200">
               National Helpline Against Atrocities (14566)

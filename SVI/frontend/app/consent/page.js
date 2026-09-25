@@ -70,7 +70,7 @@ export default function ConsentPage() {
             <div>
               <h1 className="text-lg sm:text-xl font-bold">{t.consentTitle}</h1>
               <p className="text-xs text-slate-300 dark:text-slate-400 font-medium">
-                {t.ministry} • DPDP Compliance
+                National Privacy Framework • DPDP Compliance
               </p>
             </div>
           </div>
