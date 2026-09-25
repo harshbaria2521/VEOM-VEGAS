@@ -1,11 +1,22 @@
 # Step1: Setup FastAPI backend
+import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import uvicorn
 
 from backend.ai_agent import graph, SYSTEM_PROMPT, parse_response
 
 app = FastAPI()
+
+# Allow cross-origin requests from any frontend (Vercel, localhost, etc.)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 from typing import Optional
@@ -100,4 +111,6 @@ async def ask(query: Query):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="127.0.0.1", port=5500, reload=True)
+    port = int(os.environ.get("PORT", 5500))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+
