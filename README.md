@@ -1,7 +1,7 @@
-# 🛡️ Smart Victim Intelligence (SVI)
+# Smart Victim Intelligence (SVI)
 
 <p align="center">
-  <img src="./assets/svi-workflow.png" alt="Smart Victim Intelligence workflow" width="100%">
+  <img src="./assets/svi-dashboard.png" alt="Smart Victim Intelligence workflow" width="100%">
 </p>
 
 <h3 align="center">From Listening to Meaningful Support</h3>
@@ -28,7 +28,7 @@
 
 ---
 
-## 📌 Overview
+## Overview
 
 **Smart Victim Intelligence (SVI)** is an AI-assisted real-time stress and trauma assessment concept developed for **Smart India Hackathon 2026 – Problem Statement SIH26093**.
 
@@ -47,7 +47,7 @@ SVI is designed around four principles:
 
 ---
 
-## 🎯 Problem Statement
+## Problem Statement
 
 **Problem Statement ID:** `SIH26093`
 
@@ -70,7 +70,7 @@ Traditional support systems may receive large amounts of unstructured informatio
 
 ---
 
-## 💡 Solution
+## Solution
 
 SVI combines conversational AI, NLP, speech analysis and human validation into a single support workflow.
 
@@ -80,20 +80,20 @@ The proposed assessment pipeline accepts interaction data after a **consent and 
 
 | Capability | Description |
 |---|---|
-| 🧠 Real-Time AI Assessment | Analyze interaction signals during the conversation |
-| 💬 NLP Analysis | Sentiment, emotion and linguistic signal extraction |
-| 🎙️ Speech Analysis | Acoustic indicators such as tone and pitch |
-| 🚨 Risk Classification | Low / Moderate / High / Critical risk levels |
-| 👤 Human-in-the-Loop | Counselor or authorized officer validates AI assessment |
-| 🆘 Emergency Escalation | Emergency support pathway for critical situations |
-| 🧑‍⚕️ Professional Support | Therapist/counselor discovery and follow-up |
-| 🌐 Multilingual Access | Designed for Hindi, English and Indian-language/dialect support |
-| 🔐 Privacy-First | Consent-driven data collection and security controls |
-| 🔄 Continuous Improvement | Outcomes and feedback can improve future assessments |
+| 1. Real-Time AI Assessment | Analyze interaction signals during the conversation |
+| 2. NLP Analysis | Sentiment, emotion and linguistic signal extraction |
+| 3. Speech Analysis | Acoustic indicators such as tone and pitch |
+| 4. Risk Classification | Low / Moderate / High / Critical risk levels |
+| 5. Human-in-the-Loop | Counselor or authorized officer validates AI assessment |
+| 6. Emergency Escalation | Emergency support pathway for critical situations |
+| 7. Professional Support | Therapist/counselor discovery and follow-up |
+| 8. Multilingual Access | Designed for Hindi, English and Indian-language/dialect support |
+| 9. Privacy-First | Consent-driven data collection and security controls |
+| 10. Continuous Improvement | Outcomes and feedback can improve future assessments |
 
 ---
 
-# 🏗️ System Architecture
+# System Architecture
 
 The architecture below is based on the workflow presented in the SIH solution deck.
 
@@ -163,7 +163,7 @@ The workflow covers:
 
 ---
 
-# 🧠 AI Assessment Layer
+# AI Assessment Layer
 
 The proposed multimodal assessment layer combines textual and audio signals.
 
@@ -201,7 +201,7 @@ The score is intended as an assessment-support signal rather than a medical diag
 
 ---
 
-# 🤖 Current AI Agent Implementation
+# Current AI Agent Implementation
 
 The current repository contains a working conversational AI implementation built around an agentic backend.
 
@@ -231,7 +231,7 @@ The agent layer uses:
 
 ---
 
-# 🧩 Technology Stack
+# Technology Stack
 
 The repository's current implementation uses the following technologies:
 
@@ -272,7 +272,7 @@ This distinction keeps the README aligned with both the **current repository imp
 
 ---
 
-# 🔐 Privacy, Safety & Human-in-the-Loop
+# Privacy, Safety & Human-in-the-Loop
 
 SVI is designed as a **support and decision-assistance system**, not as an autonomous replacement for trained professionals.
 
@@ -311,7 +311,7 @@ For immediate danger in India, users should contact **112** directly. The applic
 
 ---
 
-# 🌐 Access Channels
+# Access Channels
 
 The proposed architecture is designed to support multiple entry points:
 
@@ -339,7 +339,7 @@ The SIH presentation identifies **5 access channels**:
 
 ---
 
-# 📊 Impact & Benefits
+# Impact & Benefits
 
 ### Early Distress Detection
 
@@ -367,7 +367,7 @@ A common assessment engine can support multiple NHAA access channels.
 
 ---
 
-# 🔄 Impact Chain
+# Impact Chain
 
 ```text
 Interaction
@@ -387,7 +387,7 @@ Better Outcomes
 
 ---
 
-# ⚙️ Project Structure
+# Project Structure
 
 ```text
 Smart-Victim-Intelligence-SVI-/
@@ -413,7 +413,7 @@ Smart-Victim-Intelligence-SVI-/
 
 ---
 
-# 🚀 Getting Started
+# Getting Started
 
 ## 1. Clone the repository
 
@@ -465,7 +465,7 @@ Use the variable names expected by `config.py` in the repository.
 
 ---
 
-# 🧠 Local MedGemma Setup
+# Local MedGemma Setup
 
 The current conversational specialist tool uses **Ollama** with the MedGemma model.
 
@@ -479,7 +479,7 @@ Start Ollama before launching the application.
 
 ---
 
-# ▶️ Run the Backend
+# Run the Backend
 
 From the project root:
 
@@ -509,7 +509,7 @@ Example request:
 
 ---
 
-# 💻 Run the Frontend
+# Run the Frontend
 
 In a separate terminal:
 
@@ -525,7 +525,7 @@ http://localhost:8501
 
 ---
 
-# 🔌 API Flow
+# API Flow
 
 ```text
 Streamlit Frontend
@@ -552,7 +552,7 @@ Streamlit Chat Interface
 
 ---
 
-# 🧪 Example Interaction
+# Example Interaction
 
 ```text
 User
@@ -586,7 +586,7 @@ Emergency escalation + 112 guidance
 
 ---
 
-# 📚 Research & References
+# Research & References
 
 The SIH presentation references the following sources and technical literature:
 
@@ -616,7 +616,7 @@ The SIH presentation references the following sources and technical literature:
 
 ---
 
-# 🏆 Smart India Hackathon 2026
+# Smart India Hackathon 2026
 
 | Field | Details |
 |---|---|
@@ -631,7 +631,7 @@ The SIH presentation references the following sources and technical literature:
 
 ---
 
-# 🔮 Future Roadmap
+# Future Roadmap
 
 The project can be extended toward the complete multimodal architecture described in the SIH proposal.
 
@@ -652,7 +652,7 @@ The project can be extended toward the complete multimodal architecture describe
 
 ---
 
-# ⚠️ Responsible AI Disclaimer
+# Responsible AI Disclaimer
 
 SVI is an **AI-assisted support and assessment system**. It is not intended to diagnose mental-health conditions, replace qualified professionals, or make autonomous decisions about a person's care.
 
@@ -662,7 +662,7 @@ For immediate danger in India, contact **112** directly. For 24/7 mental-health 
 
 ---
 
-# 🤝 Team Veom Vegas
+# Team Veom Vegas
 
 **Smart Victim Intelligence — SVI**
 
@@ -673,6 +673,6 @@ Built for **Smart India Hackathon 2026**.
 ---
 
 <p align="center">
-  <b>🛡️ Smart Victim Intelligence</b><br>
+  <b> Smart Victim Intelligence</b><br>
   <sub>Victim-Centric • Privacy-First • Scalable • Human-in-the-Loop</sub>
 </p>
