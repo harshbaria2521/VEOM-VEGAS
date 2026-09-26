@@ -1,12 +1,22 @@
-# Step1: Setup FastAPI backend
+# Step 1: Setup FastAPI backend
 import os
 import socket
+import threading
+import uuid
+from collections import OrderedDict
+from typing import Optional
+
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import uvicorn
+from pydantic import BaseModel, Field
 
-from backend.ai_agent import graph, SYSTEM_PROMPT, parse_response
+from backend.ai_agent import (
+    SYSTEM_PROMPT,
+    build_agent_messages,
+    graph,
+    parse_response,
+)
 
 app = FastAPI()
 
@@ -20,15 +30,52 @@ app.add_middleware(
 )
 
 
-from typing import Optional
+# ---------------------------------------------------------------------------
+# Conversation memory
+# ---------------------------------------------------------------------------
+# Memory is isolated by a random session_id supplied by the Next.js proxy.
+# It is intentionally bounded and in-memory; no conversation is shared
+# between users and nothing is written to disk by this layer.
+MAX_SESSIONS = 100
+MAX_HISTORY_MESSAGES = 20  # 10 user/assistant turns
+conversation_store = OrderedDict()
+conversation_lock = threading.Lock()
 
 
-# Step2: Receive and validate request from Frontend
+def get_session_history(session_id: str):
+    with conversation_lock:
+        if session_id not in conversation_store:
+            conversation_store[session_id] = []
+
+        conversation_store.move_to_end(session_id, last=True)
+        return list(conversation_store[session_id])
+
+
+def save_session_turn(session_id: str, user_message: str, assistant_message: str):
+    """Append one completed user/assistant turn and enforce memory limits."""
+    with conversation_lock:
+        history = conversation_store.setdefault(session_id, [])
+        history.append({"role": "user", "content": user_message})
+        history.append({"role": "assistant", "content": assistant_message})
+
+        # Keep only the newest turns.
+        if len(history) > MAX_HISTORY_MESSAGES:
+            del history[:-MAX_HISTORY_MESSAGES]
+
+        conversation_store.move_to_end(session_id, last=True)
+
+        # Prevent an unbounded number of abandoned browser sessions.
+        while len(conversation_store) > MAX_SESSIONS:
+            conversation_store.popitem(last=False)
+
+
+# Step 2: Receive and validate request from Frontend
 class Query(BaseModel):
-    message: str
+    message: str = Field(min_length=1)
     language: Optional[str] = "English"
     lang_code: Optional[str] = "en"
     native_name: Optional[str] = None
+    session_id: Optional[str] = None
 
 
 @app.get("/")
@@ -42,40 +89,55 @@ async def root():
 
 @app.post("/ask")
 async def ask(query: Query):
+    session_id = (query.session_id or "").strip() or str(uuid.uuid4())
+
     try:
+        user_message = query.message.strip()
         lang_name = (query.language or "English").strip()
         lang_code = (query.lang_code or "en").strip().lower()
         native_name = (query.native_name or "").strip()
 
-        # Build multilingual system instructions
+        # Build multilingual system instructions.
         if lang_code and lang_code != "en":
             target_lang = f"{lang_name} ({native_name})" if native_name else lang_name
             multilingual_rule = (
-                f"\n\n=======================================================\n"
-                f"CRITICAL MULTILINGUAL MANDATE:\n"
+                "\n\n=======================================================\n"
+                "CRITICAL MULTILINGUAL MANDATE:\n"
                 f"1. The user has selected the language: {target_lang} (Language Code: '{lang_code}').\n"
                 f"2. You MUST write your ENTIRE final response to the user in {target_lang}.\n"
                 f"3. Use the authentic, standard native script of {lang_name} (for example: Devanagari script for Hindi/Marathi, Gujarati script for Gujarati, Tamil script for Tamil, Bengali script for Bengali, Gurmukhi for Punjabi, Telugu script for Telugu, Malayalam script for Malayalam, Kannada script for Kannada, etc.). Never respond in English when a regional language is specified.\n"
                 f"4. Even if internal tools or context return English text, you MUST translate and synthesize all therapeutic advice, coping exercises, empathy, and steps into {target_lang}.\n"
-                f"5. Maintain all Indian emergency numbers clearly: 112, Tele-MANAS 14416 / 1-800-891-4416, and NHAA 14566.\n"
-                f"=======================================================\n"
+                "5. Maintain all Indian emergency numbers clearly: 112, Tele-MANAS 14416 / 1-800-891-4416, and NHAA 14566.\n"
+                "=======================================================\n"
             )
             enhanced_system_prompt = SYSTEM_PROMPT + multilingual_rule
         else:
             multilingual_rule = (
-                f"\n\nLANGUAGE ATTUNEMENT:\n"
-                f"- If the user communicates in Hindi, Marathi, Gujarati, or any Indian regional language, reply naturally in that same language and script.\n"
-                f"- If communicating in English, reply in warm, empathetic English.\n"
+                "\n\nLANGUAGE ATTUNEMENT:\n"
+                "- If the user communicates in Hindi, Marathi, Gujarati, or any Indian regional language, reply naturally in that same language and script.\n"
+                "- If communicating in English, reply in warm, empathetic English.\n"
             )
             enhanced_system_prompt = SYSTEM_PROMPT + multilingual_rule
 
+        # IMPORTANT: replay the previous user/assistant turns before the new
+        # message. This is what gives Tara actual conversational memory.
+        history = get_session_history(session_id)
         inputs = {
-            "messages": [("system", enhanced_system_prompt), ("user", query.message)]
+            "messages": build_agent_messages(
+                enhanced_system_prompt,
+                history,
+                user_message,
+                max_history_messages=MAX_HISTORY_MESSAGES,
+            )
         }
+
         stream = graph.stream(
-            inputs, stream_mode="updates", config={"recursion_limit": 6}
+            inputs,
+            stream_mode="updates",
+            config={"recursion_limit": 6},
         )
         tool_called_name, final_response = parse_response(stream)
+
         if not final_response:
             if lang_code == "hi":
                 final_response = (
@@ -97,7 +159,17 @@ async def ask(query: Query):
                     "I'm here with you, though I had trouble putting a reply together. "
                     "If this feels urgent, please call 112 or Tele-MANAS at 14416."
                 )
-        return {"response": final_response, "tool_called": tool_called_name}
+
+        # Save only the completed conversational turn. Tool internals are not
+        # stored, so the next turn sees a clean user <-> Tara conversation.
+        save_session_turn(session_id, user_message, final_response)
+
+        return {
+            "response": final_response,
+            "tool_called": tool_called_name,
+            "session_id": session_id,
+        }
+
     except Exception as e:
         print(f"[SVI] /ask failed: {e}")
         fallback_msg = (
@@ -122,6 +194,7 @@ async def ask(query: Query):
         return {
             "response": fallback_msg,
             "tool_called": "None",
+            "session_id": session_id,
         }
 
 
