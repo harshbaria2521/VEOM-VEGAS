@@ -1,6 +1,6 @@
-// SVI Service Worker — Safe Static Asset Caching Only
-// STRICT COMPLIANCE: Zero sensitive victim data or private API responses are cached.
-const CACHE_NAME = 'svi-static-v1';
+// SVI Service Worker — Safe Static Asset Caching Only.
+// Sensitive API responses and user conversations are never cached.
+const CACHE_NAME = 'svi-static-v2';
 
 const STATIC_ASSETS = [
   '/',
@@ -15,99 +15,71 @@ const STATIC_ASSETS = [
   '/favicon.ico',
 ];
 
-// Install event — precache static app shell
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate event — clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys()
+      .then((cacheNames) => Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
-      );
-    }).then(() => self.clients.claim())
+      ))
+      .then(() => self.clients.claim())
   );
 });
 
-// Fetch event — network-first with safe static fallback
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // STRICT RULE: Bypass service worker completely for:
-  // 1. Non-GET requests (POST, PUT, DELETE, etc.)
-  // 2. Backend API requests (/backend-api/, /api/, port 5500)
-  // 3. Sensitive endpoints or dynamic API streams
+  // Never intercept non-GET requests or application API routes.
   if (
     event.request.method !== 'GET' ||
-    url.pathname.startsWith('/backend-api') ||
     url.pathname.startsWith('/api') ||
-    url.port === '5500' ||
-    url.hostname === '127.0.0.1' && url.port !== '3000'
+    url.pathname.startsWith('/_next/webpack-hmr')
   ) {
-    return; // Pass through to network directly without touching cache
+    return;
   }
 
-  // Handle navigation (HTML page requests)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .catch(() => {
-          return caches.match(event.request).then((cachedResponse) => {
-            return cachedResponse || caches.match('/offline.html');
-          });
-        })
+      fetch(event.request).catch(() =>
+        caches.match(event.request).then(
+          (cached) => cached || caches.match('/offline.html')
+        )
+      )
     );
     return;
   }
 
-  // For static assets (scripts, styles, images, fonts)
-  if (
+  const isStaticAsset =
     url.pathname.startsWith('/_next/static/') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.jpeg') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.ico') ||
-    url.pathname.endsWith('.webmanifest')
-  ) {
+    /\.(png|jpg|jpeg|svg|ico|webmanifest)$/.test(url.pathname);
+
+  if (isStaticAsset) {
     event.respondWith(
       caches.match(event.request).then((cached) => {
-        if (cached) {
-          // Stale-while-revalidate for static assets
-          fetch(event.request)
-            .then((networkResponse) => {
-              if (networkResponse && networkResponse.status === 200) {
-                caches.open(CACHE_NAME).then((cache) => {
-                  cache.put(event.request, networkResponse);
-                });
-              }
-            })
-            .catch(() => {});
-          return cached;
-        }
-        return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
+        const network = fetch(event.request).then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
+              cache.put(event.request, clone);
             });
           }
-          return networkResponse;
+          return response;
         });
+        return cached || network;
       })
     );
     return;
   }
 
-  // Default: network with cache fallback
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
   );

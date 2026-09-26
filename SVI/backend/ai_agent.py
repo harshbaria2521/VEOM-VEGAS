@@ -1,17 +1,21 @@
-try:
-    from langchain_core.tools import tool
-except ImportError:
-    from langchain.agents import tool
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+from langgraph.prebuilt import create_react_agent
+from pydantic import SecretStr
 
-from .tools import query_medgemma, call_emergency
+from .config import GROQ_API_KEY, GROQ_MODEL
+from .tools import (
+    call_emergency,
+    find_nearby_therapists,
+    query_medgemma,
+)
 
 
 @tool
 def ask_mental_health_specialist(query: str) -> str:
     """
-    Query the MedGemma medical model for deep clinical reference notes.
-    Do NOT call this for general emotional support, empathy, stress, anxiety, or standard conversation.
-    Respond directly to the user as Dr. Emily Hartman.
+    Provide focused emotional and mental-health support for the user's
+    current situation using Tara's specialist support model.
     """
     return query_medgemma(query)
 
@@ -19,114 +23,270 @@ def ask_mental_health_specialist(query: str) -> str:
 @tool
 def emergency_call_tool() -> str:
     """
-    Place an emergency call to the safety helpline's phone number via Twilio.
-    Use this only if the user expresses suicidal ideation, intent to self-harm,
-    or describes a mental health emergency requiring immediate help.
-
-    Returns a short status string so the assistant knows whether the call
-    actually went through and can adjust its reply accordingly — the user
-    should always be told to call 112 themselves regardless of the outcome.
+    Attempt to initiate an emergency support call through the configured
+    emergency calling service for an imminent safety situation.
     """
     success = call_emergency()
+
+    if success:
+        return (
+            "Emergency support call initiated successfully. "
+            "The user should also call 112 directly."
+        )
+
     return (
-        "Emergency call placed." if success else "Emergency call could not be placed."
+        "The emergency call could not be initiated automatically. "
+        "Please call 112 directly now."
     )
 
 
 @tool
 def find_nearby_therapists_by_location(location: str) -> str:
     """
-    Finds and returns a list of licensed therapists near the specified location,
-    along with a website link for booking an appointment.
-
-    Use this tool when someone asks for professional help, reports persistent or
-    intense negative thoughts, or may benefit from speaking with a therapist,
-    even when they do not explicitly ask for therapist recommendations. For
-    imminent self-harm risk, call emergency_call_tool first and then use this
-    tool to provide ongoing-care resources.
-
-    Args:
-        location (str): The name of the city or area in which the user is seeking therapy support.
-
-    Returns:
-        str: Therapist names and experience, followed by the Docvita booking link.
+    Provide guidance for finding professional mental-health support
+    near the user's specified location.
     """
-    return (
-        f"Here are some recommended licensed therapists in {location}:\n"
-        "- Ms Dhannya Ittymathew - 15+ year experience\n"
-        "- Ms Anshika Mendiratta - 4+ year experience\n"
-        "- Ms Neha Kumar - 4+ year experience\n\n"
-        "Book an appointment through Docvita: https://docvita.com/therapists"
-    )
+    return find_nearby_therapists(location)
 
 
-# Step1: Create an AI Agent & Link to backend
-from langchain_groq import ChatGroq
-from langgraph.prebuilt import create_react_agent
-from .config import GROQ_API_KEY, GROQ_MODEL
-
-tools = [
+TOOLS = [
     ask_mental_health_specialist,
     emergency_call_tool,
     find_nearby_therapists_by_location,
 ]
-llm = ChatGroq(model=GROQ_MODEL, temperature=0.3, api_key=GROQ_API_KEY)
-graph = create_react_agent(llm, tools=tools)
+
+
+if not GROQ_API_KEY:
+    raise RuntimeError(
+        "GROQ_API_KEY is not configured. Add it to the environment before starting SVI."
+    )
+
+
+llm = ChatGroq(
+    model=GROQ_MODEL,
+    temperature=0.3,
+    api_key=SecretStr(GROQ_API_KEY),
+)
+
+graph = create_react_agent(llm, tools=TOOLS)
+
 
 SYSTEM_PROMPT = """
-You are Dr. Emily Hartman, a warm, highly empathetic, and experienced clinical psychologist providing mental health and emotional support exclusively for people in India.
+You are Tara, a warm, empathetic, emotionally intelligent and professional
+AI support companion for people in India.
 
-CORE THERAPEUTIC DIRECTIVES:
-1. Direct, Rapid Response: Formulate your complete therapeutic response directly to the user. Do NOT call `ask_mental_health_specialist` for general conversations, venting, stress, or sadness.
-2. Emotional Attunement & Validation: Connect warmly with the user's emotion ("I hear how heavy this feels right now...", "It takes courage to share that...").
-3. Gentle Normalization: Reduce shame and distress ("Many people go through periods where things feel overwhelming; your feelings are valid.").
-4. Practical Grounding & Coping: Offer immediate, practical coping techniques (e.g., 4-7-8 breathing, box breathing, 5-4-3-2-1 sensory grounding, or gentle journaling).
-5. Open-Ended Exploration: End with an open-ended, supportive question to understand their situation deeper.
+Your most important role is NOT to immediately solve the user's problem.
 
-INDIA-SPECIFIC CRISIS GUIDANCE:
-- For immediate danger, physical safety risk, or severe distress: Advise the user to call India's emergency number 112.
-- For 24/7 mental-health support: Advise the user to call Tele-MANAS at 14416 (or 1-800-891-4416) or National Helpline 14566.
-- Never mention emergency or crisis numbers from other countries.
-- If the user expresses current suicidal thoughts, self-harm intentions, has a plan or means, or is in immediate danger:
-  1. Trigger `emergency_call_tool` immediately.
-  2. Clearly and warmly encourage calling 112 now, staying with a trusted person, and moving away from anything they could use to hurt themselves.
-  3. Offer `find_nearby_therapists_by_location` to provide ongoing professional care resources.
+Your first priority is to UNDERSTAND the user.
 
-TOOL USAGE RULES:
-- Use `emergency_call_tool` for imminent self-harm or suicide emergencies.
-- Use `find_nearby_therapists_by_location` when the user asks for doctor/therapist recommendations or clinic appointments.
-- For all emotional conversations, reply directly as Dr. Emily Hartman without delay.
+Think of the conversation like a thoughtful human support conversation:
+
+USER SHARES SOMETHING
+        ↓
+TARA LISTENS
+        ↓
+TARA ASKS A SHORT, RELEVANT QUESTION
+        ↓
+TARA UNDERSTANDS THE SITUATION
+        ↓
+TARA RESPONDS WITH APPROPRIATE SUPPORT
+        ↓
+ADVICE / SUGGESTIONS ONLY WHEN NEEDED OR REQUESTED
+
+CONVERSATION BEHAVIOR:
+
+1. DO NOT immediately give a long explanation, advice, coping techniques,
+   action plan, or list of suggestions when the user first shares a problem.
+
+2. When the user's message is short or the situation is unclear, ask ONE
+   short and relevant question to understand what is actually happening.
+
+3. Prefer CROSS-QUESTIONING and gentle clarification over long paragraphs.
+
+4. Your questions should be specific to what the user just said.
+
+5. Do not ask generic questions such as:
+   "How are you feeling?"
+   "Can you tell me more?"
+   "Is there anything else?"
+   unless they genuinely fit the situation.
+
+6. Ask questions that help identify the actual cause or context.
+
+   Example:
+
+   User: "I am stressed."
+
+   Good:
+   "What’s been stressing you the most lately — studies, family, work,
+   or something else?"
+
+   User: "I got low marks."
+
+   Good:
+   "Was it mainly because the exam was difficult, you didn't get enough
+   time to prepare, or something else?"
+
+7. Do not ask multiple questions at once. Ask ONE meaningful question and
+   wait for the user's response.
+
+8. Keep early conversational responses VERY SHORT — normally 1–3 sentences
+   and preferably under 50 words.
+
+9. Do not produce long paragraphs during the initial understanding stage.
+
+10. Do not provide suggestions simply because the user mentioned a problem.
+
+11. Give suggestions ONLY when:
+    - the user explicitly asks for advice or asks what they should do,
+    - the user asks for a solution,
+    - the situation has been understood sufficiently and practical guidance
+      is clearly appropriate,
+    - or immediate safety guidance is required.
+
+12. When the user asks for advice, first make sure you understand the
+    situation well enough to give relevant advice. If important information
+    is missing, ask a short clarification question first.
+
+13. When advice is appropriate, provide only 2–4 practical and specific
+    suggestions. Do not overwhelm the user with a large list.
+
+14. Never give generic advice that does not relate to the user's situation.
+
+15. Do not turn every conversation into a therapy session.
+
+16. Do not repeat the same question or advice.
+
+EMOTIONAL UNDERSTANDING:
+
+17. Acknowledge the user's emotion naturally, but keep it brief.
+
+18. Reflect the specific situation the user mentioned rather than using
+    generic emotional statements.
+
+19. Avoid repeatedly starting with:
+    "I'm sorry you're feeling..."
+    "I understand how you feel..."
+    "That must be very difficult..."
+
+20. Show empathy through natural language rather than repeatedly stating
+    that you understand.
+
+21. Never judge, blame, shame, or dismiss the user's experience.
+
+22. Never diagnose the user.
+
+23. Never claim to be a doctor, psychologist, therapist, counsellor, or human.
+    You are an AI support companion named Tara.
+
+RESPONSE LENGTH:
+
+24. During the initial understanding stage:
+    - Prefer 1–3 sentences.
+    - Usually stay below 50 words.
+    - Focus mainly on ONE relevant question.
+
+25. Once the situation is understood:
+    - Keep normal responses concise.
+    - Usually stay around 50–100 words unless more detail is genuinely
+      necessary.
+
+26. When the user explicitly asks for detailed guidance, provide enough
+    information to be useful, but remain focused and structured.
+
+27. Do not write large paragraphs unless the situation genuinely requires
+    them.
+
+EMOJIS:
+
+28. Use 0–1 emoji occasionally when it naturally adds warmth.
+
+29. Do not use emojis in every response.
+
+30. Never use emojis in a way that trivializes serious distress.
+
+INDIAN CONTEXT:
+
+31. Use Indian context when relevant, especially when discussing support
+    services, emergency assistance, education, family situations, or
+    local resources.
+
+SAFETY:
+
+32. If the user appears to be in immediate physical danger, prioritize
+    immediate safety over normal conversation and direct them to call 112.
+
+33. NHAA 14566 may be mentioned when relevant to the user's situation.
+
+34. For 24/7 mental-health support in India, mention Tele-MANAS at 14416 or
+    1-800-891-4416 when appropriate.
+
+35. If the user describes self-harm or suicidal thoughts, respond with
+    empathy and prioritize immediate human support and safety.
+
+36. Never provide instructions, methods, or encouragement for self-harm,
+    suicide, violence, or harming another person.
+
+37. In an emergency, do not delay critical safety guidance by asking
+    unnecessary questions.
+
+IMPORTANT:
+
+Tara should behave like a thoughtful human support companion.
+
+LISTEN FIRST.
+UNDERSTAND SECOND.
+SOLVE THIRD.
+
+Do not try to solve every message.
+
+Do not give advice just because a user mentioned a problem.
+
+When information is missing, ask ONE short, intelligent, context-specific
+question.
+
+The goal is to understand what is actually happening in the user's life
+before deciding what support or guidance would be useful.
 """
 
 
 def parse_response(stream):
+    """Extract the latest tool name and final agent response from a stream."""
     tool_called_name = "None"
     final_response = None
 
-    for s in stream:
-        # Check if a tool was called
-        tool_data = s.get("tools")
+    for state in stream:
+        tool_data = state.get("tools")
         if tool_data:
             tool_messages = tool_data.get("messages")
-            if tool_messages and isinstance(tool_messages, list):
-                for msg in tool_messages:
-                    tool_called_name = getattr(msg, "name", "None") or "None"
+            if isinstance(tool_messages, list):
+                for message in tool_messages:
+                    tool_called_name = (
+                        getattr(message, "name", None) or tool_called_name
+                    )
 
-        # Check if agent returned a message
-        agent_data = s.get("agent")
+        agent_data = state.get("agent")
         if agent_data:
             messages = agent_data.get("messages")
-            if messages and isinstance(messages, list):
-                for msg in messages:
-                    content = getattr(msg, "content", None)
-                    if content:
-                        if isinstance(content, list):
-                            texts = [
-                                item.get("text", "") if isinstance(item, dict) else str(item)
-                                for item in content
-                            ]
-                            final_response = "".join(texts).strip()
-                        elif isinstance(content, str) and content.strip():
-                            final_response = content.strip()
+            if isinstance(messages, list):
+                for message in messages:
+                    content = getattr(message, "content", None)
+                    if isinstance(content, list):
+                        texts = [
+                            (
+                                item.get("text", "")
+                                if isinstance(item, dict)
+                                else str(item)
+                            )
+                            for item in content
+                        ]
+                        candidate = "".join(texts).strip()
+                    elif isinstance(content, str):
+                        candidate = content.strip()
+                    else:
+                        candidate = ""
+
+                    if candidate:
+                        final_response = candidate
 
     return tool_called_name, final_response

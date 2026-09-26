@@ -1,46 +1,51 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
-  let body = null;
   try {
-    body = await request.json();
-    const backendBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5500';
+    const body = await request.json();
+    const backendBaseUrl = (
+      process.env.SVI_BACKEND_URL ||
+      process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'http://127.0.0.1:8000'
+    ).replace(/\/$/, '');
 
     const backendResponse = await fetch(`${backendBaseUrl}/ask`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(body),
-      // Server-side fetch with extended timeout
       cache: 'no-store',
     });
 
+    const raw = await backendResponse.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch { data = { response: raw }; }
+
     if (!backendResponse.ok) {
-      throw new Error(`Backend responded with status ${backendResponse.status}`);
+      console.error('[SVI] Backend /ask failed:', backendResponse.status, data);
+      return NextResponse.json(
+        { error: 'Backend request failed', status: backendResponse.status, details: data },
+        { status: 502 }
+      );
     }
 
-    const data = await backendResponse.json();
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Server-side ask route error:', error);
-    let fallbackText = "I am here with you. If you are experiencing distress or need immediate assistance, please reach out to the National Helpline (NHAA 14566), Tele-MANAS (14416), or 112 directly.";
-    try {
-      if (body?.lang_code === 'hi') {
-        fallbackText = "मैं आपकी सहायता के लिए यहाँ उपस्थित हूँ। यदि आप अत्यधिक संकट में हैं या तत्काल सहायता की आवश्यकता है, तो कृपया सीधे 112 या राष्ट्रीय हेल्पलाइन 14566 / टेली-मानस 14416 पर संपर्क करें।";
-      } else if (body?.lang_code === 'gu') {
-        fallbackText = "હું આપની સાથે છું. આપત્કાલીન સહાય માટે કૃપા કરીને રાષ્ટ્રીય હેલ્પલાઇન 14566 અથવા 112 પર તરત જ સંપર્ક કરો.";
-      } else if (body?.lang_code === 'mr') {
-        fallbackText = "मी आपल्या मदतीसाठी येथे उपस्थित आहे. तातडीच्या मदतीसाठी कृपया 112 किंवा राष्ट्रीय हेल्पलाइन 14566 वर संपर्क साधा.";
-      }
-    } catch (e) {}
+    if (!data?.response || typeof data.response !== 'string') {
+      console.error('[SVI] Invalid /ask response:', data);
+      return NextResponse.json(
+        { error: 'Backend returned an invalid response' },
+        { status: 502 }
+      );
+    }
 
+    // Return the FastAPI response unchanged.
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    console.error('[SVI] /api/ask proxy error:', error);
     return NextResponse.json(
-      {
-        response: fallbackText,
-        tool_called: "None",
-      },
-      { status: 200 }
+      { error: 'Unable to reach the SVI backend', message: error?.message || 'Unknown error' },
+      { status: 502 }
     );
   }
 }

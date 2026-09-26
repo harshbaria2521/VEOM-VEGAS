@@ -430,7 +430,7 @@ export default function ChatWidget() {
       sender: 'assistant',
       text: t.initialGreeting || (lang === 'hi' 
         ? "\u0928\u092E\u0938\u094D\u0924\u0947\u0964 \u092F\u0939 \u0930\u093E\u0937\u094D\u091F\u094D\u0930\u0940\u092F \u0905\u0924\u094D\u092F\u093E\u091A\u093E\u0930 \u0935\u093F\u0930\u094B\u0927\u0940 \u0939\u0947\u0932\u094D\u092A\u0932\u093E\u0907\u0928 (NHAA 14566) \u0915\u093E \u0938\u0941\u0930\u0915\u094D\u0937\u093F\u0924 \u090F\u0935\u0902 \u0917\u094B\u092A\u0928\u0940\u092F \u0938\u0939\u093E\u092F\u0924\u093E \u0915\u0947\u0902\u0926\u094D\u0930 \u0939\u0948\u0964 \u0906\u092A \u0905\u092A\u0928\u0940 \u0938\u092E\u0938\u094D\u092F\u093E \u092C\u093F\u0928\u093E \u0915\u093F\u0938\u0940 \u0939\u093F\u091A\u0915\u093F\u091A\u093E\u0939\u091F \u0915\u0947 \u0938\u093E\u091D\u093E \u0915\u0930 \u0938\u0915\u0924\u0947 \u0939\u0948\u0902\u0964 \u0939\u092E \u0906\u092A\u0915\u0940 \u0938\u0939\u093E\u092F\u0924\u093E \u0915\u0947 \u0932\u093F\u090F \u0909\u092A\u0938\u094D\u0925\u093F\u0924 \u0939\u0948\u0902\u0964"
-        : "Welcome to the National Helpline Against Atrocities (NHAA 14566) confidential support portal. Please feel free to share what is on your mind. We are here to listen and help you navigate safety and support."),
+        : "Welcome to Tara, the confidential support assistant for the National Helpline Against Atrocities (NHAA 14566). Share what is on your mind at your own pace. Tara is here to listen, understand, and help you find the right safety and support resources."),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     }
   ];

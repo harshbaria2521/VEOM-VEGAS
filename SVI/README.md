@@ -1,52 +1,235 @@
-AI Mental Health Therapist – SafeSpace
+# Smart Victim Intelligence (SVI)
 
-Your compassionate AI companion for emotional support, built with care and real-world tools. SafeSpace listens, understands, and responds with empathy — and knows when to escalate to emergency help.
+AI-enabled real-time stress and trauma support platform for victims and complainants in India.
 
-Equipped with an AI agent architecture, specialist healthcare models (MedGemma), and life-saving tools like emergency calling via Twilio, SafeSpace is designed to support mental well-being — safely and responsibly.
+SVI combines a Next.js support portal with a FastAPI + LangGraph backend, Groq-powered conversational intelligence, multilingual guidance, consent-aware intake, nearby-support discovery, and optional Twilio emergency escalation.
 
-🚀 Quick Start
+> **Safety note:** SVI is a support and triage system, not a replacement for emergency services or qualified mental-health professionals. In an immediate emergency in India, call **112**. Tele-MANAS: **14416 / 1-800-891-4416**. National Helpline Against Atrocities: **14566**.
 
-Clone the repo and run:
+## Architecture
 
+```text
+User
+  │
+  ▼
+Next.js Frontend
+  │
+  ├── /api/ask ───────────────┐
+  └── /api/nearby-support     │
+                              ▼
+                        FastAPI Backend
+                              │
+                              ▼
+                         LangGraph Agent
+                              │
+                         ┌────┴────┐
+                         ▼         ▼
+                       Groq      Safety Tools
+                                  ├─ Twilio
+                                  └─ Support Resources
 ```
-git clone https://github.com/harshbaria2521/VEOM-VEGAS
+
+## Project Structure
+
+```text
+SVI/
+├── backend/
+│   ├── __init__.py
+│   ├── ai_agent.py
+│   ├── config.py
+│   └── tools.py
+├── frontend/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── ask/route.js
+│   │   │   └── nearby-support/route.js
+│   │   ├── admin/
+│   │   ├── consent/
+│   │   ├── counsellor/
+│   │   ├── login/
+│   │   ├── profile/
+│   │   ├── track/
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   └── page.js
+│   ├── components/
+│   ├── lib/
+│   ├── public/
+│   ├── .env.example
+│   ├── next.config.js
+│   ├── package.json
+│   └── package-lock.json
+├── docs/
+├── .env.example
+├── .gitignore
+├── main.py
+├── pyproject.toml
+├── requirements.txt
+└── README.md
 ```
 
+The legacy root `frontend.py` Streamlit application is intentionally removed. The production frontend is the `frontend/` Next.js application.
 
-Start the backend in one terminal:
+## Local Development
 
-# 1. Navigate
+### 1. Backend
 
-cd "xyz\VEOM VEGAS\test1\Smart Victim Intelligence (SVI)\safespace-ai-therapist"
+From the repository root:
 
-# 2. Create virtual environment
-
+```powershell
 python -m venv .venv
-
-# 3. Activate it
-
-.venv\Scripts\Activate.ps1
-
-# 4. Install dependencies
-
+.\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-
 pip install -r requirements.txt
+```
 
-# 5. Run backend
+Create `.env` from `.env.example` and add your credentials.
 
-python -m uvicorn main:app --host 127.0.0.1 --port 5500 --reload
+Start FastAPI:
 
-Start the  frontend in a second terminal:
+```powershell
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-# 1. Navigate
-cd "C:\Users\Rahul\Desktop\VEOM VEGAS\test1\Smart Victim Intelligence (SVI)\safespace-ai-therapist\frontend"
+Verify:
 
-# 2. Run
+- API: `http://127.0.0.1:8000`
+- Swagger: `http://127.0.0.1:8000/docs`
+
+### 2. Frontend
+
+Open a second terminal:
+
+```powershell
+cd frontend
+npm install
+```
+
+Create `frontend/.env.local`:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:8000
+TAVILY_API_KEY=your_tavily_api_key_here
+```
+
+Start Next.js:
+
+```powershell
 npm run dev
+```
 
-That’s it. This command:
+Open `http://localhost:3000`.
 
-Creates a virtual environment (if needed)
-Installs all dependencies from uv.lock
-Sets up the full environment exactly as intended
+The browser talks to the Next.js `/api/ask` route. That server-side route forwards the request to FastAPI, so the browser does not need to call the backend directly.
+
+## Production Deployment
+
+### Backend — Render
+
+Use the repository root as the service root.
+
+Build command:
+
+```text
+pip install -r requirements.txt
+```
+
+Start command:
+
+```text
+uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+Set these Render environment variables:
+
+```text
+GROQ_API_KEY
+GROQ_MODEL
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_FROM_NUMBER
+EMERGENCY_CONTACT
+```
+
+### Frontend — Render / Vercel
+
+Set the frontend service root directory to:
+
+```text
+frontend
+```
+
+Build command:
+
+```text
+npm run build
+```
+
+Start command:
+
+```text
+npm start
+```
+
+Set:
+
+```text
+NEXT_PUBLIC_API_BASE_URL=https://YOUR-BACKEND-SERVICE.onrender.com
+```
+
+If nearby-support live search is enabled, also set:
+
+```text
+TAVILY_API_KEY=your_tavily_api_key
+```
+
+## API
+
+### Health Check
+
+```http
+GET /
+```
+
+### AI Support
+
+```http
+POST /ask
+Content-Type: application/json
+```
+
+Example:
+
+```json
+{
+  "message": "I am stressed",
+  "language": "English",
+  "lang_code": "en",
+  "native_name": "English"
+}
+```
+
+Example response:
+
+```json
+{
+  "response": "...",
+  "tool_called": "None"
+}
+```
+
+## Security
+
+- Never commit `.env` files or API keys.
+- Keep production credentials in Render/Vercel environment variables.
+- Do not cache chat or sensitive API responses in the service worker.
+- Emergency automation must never replace the instruction to call 112 directly.
+- Validate and review any third-party search results before treating them as authoritative.
+
+## Important Implementation Note
+
+The backend uses Groq for the deployed conversational model. Ollama/MedGemma is not required for the Render deployment.
+
+## Documentation
+
+The `docs/` directory contains the SIH presentation material, technical architecture, roadmap, judge/viva preparation, and supporting project documents.

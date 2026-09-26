@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-// In browser during local dev, use relative /backend-api rewrite to avoid CORS.
-// In SSR or production, fall back to NEXT_PUBLIC_API_BASE_URL.
+// Browser requests use the Next.js /api routes.
+// Server-side consumers fall back to NEXT_PUBLIC_API_BASE_URL.
 const BASE_URL = typeof window !== 'undefined'
-  ? '/backend-api'
-  : (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:5500');
+  ? '/api'
+  : (process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000');
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -50,10 +50,7 @@ export async function askTherapist(message, languageMeta = {}) {
     return response.data;
   } catch (error) {
     console.error('SVI API Error:', error);
-    return {
-      response: "I am having trouble connecting to the assessment service right now. Please know you are not alone. For immediate confidential support, please call the National Helpline at 14566, Tele-MANAS at 14416, or 112 directly.",
-      tool_called: "None"
-    };
+    throw error;
   }
 }
 

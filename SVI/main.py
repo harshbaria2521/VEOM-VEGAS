@@ -1,5 +1,6 @@
 # Step1: Setup FastAPI backend
 import os
+import socket
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -124,6 +125,21 @@ async def ask(query: Query):
         }
 
 
+def get_available_port(preferred_port: int) -> int:
+    """Return the preferred port when free; otherwise choose an available one."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        try:
+            sock.bind(("0.0.0.0", preferred_port))
+            return preferred_port
+        except OSError:
+            sock.bind(("0.0.0.0", 0))
+            free_port = sock.getsockname()[1]
+            print(
+                f"[SVI] Port {preferred_port} is busy. Falling back to port {free_port}."
+            )
+            return free_port
+
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5500))
+    port = get_available_port(int(os.environ.get("PORT", 8000)))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
