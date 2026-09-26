@@ -1,0 +1,23 @@
+[project]
+name = "smart-victim-intelligence-svi"
+version = "0.1.0"
+description = "AI-enabled real-time stress and trauma support platform for victims and complainants in India."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.116.1",
+    "groq>=0.11.0",
+    "langchain>=0.3.27",
+    "langchain-groq>=0.3.8",
+    "langchain-openai>=0.3.28",
+    "langgraph>=0.6.0",
+    "pydantic>=2.11.7",
+    "python-multipart>=0.0.9",
+    "requests>=2.32.4",
+    "twilio>=9.7.0",
+    "uvicorn>=0.35.0",
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"

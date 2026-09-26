@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #FAF8F5;
+  --text-main: #1E293B;
+  --gov-navy: #0B2545;
+  --gov-teal: #134E43;
+}
+
+.dark {
+  --bg-primary: #090E17;
+  --text-main: #F1F5F9;
+  --gov-navy: #1E293B;
+  --gov-teal: #0D9488;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom scrollbar for chat and tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* Focus styles for WCAG accessibility */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #134E43;
+  outline-offset: 2px;
+}
+
+.dark a:focus-visible, .dark button:focus-visible, .dark input:focus-visible, .dark select:focus-visible, .dark textarea:focus-visible {
+  outline: 2px solid #2DD4BF;
+  outline-offset: 2px;
+}
+
+/* Chat bubble fade-in + slide-up animation (Task 2) */
+@keyframes svi-msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.svi-msg-animate {
+  animation: svi-msg-in 200ms ease-out both;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .svi-msg-animate {
+    animation: none;
+  }
+}
+
+/* Mobile Safe Area & Touch UX Utilities */
+html {
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* Prevent iOS automatic zoom on focus while maintaining accessibility */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Global Print Stylesheet: Preserves the active theme without mode switching */
+@media print {
+  header, footer, nav {
+    display: none !important;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  html.dark, html.dark body, .dark body {
+    background-color: #0b141a !important;
+    color: #f1f5f9 !important;
+    color-scheme: dark !important;
+  }
+  html:not(.dark), html:not(.dark) body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    color-scheme: light !important;
+  }
+}
+
+/* Welcome Splash Animations */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-fadeInLeft {
+  animation: fadeInLeft 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fadeInRight {
+  animation: fadeInRight 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}

@@ -1,0 +1,451 @@
+================================================================================
+  SVI — SMART VICTIM INTELLIGENCE
+  PPT vs Prototype: Gap Analysis & Future Roadmap
+  Based on: "Veom Vegas SIH.pptx" (SIH 2026 — PS ID 26093)
+  Analysed: 14 September 2026
+================================================================================
+
+  OVERALL VERDICT
+  ───────────────────────────────────────────────────────────────────────────
+  The current prototype is a strong, well-structured foundation that covers
+  the CORE of what was promised in the PPT. However, several significant
+  technical capabilities described in the slides — especially in AI/ML,
+  multimodal analysis, database, authentication, deployment, and IVRS
+  integration — are NOT yet implemented and represent the critical path
+  toward a production-ready SIH submission.
+
+
+────────────────────────────────────────────────────────────────────────────────
+  SECTION 1 — WHAT THE PPT PROMISES (All 6 Slides Summarised)
+────────────────────────────────────────────────────────────────────────────────
+
+  SLIDE 1 — Identity
+    Team: Veom Vegas | PS ID: SIH26093
+    Problem: AI-Based Real-Time Stress and Trauma Assessment Module
+             for Victims/Complainants Accessing NHAA (14566)
+    Theme: MedTech / BioTech / HealthTech | Category: Software
+
+  SLIDE 2 — Core Idea / Solution
+    ➤ Real-time stress & trauma assessment using AI/ML
+    ➤ Textual + conversational signal analysis (distress, fear, anxiety,
+       hopelessness, emotional overload)
+    ➤ Multimodal AI: linguistic + conversational + voice-based indicators
+    ➤ Non-diagnostic stress/trauma risk score with severity categorisation
+    ➤ Early alerts and priority indicators to authorized personnel
+    ➤ Support pathway recommendations (counselling / human / emergency)
+    ➤ Privacy-first, consent-driven architecture throughout
+
+  SLIDE 3 — Workflow / Tech Stack mentioned
+    MongoDB, Express, React, Node.js, PyTorch, Keras, Python,
+    OpenCV, Google Maps, GraphQL, AWS, Django, Tailwind CSS
+
+  SLIDE 4 — Feasibility
+    ➤ Modular API-based architecture
+    ➤ Deployment across: 14566 Helpline → Web Portal → Chatbot →
+      Mobile App → IVRS
+    ➤ Multilingual NLP/STT with language detection
+    ➤ Diverse datasets + fairness testing
+    ➤ Encryption, access control, data minimisation, secure storage
+
+  SLIDE 5 — Impact & Benefits
+    ➤ Real-time stress/trauma detection during interaction
+    ➤ AI-generated risk levels for resource prioritisation
+    ➤ Structured support insights from conversations
+    ➤ Multilingual accessibility
+    ➤ Privacy-preserving aggregated analytics
+    ➤ API layer integrating multiple NHAA channels
+
+  SLIDE 6 — Research & Technical Approach
+    AI/ML: Transformer-based NLP, LLM conversational analysis,
+           sentiment & emotion analysis, context-aware distress detection,
+           Speech-to-Text, voice feature extraction, prosodic/emotional
+           indicators, stress/trauma-risk classification, anomaly detection
+    Frontend: React / Next.js
+    Backend: FastAPI / Node.js
+    Database: PostgreSQL
+    Auth: Secure role-based access
+    APIs: REST
+    Deployment: Cloud infrastructure
+    Additional: PyTorch / TensorFlow, Hugging Face,
+                OpenAI-compatible LLM/API, Speech-to-Text model,
+                Encryption, Secure logging, Analytics dashboard
+
+
+────────────────────────────────────────────────────────────────────────────────
+  SECTION 2 — WHAT IS ALREADY BUILT IN THE PROTOTYPE
+────────────────────────────────────────────────────────────────────────────────
+
+  ✅ React / Next.js frontend (App Router, SSR)
+  ✅ Tailwind CSS styling
+  ✅ FastAPI backend (Python, Uvicorn)
+  ✅ LangGraph-based AI agent (LangChain + Groq LLM)
+  ✅ Non-diagnostic risk scoring (Critical / High / Moderate / Low)
+  ✅ AI Suggested Pathway (non-diagnostic, action-oriented)
+  ✅ WhatsApp-style victim chat portal with typing indicator
+  ✅ Bilingual support: English + Hindi (UI + voice input)
+  ✅ Voice input via Web Speech API (hi-IN, en-IN)
+  ✅ Counsellor portal with real-time priority queue
+  ✅ 5-category case queue filters (Risk, Channel, Language, Time, Status)
+  ✅ Case detail page with contributing indicators
+  ✅ Acoustic/speech emotion indicators (Vocal Tremor, Pitch Stability,
+     Speech Cadence) — displayed when voice consented
+  ✅ Human-in-the-loop override with mandatory justification
+  ✅ Officer audit trail per case
+  ✅ DPDP consent modal (first-visit, localStorage persisted)
+  ✅ Consent management page (/consent)
+  ✅ 3-way role login (Victim / Counsellor / Admin)
+  ✅ Victim profile with ticket number
+  ✅ Admin dashboard with KPI cards
+  ✅ Analytics (risk distribution, channel, language, weekly trends)
+  ✅ Anonymised CSV export
+  ✅ Emergency escalation trigger (Twilio call)
+  ✅ Crisis ribbon (112, 14566 tap-to-call)
+  ✅ MoSJE tricolor header strip
+  ✅ Government footer with all helpline numbers
+  ✅ Nearby support lookup (Tavily Search API)
+  ✅ Graceful server fallback (calm message + helplines)
+  ✅ ARIA accessibility, keyboard navigation, focus-visible states
+  ✅ Print / Save as PDF (Case Summary)
+  ✅ Chat bubble animations
+  ✅ Audio alert beep with toggle (new Critical cases)
+  ✅ Secure key management (os.getenv, .env, .gitignore)
+  ✅ GitHub repository published
+
+
+────────────────────────────────────────────────────────────────────────────────
+  SECTION 3 — WHAT IS MISSING / GAP ANALYSIS
+  (PPT promised vs. Prototype reality)
+────────────────────────────────────────────────────────────────────────────────
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 1 — REAL AI/ML STRESS & TRAUMA MODELS (CRITICAL GAP)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Transformer-based NLP models (Hugging Face)
+    • Sentiment & emotion analysis
+    • Context-aware distress detection
+    • Stress/trauma-risk classification (PyTorch / TensorFlow / Keras)
+    • Multimodal AI combining linguistic + conversational + voice signals
+
+  Current State:
+    • Risk scoring is driven by the Groq LLM prompt (GPT-class model)
+    • No fine-tuned stress/trauma classification model
+    • No PyTorch / TensorFlow / Keras model in the codebase
+    • No Hugging Face model integration
+    • Acoustic indicators (Tremor, Pitch, Cadence) are MOCK DATA —
+      they are not computed from real audio analysis
+
+  What Needs to Be Done:
+    → Integrate a fine-tuned Hugging Face model for emotion/distress
+      classification (e.g., j-hartmann/emotion-english-distilroberta-base
+      or a custom-trained Indian-language model)
+    → Replace mock acoustic indicators with real audio feature extraction
+      (e.g., librosa for pitch, energy, speech rate analysis)
+    → Add a stress/trauma risk scorer that combines LLM output + ML
+      classification as an ensemble
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 2 — REAL SPEECH-TO-TEXT / VOICE FEATURE EXTRACTION (CRITICAL)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Speech-to-Text (STT) for voice analysis
+    • Voice feature extraction
+    • Prosodic / emotional indicators from actual audio
+    • Speech emotion recognition
+
+  Current State:
+    • Voice input uses browser Web Speech API only (Google STT via browser)
+    • No server-side STT pipeline
+    • No prosodic feature extraction from audio
+    • Vocal Tremor / Pitch Stability / Speech Cadence are STATIC MOCK VALUES
+      — they do not reflect actual audio analysis
+
+  What Needs to Be Done:
+    → Integrate server-side STT (e.g., OpenAI Whisper, Google Cloud STT,
+      or Bhashini API for Indian languages)
+    → Add audio feature extraction using librosa or pyAudioAnalysis
+      (MFCC, pitch, energy, speech rate, jitter/shimmer)
+    → Build a real prosodic emotion classifier
+    → Store audio (consent-gated) and extract features server-side
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 3 — PERSISTENT DATABASE (CRITICAL)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • PostgreSQL database for persistent storage
+
+  Current State:
+    • All case data is stored in-memory (lib/caseStore.js — frontend state)
+    • Mock data (lib/mockData.js) pre-populates the case queue
+    • No database exists — refreshing the page resets all data
+    • No persistent storage of cases, transcripts, audit logs, or users
+
+  What Needs to Be Done:
+    → Set up PostgreSQL (or MongoDB as mentioned in Slide 3)
+    → Design schema: users, cases, transcripts, audit_trail, consents
+    → Replace mockData.js with real API calls fetching DB records
+    → Migrate in-memory caseStore to server-side persistence
+    → Add proper data retention and deletion for DPDP compliance
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 4 — REAL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (CRITICAL)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Secure role-based access control
+
+  Current State:
+    • Login is simulated — no real credentials checked against a database
+    • AuthContext stores role in React state / localStorage
+    • No session tokens, JWTs, or secure cookies
+    • No server-side authentication validation
+    • Any user can access any route if they manipulate localStorage
+
+  What Needs to Be Done:
+    → Implement JWT-based authentication (FastAPI + python-jose)
+    → Enforce role-based access control (RBAC) on all API endpoints
+    → Add OTP or secure credential flow for Counsellor / Admin
+    → Protect Next.js routes using middleware (next/middleware.js)
+    → Store hashed passwords in DB (bcrypt)
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 5 — MULTIMODAL AI PIPELINE (HIGH PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Multimodal AI combining linguistic + conversational + voice indicators
+    • OpenCV mentioned in Slide 3 (possibly for future video/image input)
+
+  Current State:
+    • Only text-based LLM analysis is performed
+    • Voice is transcribed via browser but not analysed at the acoustic level
+    • No multimodal fusion layer
+
+  What Needs to Be Done:
+    → Build a multimodal fusion layer that combines:
+      (a) LLM text distress score
+      (b) ML emotion classification score
+      (c) Acoustic feature score (if audio consented)
+    → Weighted ensemble risk scorer
+    → OpenCV integration if visual indicators (video) are planned
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 6 — MULTILINGUAL NLP (BEYOND HINDI/ENGLISH) (HIGH PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Multilingual NLP/STT with language detection
+    • Support for Indian languages and dialects
+    • Continuous dataset improvement
+
+  Current State:
+    • UI bilingual: English + Hindi only
+    • Voice input supports hi-IN + en-IN
+    • LLM handles multilingual text to some extent via Groq
+    • No language detection model
+    • No Bhashini / IndicNLP integration
+
+  What Needs to Be Done:
+    → Add automatic language detection (langdetect or Bhashini API)
+    → Extend STT to regional Indian languages (Tamil, Telugu, Marathi,
+      Bengali, Kannada, etc.) via Bhashini or Google Cloud STT
+    → Extend UI language switcher to support more Indian languages
+    → Improve NLP models with Indian-language training data
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 7 — CLOUD DEPLOYMENT & INFRASTRUCTURE (HIGH PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Cloud-based deployment (AWS mentioned in Slide 3)
+    • Scalable modular API-based architecture
+    • Deployment across: Helpline → Web Portal → Chatbot →
+      Mobile App → IVRS
+
+  Current State:
+    • Runs only locally (localhost:3000 frontend, localhost:5500 backend)
+    • No cloud deployment
+    • No containerisation (no Docker / no Kubernetes)
+    • No CI/CD pipeline
+
+  What Needs to Be Done:
+    → Containerise with Docker (Dockerfile for frontend + backend)
+    → Deploy frontend to Vercel / AWS Amplify / AWS CloudFront
+    → Deploy backend to AWS EC2 / AWS Lambda / Railway / Render
+    → Set up PostgreSQL on AWS RDS or Supabase
+    → Configure environment variables securely on cloud
+    → Set up GitHub Actions CI/CD pipeline
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 8 — IVRS INTEGRATION (MEDIUM PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Integration with IVRS (Interactive Voice Response System)
+      as part of the multi-channel deployment
+
+  Current State:
+    • Not implemented
+
+  What Needs to Be Done:
+    → Integrate Twilio Programmable Voice / IVR flow
+    → Build IVRS-to-AI bridge: caller audio → STT → AI assessment → IVR response
+    → Connect to 14566 helpline workflow
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 9 — MOBILE APP CHANNEL (MEDIUM PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Mobile App as one of the deployment channels
+
+  Current State:
+    • Web app is mobile-responsive but not a native/PWA mobile app
+
+  What Needs to Be Done:
+    → Convert to a Progressive Web App (PWA) with next-pwa
+    → Or build a React Native companion app
+    → Ensure camera/mic permissions for mobile voice consent flow
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 10 — DATA ENCRYPTION & SECURE STORAGE (MEDIUM PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Encryption, access control, data minimisation, secure storage
+    • Diverse datasets and fairness testing
+
+  Current State:
+    • No encryption of stored data (data doesn't persist anyway)
+    • No at-rest or in-transit encryption beyond HTTPS (not yet deployed)
+    • No fairness or bias testing framework
+
+  What Needs to Be Done:
+    → Implement TLS/HTTPS for deployment
+    → Encrypt sensitive fields in DB (transcripts, personal data)
+    → Implement data minimisation: collect only what is consented
+    → Add model fairness testing (demographic parity, equalized odds)
+    → Add audit log integrity protection (hash chaining or DB triggers)
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 11 — GRAPHQL API (LOW PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Mentioned (Slide 3):
+    • GraphQL
+
+  Current State:
+    • REST APIs via FastAPI and Next.js API routes only
+
+  What Needs to Be Done:
+    → Optional: Add GraphQL layer (Strawberry for Python) for flexible
+      querying of case data by the admin dashboard
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 12 — LEGAL TOOLTIP INTERACTIVITY (LOW PRIORITY)
+  ────────────────────────────────────────────────────────────────────────────
+  Status    : Mentioned as an optional feature in the SVI Master Directive
+  PPT Ref   : Legal tags (PoA Act, PCR Act) present in the prototype
+              but without explanatory tooltips
+
+  What Needs to Be Done:
+    → Add hover/focus tooltips explaining each legal section
+      e.g., "Section 3(1)(r): Intentional humiliation in public"
+
+  ────────────────────────────────────────────────────────────────────────────
+  GAP 13 — FINE-TUNED DATASET & TRAINING (FUTURE RESEARCH)
+  ────────────────────────────────────────────────────────────────────────────
+  PPT Promised:
+    • Diverse datasets, continuous evaluation, fairness testing
+
+  Current State:
+    • No training pipeline, no dataset, no fine-tuned model
+
+  What Needs to Be Done:
+    → Curate/annotate an Indian-context victim dialogue dataset
+    → Fine-tune a distress/emotion classifier (DistilBERT, IndicBERT,
+      MuRIL from Google AI India)
+    → Establish continuous evaluation pipeline with human review
+    → Document model card with limitations and fairness metrics
+
+
+────────────────────────────────────────────────────────────────────────────────
+  SECTION 4 — PRIORITISED FUTURE ROADMAP
+────────────────────────────────────────────────────────────────────────────────
+
+  PHASE 1 — SIH DEMO READINESS (Immediate / Pre-Submission)
+  ──────────────────────────────────────────────────────────
+  Priority  Task
+  ────────  ─────────────────────────────────────────────────────────────────
+  🔴 P1     Replace mock acoustic indicators with real librosa analysis
+            (even a simple pitch + energy extraction from browser audio)
+  🔴 P1     Integrate a Hugging Face emotion model (even inference-only)
+            to show real ML stress classification alongside LLM
+  🔴 P1     Connect a real database (SQLite → PostgreSQL) to persist
+            cases, transcripts, audit logs across sessions
+  🔴 P1     Add JWT-based authentication for Counsellor and Admin routes
+  🔴 P1     Deploy to cloud (Vercel for frontend, Railway/Render for backend)
+  🟡 P2     Add legal tooltips to PoA/PCR tags in counsellor queue
+  🟡 P2     Extend language switcher to at least 2 more Indian languages
+  🟡 P2     Add Docker Compose file for reproducible local setup
+
+  PHASE 2 — POST-SIH PRODUCTION HARDENING
+  ──────────────────────────────────────────────────────────
+  Priority  Task
+  ────────  ─────────────────────────────────────────────────────────────────
+  🔴 P1     Server-side STT pipeline (OpenAI Whisper or Bhashini API)
+  🔴 P1     Multimodal fusion: LLM score + ML emotion score + acoustic score
+  🔴 P1     Full RBAC enforcement on all backend endpoints
+  🔴 P1     At-rest encryption of transcripts and personal data
+  🟡 P2     IVRS integration via Twilio Programmable Voice
+  🟡 P2     PWA / Mobile app conversion
+  🟡 P2     GraphQL API layer for admin analytics
+  🟡 P2     Fairness testing pipeline for AI models
+  🟢 P3     Fine-tune IndicBERT / MuRIL on annotated victim dialogue dataset
+  🟢 P3     CI/CD pipeline (GitHub Actions → Vercel + AWS)
+  🟢 P3     OpenCV integration for video-based emotional indicator (future)
+
+  PHASE 3 — FULL NHAA INTEGRATION (Long-term)
+  ──────────────────────────────────────────────────────────
+  Priority  Task
+  ────────  ─────────────────────────────────────────────────────────────────
+  🟢 P3     Connect to live 14566 helpline telephony (Twilio IVR bridge)
+  🟢 P3     Integrate with MoSJE Integrated Portal (API partnership)
+  🟢 P3     Bhashini deep integration (22 scheduled Indian languages)
+  🟢 P3     National deployment on AWS GovCloud / NIC infrastructure
+  🟢 P3     Formal security audit and DPDP compliance certification
+
+
+────────────────────────────────────────────────────────────────────────────────
+  SECTION 5 — SUMMARY SCORECARD
+────────────────────────────────────────────────────────────────────────────────
+
+  Area                          PPT Promised      Built?    Gap Level
+  ────────────────────────────  ────────────────  ────────  ──────────────
+  WhatsApp-style Chat UI        ✅ Yes            ✅ Done   None
+  Bilingual UI (EN/HI)          ✅ Yes            ✅ Done   None
+  Voice Input (Browser STT)     ✅ Yes            ✅ Done   None
+  LLM-based Risk Scoring        ✅ Yes            ✅ Done   None
+  Non-diagnostic AI Pathway     ✅ Yes            ✅ Done   None
+  Human Override + Audit Trail  ✅ Yes            ✅ Done   None
+  Counsellor Priority Queue     ✅ Yes            ✅ Done   None
+  DPDP Consent Architecture     ✅ Yes            ✅ Done   None
+  Role-Based Login              ✅ Yes            ⚠️ Mock   Critical
+  Admin Dashboard + Analytics   ✅ Yes            ✅ Done   None
+  Emergency Escalation (Twilio) ✅ Yes            ✅ Done   None
+  Privacy Controls              ✅ Yes            ✅ Done   None
+  Real ML Emotion Classifier    ✅ Yes            ❌ No     Critical
+  Real Acoustic Feature Extract ✅ Yes            ❌ No     Critical
+  Server-side STT Pipeline      ✅ Yes            ❌ No     Critical
+  PostgreSQL / Real Database    ✅ Yes            ❌ No     Critical
+  Real Secure Authentication    ✅ Yes            ❌ No     Critical
+  Cloud Deployment              ✅ Yes            ❌ No     High
+  Multimodal AI Fusion          ✅ Yes            ❌ No     High
+  Extended Indian Languages     ✅ Yes            ❌ No     High
+  Data Encryption               ✅ Yes            ❌ No     High
+  IVRS Integration              ✅ Yes            ❌ No     Medium
+  Mobile App / PWA              ✅ Yes            ❌ No     Medium
+  Fine-tuned Dataset / Training ✅ Yes            ❌ No     Long-term
+  GraphQL API                   ✅ Yes            ❌ No     Low
+  ────────────────────────────────────────────────────────────────────────────
+  PROTOTYPE COMPLETION          ≈ 55% of PPT vision implemented
+  CRITICAL GAPS REMAINING       5 (ML model, STT, DB, Auth, Deployment)
+
+
+================================================================================
+  END OF GAP ANALYSIS REPORT
+  SVI — Smart Victim Intelligence | NHAA 14566 | Team: Veom Vegas
+  SIH 2026 | PS ID: 26093
+================================================================================
