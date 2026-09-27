@@ -93,8 +93,10 @@ export function AuthProvider({ children }) {
     setVictim(null);
     try {
       localStorage.removeItem('svi_victim_user');
-      localStorage.removeItem('svi_victim_consent'); // Re-triggers consent on next manual login
+      // Keep consent to directly land on AI chat without modal blocking
+      // localStorage.removeItem('svi_victim_consent'); 
     } catch (e) {}
+    window.location.href = '/';
   };
 
   const changeLanguage = (newLang) => {
