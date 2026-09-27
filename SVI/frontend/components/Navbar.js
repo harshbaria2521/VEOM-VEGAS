@@ -236,11 +236,11 @@ export default function Navbar() {
             <Settings className="w-5 h-5" />
           </Link>
 
-          {/* Desktop User / Staff / Victim Status */}
-          <div className="hidden md:flex items-center">
+          {/* User / Staff / Victim Status */}
+          <div className="flex items-center">
             {user ? (
-              <div className="flex items-center gap-2 pl-1">
-                <span className="hidden xl:inline text-xs font-semibold text-gov-navy dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded">
+              <div className="flex items-center gap-1 sm:gap-2 pl-1">
+                <span className="hidden sm:inline text-xs font-semibold text-gov-navy dark:text-amber-200 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded">
                   {user.name} ({user.role})
                 </span>
                 <button
@@ -253,13 +253,13 @@ export default function Navbar() {
                 </button>
               </div>
             ) : victim ? (
-              <div className="flex items-center gap-2 pl-1">
+              <div className="flex items-center gap-1 sm:gap-2 pl-1">
                 <Link
                   href="/profile"
-                  className="flex items-center gap-1.5 text-xs font-bold text-gov-navy dark:text-teal-200 bg-gov-tealSoft dark:bg-teal-950/60 border border-gov-teal/30 dark:border-teal-700 px-2.5 py-1 rounded hover:bg-gov-teal hover:text-white transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-bold text-gov-navy dark:text-teal-200 bg-gov-tealSoft dark:bg-teal-950/60 border border-gov-teal/30 dark:border-teal-700 px-2 sm:px-2.5 py-1 rounded hover:bg-gov-teal hover:text-white transition-colors"
                 >
-                  <span>{victim.name}</span>
-                  <span className="text-[10px] font-mono opacity-80 font-normal">({victim.id})</span>
+                  <span className="max-w-[70px] sm:max-w-[120px] truncate">{victim.name}</span>
+                  <span className="hidden sm:inline text-[10px] font-mono opacity-80 font-normal">({victim.id})</span>
                 </Link>
                 <button
                   onClick={logoutVictim}
@@ -273,7 +273,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="whitespace-nowrap text-xs font-semibold text-gov-teal dark:text-teal-300 border border-gov-teal/40 dark:border-teal-700 hover:bg-gov-tealSoft dark:hover:bg-teal-950/40 px-2.5 py-1.5 rounded-md transition-colors"
+                className="whitespace-nowrap text-xs font-semibold text-gov-teal dark:text-teal-300 border border-gov-teal/40 dark:border-teal-700 hover:bg-gov-tealSoft dark:hover:bg-teal-950/40 px-2 sm:px-2.5 py-1.5 rounded-md transition-colors"
               >
                 {t.navLogin || 'Sign Up / Login'}
               </Link>

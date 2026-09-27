@@ -488,6 +488,47 @@ export default function ChatWidget() {
   const chatContainerRef = useRef(null);
   const widgetRef = useRef(null);
   const isInitialMount = useRef(true);
+  const prevVictimRef = useRef(victim);
+  const recognitionRef = useRef(null);
+  const inputMessageRef = useRef('');
+
+  // Keep the ref always in sync with the latest inputMessage state
+  useEffect(() => {
+    inputMessageRef.current = inputMessage;
+  }, [inputMessage]);
+
+  const resetChatState = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
+    }
+    setIsRecording(false);
+    setIsTyping(false);
+    setInputMessage('');
+    setHumanRequested(false);
+    setMessages(getInitialGreeting());
+    try {
+      localStorage.removeItem('svi_active_chat_history');
+      sessionStorage.removeItem('svi_chat_transcript');
+    } catch (e) {}
+  };
+
+  // Listen for global reset chat event (triggered on logout)
+  useEffect(() => {
+    window.addEventListener('svi-reset-chat', resetChatState);
+    return () => {
+      window.removeEventListener('svi-reset-chat', resetChatState);
+    };
+  }, [lang, t.initialGreeting]);
+
+  // Reset chatbot if victim logs out (victim transitions from object to null)
+  useEffect(() => {
+    if (prevVictimRef.current && !victim) {
+      resetChatState();
+    }
+    prevVictimRef.current = victim;
+  }, [victim, lang, t.initialGreeting]);
 
   const scrollToBottom = (behavior = 'smooth') => {
     if (chatContainerRef.current) {
@@ -540,17 +581,14 @@ export default function ChatWidget() {
       const hasUser = messages.some((m) => m.sender === 'user');
       if (hasUser) {
         localStorage.setItem('svi_active_chat_history', JSON.stringify(messages));
+      } else {
+        localStorage.removeItem('svi_active_chat_history');
       }
     } catch (e) {}
   }, [messages, isTyping]);
 
   const handleNewChat = () => {
-    setMessages(getInitialGreeting());
-    setInputMessage('');
-    setHumanRequested(false);
-    try {
-      localStorage.removeItem('svi_active_chat_history');
-    } catch (e) {}
+    resetChatState();
   };
 
   const handleSend = async (e) => {
@@ -717,13 +755,6 @@ export default function ChatWidget() {
     setMessages((prev) => [...prev, escalationMsg]);
   };
 
-  const recognitionRef = useRef(null);
-  const inputMessageRef = useRef(inputMessage);
-
-  // Keep the ref always in sync with the latest inputMessage state
-  useEffect(() => {
-    inputMessageRef.current = inputMessage;
-  }, [inputMessage]);
 
   const hasUserComplaint = messages.some((m) => m.sender === 'user' && m.text?.trim());
 

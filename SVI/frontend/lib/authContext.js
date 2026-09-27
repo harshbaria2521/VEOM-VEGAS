@@ -75,6 +75,12 @@ export function AuthProvider({ children }) {
   const logoutStaff = () => {
     try {
       localStorage.removeItem('svi_staff_user');
+      localStorage.removeItem('svi_active_chat_history');
+      sessionStorage.removeItem('svi_chat_transcript');
+      sessionStorage.removeItem('svi_reload_chat_cleared');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('svi-reset-chat'));
+      }
       // Bypass the consent "login" modal for staff who just logged out
       localStorage.setItem('svi_victim_consent', JSON.stringify({
         name: 'Staff Reviewer',
@@ -86,17 +92,33 @@ export function AuthProvider({ children }) {
     } catch (e) {}
     
     // Redirect before clearing state to prevent Access Denied flash
-    window.location.href = '/';
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname === '/') {
+        window.location.reload();
+      } else {
+        window.location.href = '/';
+      }
+    }
   };
 
   const logoutVictim = () => {
     setVictim(null);
     try {
       localStorage.removeItem('svi_victim_user');
-      // Keep consent to directly land on AI chat without modal blocking
-      // localStorage.removeItem('svi_victim_consent'); 
+      localStorage.removeItem('svi_active_chat_history');
+      sessionStorage.removeItem('svi_chat_transcript');
+      sessionStorage.removeItem('svi_reload_chat_cleared');
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('svi-reset-chat'));
+      }
     } catch (e) {}
-    window.location.href = '/';
+    if (typeof window !== 'undefined') {
+      if (window.location.pathname === '/') {
+        window.location.reload();
+      } else {
+        window.location.href = '/';
+      }
+    }
   };
 
   const changeLanguage = (newLang) => {
