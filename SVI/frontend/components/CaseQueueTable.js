@@ -20,7 +20,7 @@ import {
 
 export default function CaseQueueTable({ cases, onClaimCase }) {
   const { lang, user } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [riskFilter, setRiskFilter] = useState('ALL');
   const [channelFilter, setChannelFilter] = useState('ALL');
@@ -300,6 +300,18 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
                         <User className="w-3.5 h-3.5 text-gov-teal dark:text-teal-400" />
                         {c.assignedTo}
                       </span>
+                    ) : user?.role === 'admin' ? (
+                      <button
+                        onClick={() => {
+                          const officerName = window.prompt('Enter Officer Name to assign this case:');
+                          if (officerName && officerName.trim() !== '') {
+                            onClaimCase(c.id, officerName.trim());
+                          }
+                        }}
+                        className="text-[11px] bg-gov-navy/10 hover:bg-gov-navy hover:text-white text-gov-navy px-2 py-1 rounded font-bold transition-colors"
+                      >
+                        Assign
+                      </button>
                     ) : (
                       <button
                         onClick={() => onClaimCase(c.id, user?.name || 'Officer Sharma')}
@@ -420,6 +432,18 @@ export default function CaseQueueTable({ cases, onClaimCase }) {
                     <User className="w-3.5 h-3.5 text-gov-teal dark:text-teal-400" />
                     <span className="truncate max-w-[120px]">{c.assignedTo}</span>
                   </span>
+                ) : user?.role === 'admin' ? (
+                  <button
+                    onClick={() => {
+                      const officerName = window.prompt('Enter Officer Name to assign this case:');
+                      if (officerName && officerName.trim() !== '') {
+                        onClaimCase(c.id, officerName.trim());
+                      }
+                    }}
+                    className="text-[11px] bg-gov-navy/10 hover:bg-gov-navy hover:text-white text-gov-navy px-2 py-1 rounded font-bold transition-colors"
+                  >
+                    Assign
+                  </button>
                 ) : (
                   <button
                     onClick={() => onClaimCase(c.id, user?.name || 'Officer Sharma')}

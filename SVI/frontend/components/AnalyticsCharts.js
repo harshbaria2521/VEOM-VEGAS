@@ -8,7 +8,7 @@ import { BarChart3, Download, ShieldCheck, Clock, AlertTriangle, RefreshCw, Chec
 
 export default function AnalyticsCharts() {
   const { lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
   const [downloading, setDownloading] = useState(false);
 
   const handleExportCsv = () => {

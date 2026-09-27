@@ -31,7 +31,7 @@ export default function CaseDetailPage() {
   const caseId = params?.caseId;
   const { cases, applyHumanAction } = useCaseStore();
   const { lang, user } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [showSensitiveTranscript, setShowSensitiveTranscript] = useState(false);
 

@@ -5,21 +5,25 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../lib/authContext';
 import { translations } from '../lib/translations';
-import { MessageSquare, Lock, PhoneCall, UserCheck, BarChart3, User, LogIn, Search } from 'lucide-react';
+import { Home, MessageSquare, PlusCircle, User, LogIn, Search, PhoneCall, LayoutDashboard, Bot, FileWarning, Settings, BarChart3 } from 'lucide-react';
 
 export default function MobileBottomNav() {
   const pathname = usePathname();
   const { user, victim, lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   // Determine dashboard link based on role
   let dashboardHref = '/counsellor';
   let dashboardLabel = 'Officer';
-  let DashboardIcon = UserCheck;
+  let DashboardIcon = LayoutDashboard;
   if (user?.role === 'admin') {
     dashboardHref = '/admin';
     dashboardLabel = 'Admin';
     DashboardIcon = BarChart3;
+  } else if (victim) {
+    dashboardHref = '/profile';
+    dashboardLabel = 'Dashboard';
+    DashboardIcon = LayoutDashboard;
   } else if (!user && !victim) {
     dashboardHref = '/login';
     dashboardLabel = 'Officer';
@@ -59,15 +63,15 @@ export default function MobileBottomNav() {
           aria-label="Home AI Triage Chat"
         >
           <div className="relative">
-            <MessageSquare className={`w-5 h-5 ${isHome ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+            <Bot className={`w-6 h-6 ${isHome ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
             {isHome && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gov-teal dark:bg-teal-400" />
             )}
           </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Chat</span>
+          <span className="text-[10px] mt-0.5 tracking-tight">AI Chat</span>
         </Link>
 
-        {/* 2. Track Grievance */}
+        {/* 2. Grievance */}
         <Link
           href="/track"
           className={`flex-1 flex flex-col items-center justify-center py-1 min-w-[56px] transition-colors ${
@@ -75,15 +79,15 @@ export default function MobileBottomNav() {
               ? 'text-gov-teal dark:text-teal-400 font-bold'
               : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
           }`}
-          aria-label="Track Grievance"
+          aria-label="Grievance"
         >
           <div className="relative">
-            <Search className={`w-5 h-5 ${pathname === '/track' ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+            <FileWarning className={`w-6 h-6 ${pathname === '/track' ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
             {pathname === '/track' && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gov-teal dark:bg-teal-400" />
             )}
           </div>
-          <span className="text-[10px] mt-0.5 tracking-tight">Track</span>
+          <span className="text-[10px] mt-0.5 tracking-tight">Grievance</span>
         </Link>
 
         {/* 3. Call 14566 Emergency Trigger (Center Action) */}
@@ -94,7 +98,7 @@ export default function MobileBottomNav() {
             aria-label="Call National Toll-Free Helpline 14566"
             title="Call National Toll-Free Helpline 14566"
           >
-            <PhoneCall className="w-5 h-5 text-white animate-pulse" />
+            <PhoneCall className="w-6 h-6 text-white animate-pulse" />
           </a>
           <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 tracking-tight mt-0.5">
             14566
@@ -112,7 +116,7 @@ export default function MobileBottomNav() {
           aria-label="Officer Queue"
         >
           <div className="relative">
-            <DashboardIcon className={`w-5 h-5 ${isDashboard ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+            <LayoutDashboard className={`w-6 h-6 ${isDashboard ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
             {isDashboard && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gov-teal dark:bg-teal-400" />
             )}
@@ -132,9 +136,9 @@ export default function MobileBottomNav() {
         >
           <div className="relative">
             {victim ? (
-              <User className={`w-5 h-5 ${isProfile ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+              <User className={`w-6 h-6 ${isProfile ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
             ) : (
-              <LogIn className={`w-5 h-5 ${isProfile ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
+              <LogIn className={`w-6 h-6 ${isProfile ? 'stroke-[2.5]' : 'stroke-[1.8]'}`} />
             )}
             {isProfile && (
               <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-gov-teal dark:bg-teal-400" />

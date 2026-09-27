@@ -6,6 +6,7 @@ import { translations } from '../../lib/translations';
 import { getStoredCases, registerNewComplaint, getCaseById } from '../../lib/caseStore';
 import { assessComplaint } from '../../lib/sviScoring';
 import { generateGrievancePDF } from '../../lib/pdfGenerator';
+import { statesAndDistricts } from '../../lib/statesAndDistricts';
 import {
   Search,
   ShieldAlert,
@@ -85,11 +86,11 @@ const SAMPLE_SCENARIOS = [
 ];
 
 export default function TrackGrievancePage() {
-  const { lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const { user, lang } = useAuth();
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
-  // Active top-level tab: 'track' or 'file'
-  const [activeTab, setActiveTab] = useState('track');
+  // Active top-level tab: 'file' or 'track'
+  const [activeTab, setActiveTab] = useState('file');
 
   // Tracker state
   const [queryId, setQueryId] = useState('');
@@ -100,9 +101,11 @@ export default function TrackGrievancePage() {
 
   // Intake / File complaint state
   const [victimName, setVictimName] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(true);
-  const [district, setDistrict] = useState('Hathras');
-  const [stateName, setStateName] = useState('Uttar Pradesh');
+  const [officerVictimId, setOfficerVictimId] = useState('');
+  const [officerVictimPhone, setOfficerVictimPhone] = useState('');
+  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [district, setDistrict] = useState('');
+  const [stateName, setStateName] = useState('');
   const [complaintText, setComplaintText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [registeredSuccess, setRegisteredSuccess] = useState(null);
@@ -111,6 +114,13 @@ export default function TrackGrievancePage() {
   useEffect(() => {
     const all = getStoredCases();
     setRecentCases(all);
+
+    // Auto-fill complaint from AI chat if available
+    const savedTranscript = sessionStorage.getItem('svi_chat_transcript');
+    if (savedTranscript) {
+      setComplaintText(savedTranscript);
+      sessionStorage.removeItem('svi_chat_transcript');
+    }
   }, []);
 
   const refreshCasesList = (defaultId) => {
@@ -166,6 +176,8 @@ export default function TrackGrievancePage() {
           state: stateName,
           channel: 'Web Portal',
           preferredLanguage: lang === 'hi' ? 'Hindi' : 'English',
+          victimId: user?.role === 'counsellor' ? officerVictimId : '',
+          victimPhone: user?.role === 'counsellor' ? officerVictimPhone : '',
         });
 
         setRegisteredSuccess(newCase);
@@ -222,7 +234,7 @@ export default function TrackGrievancePage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Grievance Intake & Case Status Tracker
+              Grievance Portal
             </h1>
             <p className="text-xs sm:text-sm text-slate-200 mt-1 max-w-2xl">
               Real-time procedural tracking, statutory PoA Act section mapping, and compensation sanctioning.
@@ -231,17 +243,6 @@ export default function TrackGrievancePage() {
 
           {/* Tab Selector Buttons */}
           <div className="flex items-center bg-white/10 p-1 rounded-xl self-start sm:self-auto border border-white/20">
-            <button
-              onClick={() => setActiveTab('track')}
-              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                activeTab === 'track'
-                  ? 'bg-white text-gov-navy shadow-sm'
-                  : 'text-white hover:bg-white/10'
-              }`}
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Track Docket</span>
-            </button>
             <button
               onClick={() => setActiveTab('file')}
               className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
@@ -252,6 +253,17 @@ export default function TrackGrievancePage() {
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>File New Grievance</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('track')}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                activeTab === 'track'
+                  ? 'bg-white text-gov-navy shadow-sm'
+                  : 'text-white hover:bg-white/10'
+              }`}
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span>Track Docket</span>
             </button>
           </div>
         </div>
@@ -292,7 +304,7 @@ export default function TrackGrievancePage() {
                 <span>File Grievance & Register Incident</span>
               </h2>
               <p className="text-xs text-gov-textMuted dark:text-slate-400 mt-0.5">
-                Aap jo bhi incident likhenge, system uske according PoA/PCR Act statutory sections aur relief entitlements automatically map karega.
+                {t.grievanceFormSubtitle}
               </p>
             </div>
 
@@ -324,12 +336,12 @@ export default function TrackGrievancePage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
-                    Victim Name / नाम
+                    {t.grievanceVictimName}
                   </label>
                   <input
                     type="text"
                     disabled={isAnonymous}
-                    value={isAnonymous ? 'गुमनाम नागरिक (Anonymous)' : victimName}
+                    value={isAnonymous ? t.grievanceAnonymousValue : victimName}
                     onChange={(e) => setVictimName(e.target.value)}
                     placeholder="Enter name"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 disabled:opacity-60"
@@ -341,48 +353,91 @@ export default function TrackGrievancePage() {
                       onChange={(e) => setIsAnonymous(e.target.checked)}
                       className="rounded text-gov-teal focus:ring-gov-teal"
                     />
-                    <span>Keep Complainant Anonymous (गुमनाम रखें - Safe Reporting)</span>
+                    <span>{t.grievanceKeepAnonymous}</span>
                   </label>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
-                      District / जिला
+                      {t.grievanceState}
                     </label>
-                    <input
-                      type="text"
-                      value={district}
-                      onChange={(e) => setDistrict(e.target.value)}
-                      placeholder="e.g. Hathras"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200"
-                    />
+                    <select
+                      value={stateName}
+                      onChange={(e) => {
+                        setStateName(e.target.value);
+                        setDistrict('');
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal cursor-pointer appearance-none"
+                    >
+                      <option value="">Select State</option>
+                      {Object.keys(statesAndDistricts).sort().map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
-                      State / राज्य
+                      {t.grievanceDistrict}
                     </label>
-                    <input
-                      type="text"
-                      value={stateName}
-                      onChange={(e) => setStateName(e.target.value)}
-                      placeholder="e.g. Uttar Pradesh"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200"
-                    />
+                    <select
+                      value={district}
+                      onChange={(e) => setDistrict(e.target.value)}
+                      disabled={!stateName}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal disabled:opacity-50 cursor-pointer appearance-none"
+                    >
+                      <option value="">Select District</option>
+                      {stateName && statesAndDistricts[stateName] && 
+                        statesAndDistricts[stateName].sort().map(dist => (
+                          <option key={dist} value={dist}>{dist}</option>
+                        ))
+                      }
+                    </select>
                   </div>
                 </div>
+
+                {user?.role === 'counsellor' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                        Victim User ID (Optional)
+                      </label>
+                      <input
+                        type="text"
+                        value={officerVictimId}
+                        onChange={(e) => setOfficerVictimId(e.target.value)}
+                        placeholder="e.g., V-89412"
+                        disabled={isAnonymous}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal disabled:opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                        Victim Phone Number
+                      </label>
+                      <input
+                        type="text"
+                        value={officerVictimPhone}
+                        onChange={(e) => setOfficerVictimPhone(e.target.value)}
+                        placeholder="e.g., 9876543210"
+                        disabled={isAnonymous}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Complaint Textarea */}
               <div>
                 <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  Incident Description & Details / घटना का विवरण <span className="text-red-500">*</span>
+                  {t.grievanceIncidentLabel} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   rows={4}
                   value={complaintText}
                   onChange={(e) => setComplaintText(e.target.value)}
-                  placeholder="यहाँ अपनी समस्या या घटना का विवरण लिखें (जैसे: क्या हुआ, किसने हमला किया, क्या धमकी दी, क्या पुलिस ने रिपोर्ट लिखी?)..."
+                  placeholder={t.grievanceIncidentPlaceholder}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal"
                 />
               </div>
@@ -441,7 +496,7 @@ export default function TrackGrievancePage() {
           <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-5 border border-gov-border dark:border-slate-700 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold text-gov-textMuted dark:text-slate-300 uppercase tracking-wider">
-                Enter Docket Reference Number / शिकायत क्रमांक
+                {t.grievanceDocketRef}
               </label>
               <button
                 type="button"
@@ -509,10 +564,10 @@ export default function TrackGrievancePage() {
                 <FileText className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">
-                कोई डॉकेट चयनित नहीं है (No Docket Selected)
+                {t.grievanceNoDocket}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                अपनी दर्ज की गई शिकायत की स्थिति देखने और आधिकारिक Grievance PDF डाउनलोड करने के लिए ऊपर अपना शिकायत क्रमांक (Docket ID) दर्ज करें, या नीचे नई शिकायत दर्ज करें।
+                {t.grievanceNoDocketDesc}
               </p>
               <div className="pt-2">
                 <button
@@ -521,7 +576,7 @@ export default function TrackGrievancePage() {
                   className="px-4 py-2 bg-gov-navy hover:bg-gov-teal text-white text-xs font-bold rounded-xl transition-all shadow-sm cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <PlusCircle className="w-3.5 h-3.5" />
-                  <span>नई शिकायत दर्ज करें (File New Grievance)</span>
+                  <span>{t.grievanceFileNew}</span>
                 </button>
               </div>
             </div>

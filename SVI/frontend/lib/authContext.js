@@ -73,10 +73,20 @@ export function AuthProvider({ children }) {
   };
 
   const logoutStaff = () => {
-    setUser(null);
     try {
       localStorage.removeItem('svi_staff_user');
+      // Bypass the consent "login" modal for staff who just logged out
+      localStorage.setItem('svi_victim_consent', JSON.stringify({
+        name: 'Staff Reviewer',
+        contact: 'N/A',
+        textConsent: true,
+        voiceConsent: true,
+        timestamp: new Date().toISOString()
+      }));
     } catch (e) {}
+    
+    // Redirect before clearing state to prevent Access Denied flash
+    window.location.href = '/';
   };
 
   const logoutVictim = () => {

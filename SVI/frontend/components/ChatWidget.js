@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { askTherapist } from '../lib/api';
 import { useAuth } from '../lib/authContext';
 import { translations, supportedLanguages, getSpeechRecognitionLang } from '../lib/translations';
@@ -421,8 +422,9 @@ function detectEmergency(message) {
 }
 
 export default function ChatWidget() {
+  const router = useRouter();
   const { lang, victim } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const getInitialGreeting = () => [
     {
@@ -1062,6 +1064,21 @@ export default function ChatWidget() {
             className="w-11 h-11 rounded-full bg-[#008069] hover:bg-[#075E54] disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors shadow-sm flex-shrink-0 focus:ring-2 focus:ring-[#075E54]"
           >
             <Send className="w-4 h-4 ml-0.5" aria-hidden="true" />
+          </button>
+
+          {/* Create Grievance Button */}
+          <button
+            type="button"
+            onClick={() => {
+              const transcript = messages.map(m => `${m.sender === 'user' ? 'User' : 'AI'}: ${m.text}`).join('\n\n');
+              sessionStorage.setItem('svi_chat_transcript', transcript);
+              router.push('/track');
+            }}
+            title="Create a Grievance"
+            aria-label="Create a Grievance"
+            className="w-11 h-11 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center transition-colors shadow-sm flex-shrink-0 focus:ring-2 focus:ring-amber-500"
+          >
+            <FileText className="w-4 h-4" aria-hidden="true" />
           </button>
         </form>
 

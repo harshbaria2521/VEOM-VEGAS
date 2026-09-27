@@ -9,9 +9,10 @@ import { Shield, UserCheck, BarChart3, Lock, LogIn, User, HeartHandshake } from 
 export default function LoginPage() {
   const router = useRouter();
   const { loginStaff, loginVictim, lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [role, setRole] = useState('victim');
+  const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
   const [name, setName] = useState('');
   const [contact, setContact] = useState('');
 
@@ -19,7 +20,7 @@ export default function LoginPage() {
     e.preventDefault();
     if (role === 'victim') {
       loginVictim(name || 'Anonymous Complainant', contact || 'Protected');
-      router.push('/profile');
+      router.push('/');
     } else if (role === 'counsellor') {
       loginStaff('counsellor', name || 'Officer Sharma (ID: 4120)');
       router.push('/counsellor');
@@ -47,11 +48,37 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Auth Mode Toggle */}
+        <div className="flex border-b border-slate-200 dark:border-slate-700">
+          <button
+            onClick={() => setAuthMode('login')}
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${
+              authMode === 'login'
+                ? 'text-gov-teal border-b-2 border-gov-teal bg-slate-50 dark:bg-slate-900/50'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+            }`}
+          >
+            Existing User (Login)
+          </button>
+          <button
+            onClick={() => setAuthMode('signup')}
+            disabled={role !== 'victim'}
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${
+              authMode === 'signup'
+                ? 'text-gov-teal border-b-2 border-gov-teal bg-slate-50 dark:bg-slate-900/50'
+                : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+            } ${role !== 'victim' ? 'opacity-50 cursor-not-allowed' : ''}`}
+            title={role !== 'victim' ? 'Sign up is only for victims. Staff must be added by Admin.' : ''}
+          >
+            New User (Sign Up)
+          </button>
+        </div>
+
         {/* Login Form */}
         <form onSubmit={handleLogin} className="p-6 space-y-5">
           <div>
             <label className="block text-xs font-bold text-gov-navy dark:text-slate-200 mb-2">
-              {lang === 'hi' ? 'लॉगिन प्रकार चुनें:' : 'Select Login Type:'}
+              {lang === 'hi' ? 'भूमिका चुनें:' : 'Select Role:'}
             </label>
             <div className="grid grid-cols-3 gap-2" role="group" aria-label="Select User Role">
               {/* Victim Button */}
@@ -83,6 +110,7 @@ export default function LoginPage() {
                 aria-label="Login as Counsellor Officer"
                 onClick={() => {
                   setRole('counsellor');
+                  setAuthMode('login');
                   setName('Officer Sharma (ID: 4120)');
                 }}
                 className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all focus:outline-none focus:ring-2 focus:ring-gov-teal ${
@@ -105,6 +133,7 @@ export default function LoginPage() {
                 aria-label="Login as Admin Supervisor"
                 onClick={() => {
                   setRole('admin');
+                  setAuthMode('login');
                   setName('Supervisor Verma (Admin)');
                 }}
                 className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all focus:outline-none focus:ring-2 focus:ring-gov-navy ${
@@ -165,14 +194,14 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            aria-label={role === 'victim' ? 'Enter & View Case Record' : 'Authenticate & Access Dashboard'}
+            aria-label={authMode === 'login' ? 'Authenticate & Access Dashboard' : 'Create Account & Continue'}
             className="w-full py-2.5 px-4 bg-gov-navy hover:bg-gov-teal dark:bg-teal-600 dark:hover:bg-teal-500 text-white font-bold text-xs rounded-lg shadow transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-gov-teal"
           >
             <LogIn className="w-4 h-4 text-amber-300" aria-hidden="true" />
             <span>
-              {role === 'victim'
-                ? (lang === 'hi' ? 'प्रवेश करें एवं प्रोफ़ाइल देखें' : 'Enter & View Case Record')
-                : 'Authenticate & Access Dashboard'}
+              {authMode === 'login'
+                ? (role === 'victim' ? 'Enter & View Case Record' : 'Login to Dashboard')
+                : (role === 'victim' ? 'Register & Submit Case' : 'Create Staff Account')}
             </span>
           </button>
         </form>

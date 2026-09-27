@@ -9,8 +9,8 @@ import { Shield, Phone, HeartHandshake, Lock, Info, ExternalLink } from 'lucide-
 import Link from 'next/link';
 
 export default function HomePage() {
-  const { lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const { lang, user, victim } = useAuth();
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [hasConsented, setHasConsented] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
@@ -45,7 +45,8 @@ export default function HomePage() {
       )}
 
       {/* Hero / Information Header */}
-      <div className="bg-gradient-to-r from-gov-navy to-gov-teal dark:from-slate-900 dark:to-teal-950 rounded-xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-transparent dark:border-slate-800 transition-colors">
+      {!user && !victim && (
+        <div className="bg-gradient-to-r from-gov-navy to-gov-teal dark:from-slate-900 dark:to-teal-950 rounded-xl p-5 sm:p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-transparent dark:border-slate-800 transition-colors">
         <div className="space-y-1.5 max-w-2xl">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-widest bg-amber-400 text-gov-navyDark px-2.5 py-0.5 rounded">
@@ -78,8 +79,9 @@ export default function HomePage() {
             <Info className="w-3.5 h-3.5" />
             <span>Manage Consent Settings</span>
           </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Chat Intake Widget */}
       <ChatWidget />

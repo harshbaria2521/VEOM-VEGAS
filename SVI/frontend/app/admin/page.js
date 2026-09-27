@@ -8,8 +8,16 @@ import { translations } from '../../lib/translations';
 import { BarChart3, ShieldCheck, Lock } from 'lucide-react';
 
 export default function AdminDashboardPage() {
-  const { lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const { lang, user } = useAuth();
+  const t = { ...translations.en, ...(translations[lang] || {}) };
+
+  if (user?.role !== 'admin') {
+    return (
+      <div className="p-8 text-center text-red-500 font-bold">
+        Access Denied. Administrator privileges required.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -44,8 +44,8 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="SVI" />
-        <Script
-          id="theme-init"
+        <Script 
+          id="theme-init" 
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
@@ -70,11 +70,12 @@ export default function RootLayout({ children }) {
                   }
                 } catch (e) {}
               })();
-            `,
+            `
           }}
         />
       </head>
       <body className="bg-gov-cream dark:bg-slate-950 min-h-screen flex flex-col antialiased text-gov-textMain dark:text-slate-100 selection:bg-gov-tealSoft selection:text-gov-teal transition-colors duration-200">
+
         <ThemeProvider>
           <AuthProvider>
             <WelcomeSplash />

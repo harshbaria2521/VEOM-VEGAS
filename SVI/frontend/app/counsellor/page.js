@@ -3,18 +3,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useCaseStore } from '../../lib/caseStore';
 import CaseQueueTable from '../../components/CaseQueueTable';
-import VulnerabilityHeatmap from '../../components/VulnerabilityHeatmap';
 import { useAuth } from '../../lib/authContext';
 import { translations } from '../../lib/translations';
-import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff, MapPin, ListFilter } from 'lucide-react';
+import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff } from 'lucide-react';
 
 export default function CounsellorDashboardPage() {
   const { cases, claimCase } = useCaseStore();
   const { lang, user } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [showAlertBanner, setShowAlertBanner] = useState(true);
-  const [dashboardTab, setDashboardTab] = useState('queue'); // 'queue' or 'heatmap'
+  const [adminOfficerFilter, setAdminOfficerFilter] = useState('all');
   const [newCriticalAlertCount, setNewCriticalAlertCount] = useState(0);
   const prevCriticalCountRef = useRef(0);
 
@@ -99,10 +98,17 @@ export default function CounsellorDashboardPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cases, alertEnabled, playAlertBeep]);
 
-  const criticalCount = cases.filter((c) => c.riskLevel === 'Critical').length;
-  const highCount = cases.filter((c) => c.riskLevel === 'High').length;
-  const inReviewCount = cases.filter((c) => c.status === 'In Review').length;
-  const newCount = cases.filter((c) => c.status === 'New').length;
+  const casesToShow = user?.role === 'admin' 
+    ? (adminOfficerFilter === 'all' ? cases : cases.filter(c => c.assignedTo === adminOfficerFilter))
+    : cases.filter((c) => c.assignedTo === user?.name || c.status === 'New');
+
+  // unique officers list for admin dropdown
+  const uniqueOfficers = [...new Set(cases.map(c => c.assignedTo).filter(Boolean))];
+
+  const criticalCount = casesToShow.filter((c) => c.riskLevel === 'Critical').length;
+  const highCount = casesToShow.filter((c) => c.riskLevel === 'High').length;
+  const inReviewCount = casesToShow.filter((c) => c.status === 'In Review').length;
+  const newCount = casesToShow.filter((c) => c.status === 'New').length;
 
   // Frontend-side periodic interval check for new incoming critical cases
   useEffect(() => {
@@ -110,7 +116,7 @@ export default function CounsellorDashboardPage() {
 
     const interval = setInterval(() => {
       // Periodic check against current state to ensure alert banner reflects any new critical/high cases
-      const currentCrit = cases.filter((c) => c.riskLevel === 'Critical' && c.status === 'New').length;
+      const currentCrit = casesToShow.filter((c) => c.riskLevel === 'Critical' && c.status === 'New').length;
       if (currentCrit > 0) {
         setNewCriticalAlertCount(currentCrit);
         setShowAlertBanner(true);
@@ -119,6 +125,14 @@ export default function CounsellorDashboardPage() {
 
     return () => clearInterval(interval);
   }, [cases, criticalCount]);
+
+  if (user?.role !== 'counsellor' && user?.role !== 'admin') {
+    return (
+      <div className="p-8 text-center text-red-500 font-bold">
+        Access Denied. You must be an authorized officer to view the dashboard.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -206,8 +220,28 @@ export default function CounsellorDashboardPage() {
           <div className="flex items-center gap-3 bg-gov-cream dark:bg-slate-800 p-3 rounded-lg border border-gov-border dark:border-slate-700 text-xs">
             <UserCheck className="w-5 h-5 text-gov-teal dark:text-teal-400 flex-shrink-0" aria-hidden="true" />
             <div>
-              <div className="font-bold text-gov-navy dark:text-slate-100">{user?.name || 'Officer Sharma'}</div>
-              <div className="text-[11px] text-gov-textMuted dark:text-slate-400">Badge: NHAA-OFFICER-412</div>
+              {user?.role === 'admin' ? (
+                <>
+                  <div className="font-bold text-gov-navy dark:text-slate-100">Admin Viewer</div>
+                  <div className="mt-1">
+                    <select
+                      value={adminOfficerFilter}
+                      onChange={(e) => setAdminOfficerFilter(e.target.value)}
+                      className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 text-[11px] focus:outline-none"
+                    >
+                      <option value="all">All Cases</option>
+                      {uniqueOfficers.map(officer => (
+                        <option key={officer} value={officer}>{officer}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="font-bold text-gov-navy dark:text-slate-100">{user?.name || 'Officer Sharma'}</div>
+                  <div className="text-[11px] text-gov-textMuted dark:text-slate-400">Badge: NHAA-OFFICER-412</div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -217,7 +251,7 @@ export default function CounsellorDashboardPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="bg-white dark:bg-slate-900 p-3.5 rounded-lg border border-gov-border dark:border-slate-800 shadow-sm transition-colors">
           <div className="text-xs text-slate-600 dark:text-slate-400 font-medium">Total Cases in Queue</div>
-          <div className="text-xl font-bold text-gov-navy dark:text-slate-100 mt-1">{cases.length}</div>
+          <div className="text-xl font-bold text-gov-navy dark:text-slate-100 mt-1">{casesToShow.length}</div>
         </div>
         <div className="bg-white dark:bg-slate-900 p-3.5 rounded-lg border border-gov-border dark:border-slate-800 shadow-sm transition-colors">
           <div className="text-xs text-red-700 dark:text-red-400 font-bold flex items-center gap-1">
@@ -239,43 +273,8 @@ export default function CounsellorDashboardPage() {
         </div>
       </div>
 
-      {/* View Mode Tab Switcher */}
-      <div className="flex items-center gap-2 border-b border-gov-border dark:border-slate-800 pb-2">
-        <button
-          onClick={() => setDashboardTab('queue')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            dashboardTab === 'queue'
-              ? 'bg-gov-navy dark:bg-teal-700 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-gov-navy'
-          }`}
-        >
-          <ListFilter className="w-4 h-4" />
-          <span>Priority Case Queue ({cases.length})</span>
-        </button>
-
-        <button
-          onClick={() => setDashboardTab('heatmap')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            dashboardTab === 'heatmap'
-              ? 'bg-gov-navy dark:bg-teal-700 text-white shadow-sm'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-gov-navy'
-          }`}
-        >
-          <MapPin className="w-4 h-4 text-red-500" />
-          <span>National Vulnerability Heatmap (GIS)</span>
-        </button>
-      </div>
-
-      {/* Main View: Queue Table OR GIS Heatmap */}
-      {dashboardTab === 'queue' ? (
-        <CaseQueueTable cases={cases} onClaimCase={claimCase} />
-      ) : (
-        <VulnerabilityHeatmap
-          onSelectDistrict={(districtName) => {
-            setDashboardTab('queue');
-          }}
-        />
-      )}
+      {/* Main View: Queue Table */}
+      <CaseQueueTable cases={casesToShow} onClaimCase={claimCase} />
     </div>
   );
 }

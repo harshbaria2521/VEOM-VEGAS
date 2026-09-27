@@ -49,6 +49,8 @@ export function registerNewComplaint({
   channel = 'Web Portal',
   preferredLanguage = 'Hindi',
   voiceConsented = true,
+  victimId = '',
+  victimPhone = '',
 }) {
   const assessment = assessComplaint(complaintText);
   const now = new Date();
@@ -62,6 +64,8 @@ export function registerNewComplaint({
   const newCase = {
     id: newId,
     victimName: victimName || 'Anonymous Complainant',
+    victimId,
+    victimPhone,
     district,
     state,
     channel,

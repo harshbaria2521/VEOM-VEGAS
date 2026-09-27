@@ -7,7 +7,7 @@ import { CheckCircle2, RefreshCw, AlertOctagon, FileText, Send, ShieldCheck } fr
 
 export default function HumanActionForm({ currentCase, onPerformAction }) {
   const { lang, user } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [activeAction, setActiveAction] = useState('approve');
   const [overrideRisk, setOverrideRisk] = useState('Moderate');

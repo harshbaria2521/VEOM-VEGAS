@@ -4,13 +4,17 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/authContext';
+import { useCaseStore } from '../../lib/caseStore';
 import { translations } from '../../lib/translations';
-import { ShieldCheck, User, Lock, MessageSquare, Phone, LogOut, ArrowLeft, CheckCircle2, Clock } from 'lucide-react';
+import { ShieldCheck, User, Lock, MessageSquare, Phone, LogOut, ArrowLeft, CheckCircle2, Clock, FileText } from 'lucide-react';
 
 export default function VictimProfilePage() {
   const router = useRouter();
   const { victim, logoutVictim, lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const { cases } = useCaseStore();
+  const t = { ...translations.en, ...(translations[lang] || {}) };
+  
+  const myCases = cases.filter(c => c.victimId === victim?.id || (victim?.phone && c.victimPhone === victim?.phone));
 
   const [consentInfo, setConsentInfo] = useState(null);
   const [chatCount, setChatCount] = useState(0);
@@ -139,6 +143,46 @@ export default function VictimProfilePage() {
                 ? 'आपके सभी प्रश्न और काउंसलर सिफारिशें इस सत्र में सुरक्षित रूप से दर्ज हैं।'
                 : 'Your session exchanges are linked to your case ticket for officer review upon request.'}
             </p>
+          </div>
+
+          {/* My Grievances */}
+          <div className="space-y-3">
+            <h3 className="font-bold text-xs uppercase tracking-wider text-gov-navy dark:text-slate-200 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              {lang === 'hi' ? 'मेरी शिकायतें' : 'My Grievances'}
+            </h3>
+            
+            {myCases.length > 0 ? (
+              <div className="space-y-3">
+                {myCases.map(c => (
+                  <div key={c.id} className="p-4 bg-white dark:bg-slate-900/50 border border-gov-border dark:border-slate-700 rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono font-bold text-gov-navy dark:text-slate-200">{c.id}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
+                        c.status === 'New' ? 'bg-blue-50 text-blue-800' :
+                        c.status === 'In Review' ? 'bg-amber-50 text-amber-800' :
+                        c.status === 'Escalated' ? 'bg-red-50 text-red-800' : 'bg-emerald-50 text-emerald-800'
+                      }`}>
+                        {c.status}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gov-textMuted dark:text-slate-400 flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>{c.flaggedAt}</span>
+                    </div>
+                    {c.assignedTo && (
+                      <div className="text-xs text-gov-navy dark:text-slate-300">
+                        Assigned Officer: <span className="font-bold">{c.assignedTo}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 bg-white dark:bg-slate-900/50 border border-gov-border dark:border-slate-700 rounded-xl text-center text-xs text-gov-textMuted dark:text-slate-400">
+                {lang === 'hi' ? 'कोई शिकायत नहीं मिली।' : 'No grievances found associated with your ID.'}
+              </div>
+            )}
           </div>
 
           {/* Actions */}

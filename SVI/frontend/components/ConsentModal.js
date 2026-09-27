@@ -7,7 +7,7 @@ import { ShieldCheck, Lock, AlertCircle, Phone, CheckCircle2 } from 'lucide-reac
 
 export default function ConsentModal({ onConsentComplete, isOpen = true }) {
   const { lang } = useAuth();
-  const t = translations[lang] || translations.en;
+  const t = { ...translations.en, ...(translations[lang] || {}) };
 
   const [textConsent, setTextConsent] = useState(true);
   const [voiceConsent, setVoiceConsent] = useState(false);
