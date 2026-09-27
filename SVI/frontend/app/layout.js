@@ -4,7 +4,6 @@ import { AuthProvider } from '../lib/authContext';
 import { ThemeProvider } from '../lib/themeContext';
 import Navbar from '../components/Navbar';
 import MobileBottomNav from '../components/MobileBottomNav';
-
 import WelcomeSplash from '../components/WelcomeSplash';
 import { Shield, Phone, ExternalLink } from 'lucide-react';
 
@@ -79,7 +78,6 @@ export default function RootLayout({ children }) {
         <ThemeProvider>
           <AuthProvider>
             <WelcomeSplash />
-
             <Navbar />
             <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
               {children}

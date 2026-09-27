@@ -1,6 +1,38 @@
 import { jsPDF } from 'jspdf';
 import { assessComplaint } from './sviScoring';
 
+/**
+ * Sanitize text for jsPDF rendering.
+ * jsPDF built-in fonts (Helvetica, Courier) only support Latin-1 characters.
+ * Any Hindi (Devanagari), Gujarati, Tamil, Bengali, etc. characters render as garbled symbols.
+ * This function replaces non-renderable characters with a safe fallback.
+ */
+function sanitizeForPDF(text) {
+  if (!text) return '';
+  // Replace ₹ with Rs.
+  let cleaned = text.replace(/₹/g, 'Rs.');
+  // Check if text contains any non-Latin characters (Devanagari, etc.)
+  // Unicode ranges for major Indian scripts
+  const nonLatinRegex = /[\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0A80-\u0AFF\u0B00-\u0B7F\u0B80-\u0BFF\u0C00-\u0C7F\u0C80-\u0CFF\u0D00-\u0D7F\u0600-\u06FF]/g;
+  if (nonLatinRegex.test(cleaned)) {
+    // Replace individual non-Latin chars but keep Latin text intact
+    // First try to keep any Latin parts
+    const latinParts = cleaned.split(nonLatinRegex).filter(part => part.trim());
+    if (latinParts.length > 0 && latinParts.join(' ').trim().length > 10) {
+      // Has enough Latin text, just strip non-Latin chars
+      cleaned = cleaned.replace(nonLatinRegex, '').replace(/\s+/g, ' ').trim();
+    } else {
+      // Mostly non-Latin — provide a standard English translation note
+      cleaned = '[Complaint filed in regional language - Original text preserved in digital records. ' +
+        'Victim reported incident involving caste-based discrimination, harassment, or violence. ' +
+        'Full vernacular transcript available in SVI digital case file for officer review.]';
+    }
+  }
+  // Final cleanup: remove any remaining non-printable or unsupported chars
+  cleaned = cleaned.replace(/[^\x20-\x7E\n\r]/g, '').replace(/\s+/g, ' ').trim();
+  return cleaned || 'Details recorded in SVI digital case management system.';
+}
+
 const STATUTORY_OFFENCE_REGISTRY = [
   {
     pattern: /3\(2\)\(v\)/i,
@@ -138,7 +170,7 @@ export function generateGrievancePDF(caseData = {}) {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9);
   doc.setTextColor(15, 23, 42);
-  doc.text('GOVERNMENT OF INDIA / भारत सरकार', pageWidth / 2, y, { align: 'center' });
+  doc.text('GOVERNMENT OF INDIA', pageWidth / 2, y, { align: 'center' });
   y += 4.5;
 
   doc.setFontSize(8);
@@ -250,6 +282,9 @@ export function generateGrievancePDF(caseData = {}) {
     ? caseData.violationTags
     : (assessedInfo ? assessedInfo.sections : ['PoA Act Sec 3(1)(r)', 'PoA Act Sec 3(1)(s)', 'PCR Act Sec 4']);
 
+  // Sanitize narrative for PDF rendering (non-Latin chars become garbled in jsPDF)
+  narrativeText = sanitizeForPDF(narrativeText);
+
   // Map each section to its exact statutory act and real legal offence description
   const tags = effectiveTags.slice(0, 4).map(resolveOffenceDetail);
 
@@ -295,15 +330,47 @@ export function generateGrievancePDF(caseData = {}) {
   doc.text('2. INCIDENT NARRATIVE & VICTIM TESTIMONY (AI SYNTHESIZED)', margin, y);
   y += 4;
 
-  doc.setFillColor(248, 250, 252);
-  doc.roundedRect(margin, y, contentWidth, 26, 1.5, 1.5, 'F');
-  doc.setFont('helvetica', 'italic');
-  doc.setFontSize(7.5);
-  doc.setTextColor(30, 41, 59);
+  // Render structured conversation (max 4 messages to save space)
+  let msgsToRender = [];
+  if (caseData.transcript && Array.isArray(caseData.transcript)) {
+    msgsToRender = caseData.transcript.slice(0, 4);
+  } else {
+    msgsToRender = [{ sender: 'Victim', text: narrativeText }];
+  }
 
-  const splitNarrative = doc.splitTextToSize(narrativeText, contentWidth - 8);
-  doc.text(splitNarrative.slice(0, 5), margin + 4, y + 5);
-  y += 30;
+  // Pre-calculate heights
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  let transcriptBoxHeight = 4;
+  const parsedMsgs = msgsToRender.map(m => {
+    const safeText = sanitizeForPDF(m.text);
+    const prefix = (m.sender === 'Victim' || m.sender === 'user') ? 'Complainant: ' : 'SVI AI: ';
+    const lines = doc.splitTextToSize(prefix + safeText, contentWidth - 8);
+    const rowHeight = lines.length * 3.5;
+    transcriptBoxHeight += rowHeight + 2;
+    return { lines, rowHeight, isVictim: (m.sender === 'Victim' || m.sender === 'user') };
+  });
+
+  doc.setFillColor(248, 250, 252);
+  doc.setDrawColor(226, 232, 240);
+  doc.roundedRect(margin, y, contentWidth, transcriptBoxHeight, 1.5, 1.5, 'FD');
+  
+  let curTY = y + 5;
+  parsedMsgs.forEach(msg => {
+    if (msg.isVictim) {
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(194, 65, 12); // Amber for victim
+    } else {
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(13, 148, 136); // Teal for AI
+    }
+    // We draw the prefix bold/colored, then the rest normal, but jsPDF text() is simple,
+    // so we just color the whole block to differentiate
+    doc.text(msg.lines, margin + 4, curTY);
+    curTY += msg.rowHeight + 2;
+  });
+
+  y += transcriptBoxHeight + 4;
 
   // --- 6. Immediate Statutory Relief Entitlements (PoA Rules Schedule I) ---
   doc.setFont('helvetica', 'bold');
@@ -313,9 +380,7 @@ export function generateGrievancePDF(caseData = {}) {
   y += 4;
 
   const rawRelief = caseData.reliefEntitlement || (assessedInfo ? assessedInfo.reliefEntitlement : '');
-  const reliefAmount = rawRelief
-    ? rawRelief.replace(/₹/g, 'Rs. ')
-    : 'Rs. 1,00,000/- to Rs. 2,50,000/-';
+  const reliefAmount = sanitizeForPDF(rawRelief) || 'Rs. 1,00,000/- to Rs. 2,50,000/-';
 
   const reliefItems = [
     {

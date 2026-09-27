@@ -678,7 +678,7 @@ export default function ChatWidget() {
       victimName: victim?.name || 'Anonymous Complainant',
       district: 'Hathras',
       state: 'Uttar Pradesh',
-      channel: 'Chatbot',
+      channel: 'SVI Chatbot',
       preferredLanguage: lang === 'hi' ? 'Hindi' : 'English',
     });
 
@@ -1081,8 +1081,15 @@ export default function ChatWidget() {
           <button
             type="button"
             onClick={() => {
-              const transcript = messages.map(m => `${m.sender === 'user' ? 'User' : 'AI'}: ${m.text}`).join('\n\n');
-              sessionStorage.setItem('svi_chat_transcript', transcript);
+              // Save structured JSON so the complaint page can render each message properly
+              const structuredTranscript = messages
+                .filter(m => m.text && m.text.trim())
+                .map(m => ({
+                  sender: m.sender === 'user' ? 'Victim' : 'SVI AI',
+                  text: m.text,
+                  timestamp: m.timestamp || '',
+                }));
+              sessionStorage.setItem('svi_chat_transcript', JSON.stringify(structuredTranscript));
               router.push('/track');
             }}
             title="Create a Grievance"

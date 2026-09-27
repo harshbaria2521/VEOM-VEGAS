@@ -107,6 +107,7 @@ export default function TrackGrievancePage() {
   const [district, setDistrict] = useState('');
   const [stateName, setStateName] = useState('');
   const [complaintText, setComplaintText] = useState('');
+  const [chatMessages, setChatMessages] = useState([]); // structured transcript from AI chat
   const [submitting, setSubmitting] = useState(false);
   const [registeredSuccess, setRegisteredSuccess] = useState(null);
 
@@ -115,10 +116,26 @@ export default function TrackGrievancePage() {
     const all = getStoredCases();
     setRecentCases(all);
 
-    // Auto-fill complaint from AI chat if available
+    // Auto-fill complaint from AI chat if available (structured JSON)
     const savedTranscript = sessionStorage.getItem('svi_chat_transcript');
     if (savedTranscript) {
-      setComplaintText(savedTranscript);
+      try {
+        const parsed = JSON.parse(savedTranscript);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setChatMessages(parsed);
+          // Derive plain text (victim messages only) for SVI scoring
+          const victimText = parsed
+            .filter(m => m.sender === 'Victim')
+            .map(m => m.text)
+            .join(' ');
+          setComplaintText(victimText);
+        } else {
+          // Fallback: old plain-text format
+          setComplaintText(savedTranscript);
+        }
+      } catch {
+        setComplaintText(savedTranscript);
+      }
       sessionStorage.removeItem('svi_chat_transcript');
     }
   }, []);
@@ -169,12 +186,18 @@ export default function TrackGrievancePage() {
     setSubmitting(true);
     setTimeout(() => {
       try {
+        // Build final structured transcript: use AI chat messages if available, else wrap plain text
+        const finalTranscript = chatMessages.length > 0
+          ? chatMessages
+          : [{ sender: 'Victim', text: complaintText.trim(), timestamp: '' }];
+
         const { newCase, assessment } = registerNewComplaint({
           complaintText: complaintText.trim(),
+          messages: finalTranscript,
           victimName: isAnonymous ? 'Anonymous Complainant' : victimName || 'Citizen Complainant',
           district,
           state: stateName,
-          channel: 'Web Portal',
+          channel: chatMessages.length > 0 ? 'SVI Chatbot' : 'Web Portal',
           preferredLanguage: lang === 'hi' ? 'Hindi' : 'English',
           victimId: user?.role === 'counsellor' ? officerVictimId : '',
           victimPhone: user?.role === 'counsellor' ? officerVictimPhone : '',
@@ -190,6 +213,7 @@ export default function TrackGrievancePage() {
         // Switch back to track tab to see the live score
         setActiveTab('track');
         setComplaintText('');
+        setChatMessages([]);
       } catch (err) {
         console.error('Registration failed:', err);
       } finally {
@@ -428,19 +452,77 @@ export default function TrackGrievancePage() {
                 )}
               </div>
 
-              {/* Complaint Textarea */}
-              <div>
-                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
-                  {t.grievanceIncidentLabel} <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  rows={4}
-                  value={complaintText}
-                  onChange={(e) => setComplaintText(e.target.value)}
-                  placeholder={t.grievanceIncidentPlaceholder}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal"
-                />
-              </div>
+              {/* Structured Chat Transcript Preview (when imported from AI Chat) */}
+              {chatMessages.length > 0 ? (
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                    AI Chat Conversation Transcript <span className="text-red-500">*</span>
+                  </label>
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 overflow-hidden">
+                    <div className="max-h-72 overflow-y-auto p-3 space-y-3">
+                      {chatMessages.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex gap-2 ${
+                            msg.sender === 'Victim' ? 'justify-end' : 'justify-start'
+                          }`}
+                        >
+                          {msg.sender !== 'Victim' && (
+                            <div className="w-6 h-6 rounded-full bg-gov-teal flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-white text-[9px] font-bold">AI</span>
+                            </div>
+                          )}
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                              msg.sender === 'Victim'
+                                ? 'bg-gov-navy text-white rounded-tr-sm'
+                                : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-tl-sm'
+                            }`}
+                          >
+                            <div className={`text-[10px] font-bold mb-0.5 ${
+                              msg.sender === 'Victim' ? 'text-amber-300' : 'text-gov-teal dark:text-teal-400'
+                            }`}>
+                              {msg.sender === 'Victim' ? 'You (Victim)' : 'Tara (SVI AI)'}
+                              {msg.timestamp && <span className="ml-2 font-normal opacity-60">{msg.timestamp}</span>}
+                            </div>
+                            <p className="whitespace-pre-wrap">{msg.text}</p>
+                          </div>
+                          {msg.sender === 'Victim' && (
+                            <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-white text-[9px] font-bold">V</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border-t border-slate-200 dark:border-slate-700 px-3 py-2 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500">{chatMessages.length} messages imported from AI session</span>
+                      <button
+                        type="button"
+                        onClick={() => { setChatMessages([]); setComplaintText(''); }}
+                        className="text-[10px] text-red-500 hover:text-red-700 font-semibold"
+                      >
+                        Clear &amp; Type Manually
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Fallback: Plain Textarea */
+                <div>
+                  <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">
+                    {t.grievanceIncidentLabel} <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={complaintText}
+                    onChange={(e) => setComplaintText(e.target.value)}
+                    placeholder={t.grievanceIncidentPlaceholder}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-gov-teal"
+                  />
+                </div>
+              )}
 
               {/* STATUTORY SECTION MAPPING PREVIEW */}
               {complaintText.trim().length > 0 && liveAssessment.sections.length > 0 && (
@@ -625,22 +707,49 @@ export default function TrackGrievancePage() {
                 </button>
               </div>
 
-              {/* Real Incident Narrative Card */}
+              {/* Structured Conversation Transcript Card */}
               {selectedCase.transcript && selectedCase.transcript.length > 0 && (
                 <div className="bg-white dark:bg-slate-800/90 rounded-2xl p-5 border border-gov-border dark:border-slate-700 shadow-sm space-y-3">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-gov-navy dark:text-slate-300 flex items-center gap-1.5">
                     <FileText className="w-4 h-4 text-gov-teal" />
-                    <span>Incident Complaint Narrative & AI Triage Record</span>
+                    <span>Incident Complaint Narrative &amp; AI Triage Record</span>
+                    <span className="ml-auto text-[10px] font-normal text-slate-400">{selectedCase.transcript.length} messages</span>
                   </h3>
-                  <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs leading-relaxed text-slate-800 dark:text-slate-200 space-y-2">
-                    <p className="italic font-medium text-slate-700 dark:text-slate-300">
-                      "{selectedCase.transcript[0]?.text}"
-                    </p>
-                    {selectedCase.transcript[1] && (
-                      <div className="pt-2 border-t border-slate-200 dark:border-slate-800 text-gov-teal dark:text-teal-400 font-medium">
-                        <strong>AI Response & Action:</strong> {selectedCase.transcript[1]?.text}
+                  <div className="rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 max-h-80 overflow-y-auto p-3 space-y-3">
+                    {selectedCase.transcript.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex gap-2 ${
+                          msg.sender === 'Victim' || msg.sender === 'user' ? 'justify-end' : 'justify-start'
+                        }`}
+                      >
+                        {msg.sender !== 'Victim' && msg.sender !== 'user' && (
+                          <div className="w-6 h-6 rounded-full bg-gov-teal flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-white text-[9px] font-bold">AI</span>
+                          </div>
+                        )}
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs leading-relaxed ${
+                            msg.sender === 'Victim' || msg.sender === 'user'
+                              ? 'bg-gov-navy text-white rounded-tr-sm'
+                              : 'bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-800 dark:text-slate-200 rounded-tl-sm'
+                          }`}
+                        >
+                          <div className={`text-[10px] font-bold mb-0.5 ${
+                            msg.sender === 'Victim' || msg.sender === 'user' ? 'text-amber-300' : 'text-gov-teal dark:text-teal-400'
+                          }`}>
+                            {msg.sender === 'Victim' || msg.sender === 'user' ? 'Victim / Complainant' : 'Tara (SVI AI)'}
+                            {msg.timestamp && <span className="ml-2 font-normal opacity-60">{msg.timestamp}</span>}
+                          </div>
+                          <p className="whitespace-pre-wrap">{msg.text}</p>
+                        </div>
+                        {(msg.sender === 'Victim' || msg.sender === 'user') && (
+                          <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span className="text-white text-[9px] font-bold">V</span>
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               )}

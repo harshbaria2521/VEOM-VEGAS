@@ -5,10 +5,10 @@ import { useCaseStore } from '../../lib/caseStore';
 import CaseQueueTable from '../../components/CaseQueueTable';
 import { useAuth } from '../../lib/authContext';
 import { translations } from '../../lib/translations';
-import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff } from 'lucide-react';
+import { UserCheck, AlertOctagon, CheckCircle2, Clock, BellRing, X, Bell, BellOff, RefreshCw } from 'lucide-react';
 
 export default function CounsellorDashboardPage() {
-  const { cases, claimCase } = useCaseStore();
+  const { cases, claimCase, refreshCases } = useCaseStore();
   const { lang, user } = useAuth();
   const t = { ...translations.en, ...(translations[lang] || {}) };
 
@@ -215,6 +215,17 @@ export default function CounsellorDashboardPage() {
               : <BellOff className="w-3.5 h-3.5" aria-hidden="true" />
             }
             <span>{alertEnabled ? '🔔 Alert On' : '🔕 Alert Off'}</span>
+          </button>
+
+          {/* Refresh Queue Button */}
+          <button
+            type="button"
+            onClick={refreshCases}
+            title="Refresh case queue to see newly filed complaints"
+            className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border bg-gov-tealSoft dark:bg-teal-950/60 text-gov-teal dark:text-teal-300 border-gov-teal/30 dark:border-teal-700 hover:bg-gov-teal hover:text-white transition-colors focus:ring-2 focus:ring-gov-teal"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Refresh Queue</span>
           </button>
 
           <div className="flex items-center gap-3 bg-gov-cream dark:bg-slate-800 p-3 rounded-lg border border-gov-border dark:border-slate-700 text-xs">

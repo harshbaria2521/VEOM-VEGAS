@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { initialCases } from './mockData';
 import { assessComplaint } from './sviScoring';
 
-const STORAGE_KEY = 'svi_cases_state_v2';
+const STORAGE_KEY = 'svi_cases_state_v7';
 
 export function getStoredCases() {
   if (typeof window === 'undefined') return initialCases;
@@ -43,6 +43,7 @@ export function getCaseById(id) {
 
 export function registerNewComplaint({
   complaintText,
+  messages = null,   // optional structured transcript from AI chat
   victimName = 'Anonymous Complainant',
   district = 'Unspecified',
   state = 'India',
@@ -69,14 +70,14 @@ export function registerNewComplaint({
     district,
     state,
     channel,
-    channelIcon: channel === 'Chatbot' ? 'message-square' : 'file-text',
+    channelIcon: channel && channel.includes('Chatbot') ? 'message-square' : 'file-text',
     riskLevel: assessment.riskLevel,
     riskScore: assessment.score,
     language: preferredLanguage,
     flaggedAt: 'Just now',
     timestamp: timestampStr,
     status: 'New',
-    assignedTo: null,
+    assignedTo: assessment.riskLevel === 'Critical' ? 'Officer R. Sharma (ID: 412)' : null,
     voiceConsented,
     audioUrl: null,
     violationTags: assessment.sections,
@@ -95,13 +96,17 @@ export function registerNewComplaint({
       speechRate: assessment.score > 75 ? 'Rapid / breathless sobbing' : 'Steady reporting',
     },
     recommendedPathway: assessment.recommendedPathway,
-    transcript: [
-      { sender: 'Victim', text: complaintText },
-      {
-        sender: 'SVI AI',
-        text: `शिकायत क्रमांक ${newId} दर्ज कर लिया गया है। SVI AI विश्लेषण के अनुसार इस शिकायत का रिस्क स्कोर ${assessment.score}/100 (${assessment.riskLevel}) निर्धारित हुआ है। धाराएँ: ${assessment.sections.join(', ')}। संबंधित जिले के नोडल अधिकारी और विधिक सेवा प्राधिकरण (DLSA) को अलर्ट भेज दिया गया है।`
-      }
-    ],
+    // Use structured AI chat messages if provided, otherwise build a simple one-entry transcript
+    transcript: messages && messages.length > 0
+      ? messages
+      : [
+          { sender: 'Victim', text: complaintText, timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) },
+          {
+            sender: 'SVI AI',
+            text: `Case ${newId} registered. Risk score: ${assessment.score}/100 (${assessment.riskLevel}). Sections: ${assessment.sections.join(', ')}. Nodal officer and DLSA alerted.`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }
+        ],
     auditTrail: [
       {
         action: 'AI Assessment Completed',
@@ -128,12 +133,48 @@ export function registerNewComplaint({
 export function useCaseStore() {
   const [cases, setCases] = useState(initialCases);
 
+  // Load from localStorage on mount
   useEffect(() => {
     setCases(getStoredCases());
   }, []);
 
+  // Cross-tab sync: listen for storage events from other tabs/components
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === STORAGE_KEY) {
+        setCases(getStoredCases());
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  // Same-tab polling: pick up new complaints written by ChatWidget in the same tab
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const latest = getStoredCases();
+      setCases((prev) => {
+        // Only update if the count changed (new complaint added or case modified)
+        if (latest.length !== prev.length) return latest;
+        // Also check if any case data changed (status, assignedTo, etc.)
+        const prevJson = JSON.stringify(prev.map(c => c.id + c.status + (c.assignedTo || '')));
+        const latestJson = JSON.stringify(latest.map(c => c.id + c.status + (c.assignedTo || '')));
+        if (prevJson !== latestJson) return latest;
+        return prev;
+      });
+    }, 2000); // poll every 2 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // Manual refresh function
+  const refreshCases = () => {
+    setCases(getStoredCases());
+  };
+
   const claimCase = (caseId, officerName = 'Officer Sharma') => {
-    const updated = cases.map((c) => {
+    // Re-read from storage to get the absolute latest (includes newly registered complaints)
+    const freshCases = getStoredCases();
+    const updated = freshCases.map((c) => {
       if (c.id === caseId) {
         const newAudit = {
           action: 'Case Claimed',
@@ -145,7 +186,31 @@ export function useCaseStore() {
           ...c,
           status: 'In Review',
           assignedTo: officerName,
-          auditTrail: [newAudit, ...c.auditTrail]
+          auditTrail: [newAudit, ...(c.auditTrail || [])]
+        };
+      }
+      return c;
+    });
+
+    setCases(updated);
+    saveStoredCases(updated);
+  };
+
+  // Admin function: reassign a case to a different officer
+  const reassignOfficer = (caseId, newOfficerName, adminName = 'Admin') => {
+    const freshCases = getStoredCases();
+    const updated = freshCases.map((c) => {
+      if (c.id === caseId) {
+        const newAudit = {
+          action: 'Officer Reassigned',
+          actor: adminName,
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          details: `Case reassigned from ${c.assignedTo || 'Unassigned'} to ${newOfficerName} by administrator.`
+        };
+        return {
+          ...c,
+          assignedTo: newOfficerName,
+          auditTrail: [newAudit, ...(c.auditTrail || [])]
         };
       }
       return c;
@@ -156,7 +221,8 @@ export function useCaseStore() {
   };
 
   const applyHumanAction = (caseId, { actionType, newRiskLevel, reason, notes, officerName = 'Officer Sharma' }) => {
-    const updated = cases.map((c) => {
+    const freshCases = getStoredCases();
+    const updated = freshCases.map((c) => {
       if (c.id === caseId) {
         let updatedStatus = c.status;
         let updatedRisk = c.riskLevel;
@@ -188,7 +254,7 @@ export function useCaseStore() {
           ...c,
           status: updatedStatus,
           riskLevel: updatedRisk,
-          auditTrail: [newAudit, ...c.auditTrail]
+          auditTrail: [newAudit, ...(c.auditTrail || [])]
         };
       }
       return c;
@@ -202,6 +268,8 @@ export function useCaseStore() {
     cases,
     claimCase,
     applyHumanAction,
+    reassignOfficer,
+    refreshCases,
     registerComplaint: registerNewComplaint,
   };
 }

@@ -146,6 +146,8 @@ export default function CaseDetailPage() {
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-4 text-xs text-gov-textMuted dark:text-slate-400">
+            <span>Victim / Complainant: <strong className="text-gov-navy dark:text-slate-100 font-bold">{currentCase.victimName || 'Anonymous Complainant'}</strong></span>
+            <span>•</span>
             <span>Channel: <strong className="text-slate-800 dark:text-slate-200">{currentCase.channel}</strong></span>
             <span>•</span>
             <span>Language: <strong className="text-slate-800 dark:text-slate-200">{currentCase.language}</strong></span>

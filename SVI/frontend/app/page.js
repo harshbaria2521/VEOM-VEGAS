@@ -12,20 +12,26 @@ export default function HomePage() {
   const { lang, user, victim } = useAuth();
   const t = { ...translations.en, ...(translations[lang] || {}) };
 
-  const [hasConsented, setHasConsented] = useState(false);
+  const [hasConsented, setHasConsented] = useState(true);
   const [showConsentModal, setShowConsentModal] = useState(false);
 
   useEffect(() => {
     try {
       const stored = localStorage.getItem('svi_victim_consent');
-      if (stored) {
-        setHasConsented(true);
-        setShowConsentModal(false);
-      } else {
-        setShowConsentModal(true);
+      if (!stored) {
+        // Auto initialize default safe consent so no modal interrupts the user
+        localStorage.setItem('svi_victim_consent', JSON.stringify({
+          textConsent: true,
+          voiceConsent: true,
+          timestamp: new Date().toISOString(),
+          version: '1.0-MoSJE-NHAA'
+        }));
       }
+      setHasConsented(true);
+      setShowConsentModal(false);
     } catch (e) {
-      setShowConsentModal(true);
+      setHasConsented(true);
+      setShowConsentModal(false);
     }
   }, []);
 

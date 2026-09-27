@@ -4,16 +4,32 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Sparkles, ArrowRight, Lock, PhoneCall, CheckCircle2 } from 'lucide-react';
 
 export default function WelcomeSplash() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [isFadingOut, setIsFadingOut] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(1);
+  const [timeLeft, setTimeLeft] = useState(2);
   const [statusStage, setStatusStage] = useState(1);
 
-  // Check if splash should run
+  // Check if splash should run: only ONCE per user
   useEffect(() => {
-    // Ensure splash is visible
-    setIsVisible(true);
+    try {
+      const alreadySeen =
+        localStorage.getItem('svi_landing_splash_seen') ||
+        sessionStorage.getItem('svi_landing_splash_seen');
+
+      if (alreadySeen) {
+        setIsVisible(false);
+        return;
+      }
+
+      // Mark as seen immediately so it will never show again on logout or subsequent visits
+      localStorage.setItem('svi_landing_splash_seen', 'true');
+      sessionStorage.setItem('svi_landing_splash_seen', 'true');
+      setIsVisible(true);
+    } catch (e) {
+      setIsVisible(false);
+      return;
+    }
 
     const DURATION = 2000; // 2 seconds
     const INTERVAL = 30; // update every 30ms
@@ -42,12 +58,12 @@ export default function WelcomeSplash() {
       }
     }, INTERVAL);
 
-    // Global event listener to allow manual replay anytime
+    // Global event listener to allow manual replay anytime if triggered explicitly
     const handleReplay = () => {
       setIsFadingOut(false);
       setIsVisible(true);
       setProgress(0);
-      setTimeLeft(1);
+      setTimeLeft(2);
       setStatusStage(1);
       
       let step = 0;
@@ -77,6 +93,10 @@ export default function WelcomeSplash() {
   }, []);
 
   const dismissSplash = () => {
+    try {
+      localStorage.setItem('svi_landing_splash_seen', 'true');
+      sessionStorage.setItem('svi_landing_splash_seen', 'true');
+    } catch (e) {}
     setIsFadingOut(true);
     setTimeout(() => {
       setIsVisible(false);
@@ -173,7 +193,7 @@ export default function WelcomeSplash() {
         </div>
       </div>
 
-      {/* Bottom 3-Second Progress & Enter CTA */}
+      {/* Bottom 2-Second Progress & Enter CTA */}
       <div className="w-full max-w-2xl mx-auto px-4 pb-6 pt-2 relative z-10">
         <div className="space-y-2">
           {/* Progress Bar Label & Countdown */}

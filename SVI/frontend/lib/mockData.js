@@ -11,14 +11,16 @@
  */
 
 export const initialCases = [
+  // 1. CRITICAL - SPEECH (Helpline 14566)
   {
     id: "SVI-2026-9041",
-    channel: "Chatbot",
-    channelIcon: "message-square",
+    victimName: "Rameshwar Paswan",
+    channel: "Helpline (14566)",
+    channelIcon: "phone",
     riskLevel: "Critical",
-    riskScore: 94,
+    riskScore: 95,
     language: "Hindi",
-    flaggedAt: "2 mins ago",
+    flaggedAt: "3 mins ago",
     timestamp: "2026-09-21T12:55:00Z",
     status: "New",
     assignedTo: null,
@@ -26,394 +28,272 @@ export const initialCases = [
     audioUrl: null,
     violationTags: ["PoA Act Sec 3(1)(r)", "PoA Act Sec 3(1)(s)", "PoA Act Sec 3(2)(v)"],
     indicators: [
-      { name: "Severe Acute Distress", severity: "high", confidence: 96 },
-      { name: "Fear of Imminent Harm", severity: "critical", confidence: 94 },
-      { name: "Armed Mob Aggression", severity: "critical", confidence: 91 },
-      { name: "Social Isolation", severity: "medium", confidence: 78 }
+      { name: "Severe Acute Panic & Distress", severity: "high", confidence: 97 },
+      { name: "Imminent Armed Mob Violence", severity: "critical", confidence: 95 },
+      { name: "Arson & Life Threat", severity: "critical", confidence: 93 },
+      { name: "Vocal Acoustic Breakdown", severity: "high", confidence: 91 }
     ],
     vocalSignals: {
-      tremorScore: "0.88 (Severe)",
-      pitchVariation: "Extreme instability / high panic spike",
-      speechRate: "Rapid / breathless sobbing"
+      tremorScore: "0.89 (Severe Acoustic Instability)",
+      pitchVariation: "Extreme jitter & rapid pitch spikes",
+      speechRate: "Rapid, breathless & audible weeping"
     },
-    recommendedPathway: "Immediate Emergency Dispatch (112) + District SP Alert + High-Priority Trauma Counsellor Routing",
+    recommendedPathway: "Immediate 112 Emergency Police Dispatch + District SP Alert + High-Priority Trauma Counsellor Routing",
     transcript: [
-      { sender: "Victim", text: "नमस्ते... मुझे बहुत डर लग रहा है, वो लोग फिर से हमारे घर के बाहर लाठी और हथियार लेकर आ गए हैं। जातिसूचक गालियाँ दे रहे हैं और दरवाज़ा पीटने लगे हैं।" },
-      { sender: "SVI AI", text: "आप इस समय घर के सबसे सुरक्षित अंदरूनी कमरे में रहें और खिड़की-दरवाजे बंद रखें। हम तत्काल आपातकालीन पुलिस नियंत्रण कक्ष (112) और स्थानीय पुलिस उपाधीक्षक को आपकी लोकेशन भेज रहे हैं।" },
-      { sender: "Victim", text: "कृपया जल्दी पुलिस भेजिए, वे लोग कह रहे हैं कि मजदूरी मांगने की हिम्मत कैसे की। मुझे अपनी और बच्चों की जान का खतरा है।" },
-      { sender: "SVI AI", text: "112 कंट्रोल रूम को हाई-प्रायोरिटी अलर्ट भेजा जा चुका है। एक वरिष्ठ काउंसलर और पुलिस रिस्पांस टीम आपसे तुरंत संपर्क कर रही है। लाइन पर बने रहें।" }
+      { sender: "Victim", text: "नमस्ते... मुझे बहुत डर लग रहा है, वो लोग फिर से हमारे घर के बाहर लाठी और हथियार लेकर आ गए हैं। जातिसूचक गालियाँ दे रहे हैं और दरवाज़ा तोड़ने की कोशिश कर रहे हैं।" },
+      { sender: "SVI AI", text: "आप तुरंत घर के सबसे सुरक्षित अंदरूनी कमरे में चले जाएँ और दरवाज़ा बंद रखें। हम तत्काल 112 पुलिस नियंत्रण कक्ष और स्थानीय पुलिस उपाधीक्षक को आपकी लोकेशन भेज रहे हैं।" },
+      { sender: "Victim", text: "कृपया जल्दी पुलिस भेजिए, वे कह रहे हैं कि पूरे परिवार को जिंदा जला देंगे। मेरे छोटे बच्चे बहुत रो रहे हैं।" },
+      { sender: "SVI AI", text: "आपातकालीन 112 मोबाइल रिस्पांस यूनिट आपकी ओर रवाना कर दी गई है। एक वरिष्ठ नोडल अधिकारी को कॉल ट्रांसफर कर दिया गया है। कॉल न काटें।" }
     ],
     auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 12:55:14", details: "Classified as Critical (Score: 94/100). Imminent threat & vocal tremor detected." }
+      { action: "Voice Acoustic AI Triaged", actor: "SVI Acoustic Engine v2", timestamp: "2026-09-21 12:55:10", details: "Critical distress, pitch jitter (0.89) and lethal threat keywords detected." },
+      { action: "Emergency SOS Alert Generated", actor: "SVI AI System", timestamp: "2026-09-21 12:55:15", details: "Ready for officer claim and urgent dispatch." }
     ]
   },
+
+  // 2. CRITICAL - AI CHATBOT
   {
     id: "SVI-2026-9042",
-    channel: "Helpline (14566)",
-    channelIcon: "phone",
-    riskLevel: "High",
-    riskScore: 79,
+    victimName: "Sunil Kumar Valmiki",
+    channel: "SVI Chatbot",
+    channelIcon: "message-square",
+    riskLevel: "Critical",
+    riskScore: 92,
     language: "English",
-    flaggedAt: "14 mins ago",
-    timestamp: "2026-09-21T12:42:00Z",
-    status: "In Review",
-    assignedTo: "Officer R. Sharma (ID: 412)",
-    voiceConsented: true,
+    flaggedAt: "12 mins ago",
+    timestamp: "2026-09-21T12:45:00Z",
+    status: "New",
+    assignedTo: null,
+    voiceConsented: false,
     audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(r)", "PoA Act Sec 3(1)(u)", "UGC Equity Reg."],
+    violationTags: ["PoA Act Sec 3(2)(v)", "PoA Act Sec 4", "BNS Sec 115(2)"],
     indicators: [
-      { name: "Institutional Caste Harassment", severity: "high", confidence: 89 },
-      { name: "Prolonged Depressive Affect", severity: "high", confidence: 82 },
-      { name: "Insomnia & Panic Episodes", severity: "medium", confidence: 76 },
-      { name: "Legal Aid Requirement", severity: "medium", confidence: 91 }
+      { name: "Grievous Bodily Harm & Bone Fracture", severity: "critical", confidence: 98 },
+      { name: "Police Dereliction & FIR Refusal", severity: "high", confidence: 94 },
+      { name: "Perpetrator Intimidation", severity: "high", confidence: 89 }
     ],
-    vocalSignals: {
-      tremorScore: "0.64 (Moderate)",
-      pitchVariation: "Subdued / low energy monotone",
-      speechRate: "Slow / punctuated by deep sighs"
-    },
-    recommendedPathway: "Assign to Senior Trauma Counsellor + DLSA Legal Aid Cell + Grievance Filing to NCSC State Directorate",
+    vocalSignals: null,
+    recommendedPathway: "Special SC/ST Cell DIG Intervention + Statutory FIR Mandate + DLSA Medical Relocation",
     transcript: [
-      { sender: "Victim", text: "I am an Assistant Professor at a state technical institute in Bengaluru Rural. For the past four months, the department head has subjected me to relentless humiliation, public slurs about reservation, and withheld my lab approvals." },
-      { sender: "SVI AI", text: "I hear how exhausting and deeply painful this hostile environment has been for you. Under the PoA Act and institutional equity guidelines, this constitutes unlawful harassment. You are not alone." },
-      { sender: "Victim", text: "I cannot sleep, I get chest palpitations before entering campus, and internal committee complaints have been suppressed. I need legal and psychological help." },
-      { sender: "SVI AI", text: "We are routing your file to Officer R. Sharma and the District Legal Services Authority (DLSA) for free confidential legal support, along with Tele-MANAS psychological care." }
+      { sender: "Victim", text: "I am writing from a district hospital in Bareilly. The local contractor's men attacked me with iron rods because I asked for my daily wages. My left leg is fractured in two places." },
+      { sender: "SVI AI", text: "Under Section 3(2)(v) of the PoA Act, grievous bodily harm carries stringent life-imprisonment provisions. Have the doctors recorded the Medico-Legal Certificate (MLC)?" },
+      { sender: "Victim", text: "The hospital recorded the MLC, but the local police station officer refused to register an FIR and threatened to file a fake counter-case if I didn't reach a compromise." },
+      { sender: "SVI AI", text: "Under Section 4 of the PoA Act, a police officer refusing to register an FIR commits a punishable non-bailable offense. Your complaint is being escalated to the District Superintendent of Police." }
     ],
     auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 12:42:08", details: "Classified as High (Score: 79/100). Persistent psychological impact detected." },
-      { action: "Case Claimed", actor: "Officer R. Sharma", timestamp: "2026-09-21 12:47:30", details: "Assigned for active triage, DLSA legal notice drafting, and counsellor consultation." }
+      { action: "NLP Semantic Triage Completed", actor: "SVI NLP Engine v2.5", timestamp: "2026-09-21 12:45:22", details: "Grievous injury and Sec 4 police dereliction detected. Class: Critical (92/100)." }
     ]
   },
+
+  // 3. HIGH - SPEECH (Helpline 14566)
   {
     id: "SVI-2026-9043",
-    channel: "Web Portal",
-    channelIcon: "globe",
-    riskLevel: "Moderate",
-    riskScore: 58,
-    language: "Marathi",
-    flaggedAt: "26 mins ago",
-    timestamp: "2026-09-21T12:30:00Z",
+    victimName: "Govindbhai Vankar",
+    channel: "Helpline (14566)",
+    channelIcon: "phone",
+    riskLevel: "High",
+    riskScore: 78,
+    language: "Gujarati",
+    flaggedAt: "35 mins ago",
+    timestamp: "2026-09-21T12:20:00Z",
     status: "New",
     assignedTo: null,
-    voiceConsented: false,
+    voiceConsented: true,
     audioUrl: null,
-    violationTags: ["PCR Act Sec 4", "PoA Act Sec 3(1)(za)(A)"],
+    violationTags: ["PoA Act Sec 3(1)(za)(E)", "PoA Act Sec 3(1)(r)", "PCR Act Sec 4"],
     indicators: [
-      { name: "Denial of Potable Water Source", severity: "high", confidence: 93 },
-      { name: "Social Exclusion / Untouchability", severity: "high", confidence: 88 },
-      { name: "Procedural Distress & Inaction", severity: "medium", confidence: 75 }
+      { name: "Organized Social Boycott", severity: "high", confidence: 95 },
+      { name: "Denial of Drinking Water Source", severity: "high", confidence: 92 },
+      { name: "Community Transport Stoppage", severity: "medium", confidence: 84 }
     ],
-    vocalSignals: null,
-    recommendedPathway: "Grievance Docket Forwarding to Sub-Divisional Magistrate (SDM) & Jal Jeevan Mission Grievance Officer",
+    vocalSignals: {
+      tremorScore: "0.68 (Elevated Stress)",
+      pitchVariation: "Noticeable voice trembling and stress pauses",
+      speechRate: "Moderately hesitant / anxious"
+    },
+    recommendedPathway: "District Magistrate Inspection + Sub-Divisional Police Officer (SDPO) Protection Bandobast",
     transcript: [
-      { sender: "Victim", text: "आमच्या गावात दुष्काळ परिस्थिती असताना नवीन सरकारी सार्वजनिक विहिरीवरून अनुसूचित जातीच्या वस्तीतील महिलांना पाणी भरू दिले जात नाही. गावातील काही दबंग लोक विहिरीवर पहारा ठेवून धमकावत आहेत." },
-      { sender: "SVI AI", text: "नागरी हक्क संरक्षण कायदा (PCR Act) कलम ४ अन्वये सार्वजनिक पाणवठ्यावरून पाणी भरण्यास मज्जाव करणे हा दखलपात्र गुन्हा आहे. आम्ही तुमची तक्रार नोंदवून घेत आहोत." },
-      { sender: "Victim", text: "आम्ही स्थानिक ग्रामपंचायतीकडे तक्रार केली पण काही कारवाई झाली नाही. वस्तीत पिण्याच्या पाण्याचे दुर्भिक्ष झाले आहे. कृपया त्वरित शासकीय हस्तक्षेप मिळवून द्या." },
-      { sender: "SVI AI", text: "तुमच्या तक्रारीचा अधिकृत NHAA डॉकेट क्रमांक जनरेट करण्यात आला आहे. तहसीलदारांना व जिल्हा समाजकल्याण अधिकाऱ्यांना तातडीच्या पाहणीसाठी आदेश पाठवला जात आहे." }
+      { sender: "Victim", text: "અમારા સુરેન્દ્રનગર જિલ્લાના ગામમાં પંચાયતે અમારા વાસનો સામાજિક બહિષ્કાર કર્યો છે. અમને ગામના જાહેર કૂવામાંથી પીવાનું પાણી ભરવા દેતા નથી." },
+      { sender: "SVI AI", text: "PoA કાયદાની કલમ 3(1)(za) અને PCR કલમ 4 મુજબ પીવાના પાણીના સ્ત્રોત પર રોક લગાવવી એ ગંભીર દંડનીય ગુનો છે. શું રાશન અથવા અન્ય આવશ્યક સેવાઓ પણ રોકવામાં આવી છે?" },
+      { sender: "Victim", text: "હા, ગામની કરિયાણાની દુકાનોમાંથી અમને સામાન આપવાની મનાઈ કરી છે અને બાળકોની સ્કૂલ વાન પણ રોકી દેવામાં આવી છે." },
+      { sender: "SVI AI", text: "જિલ્લા કલેક્ટર અને સમાજ કલ્યાણ અધિકારીને ત્વરિત મુલાકાત અને સુરક્ષા ટીમ મોકલવા માટે પ્રાથમિકતા ચેતવણી મોકલાઈ છે." }
     ],
     auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 12:30:22", details: "Classified as Moderate (Score: 58/100). PCR Act water discrimination verified." }
+      { action: "Voice Intake & Audio Acoustic Assessed", actor: "SVI Speech AI", timestamp: "2026-09-21 12:20:18", details: "Systematic social boycott indicators flagged. Vocal stress: 0.68." }
     ]
   },
+
+  // 4. HIGH - AI CHATBOT
   {
     id: "SVI-2026-9044",
-    channel: "IVRS Voice",
-    channelIcon: "mic",
-    riskLevel: "Critical",
-    riskScore: 97,
-    language: "Hindi",
-    flaggedAt: "38 mins ago",
-    timestamp: "2026-09-21T12:18:00Z",
-    status: "Escalated",
-    assignedTo: "Supervisor K. Patel",
-    voiceConsented: true,
-    audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(za)(C)", "PoA Act Sec 3(2)(v)", "BNS Sec 189"],
-    indicators: [
-      { name: "Wedding Procession Obstruction", severity: "critical", confidence: 98 },
-      { name: "Physical Assault in Public View", severity: "critical", confidence: 95 },
-      { name: "High Vocal Tremor & Hysteria", severity: "critical", confidence: 94 }
-    ],
-    vocalSignals: {
-      tremorScore: "0.93 (Extreme)",
-      pitchVariation: "Peak vocal dissonance / screaming",
-      speechRate: "Fragmented / hyperventilating"
-    },
-    recommendedPathway: "District Magistrate Emergency Mobilization + SP Quick Response Team (QRT) + 112 PCR Van Dispatch",
-    transcript: [
-      { sender: "Victim", text: "सर मदद कीजिये! मेरी बेटी की बारात पर हमला हो गया है! वो लोग दूल्हे को घोड़ी से उतार कर मार रहे हैं और पत्थरबाजी कर रहे हैं! टेंट तोड़ दिया है!" },
-      { sender: "SVI AI", text: "कृपया शांति बनाए रखने की कोशिश करें और सुरक्षित आड़ लें। आपातकालीन नियंत्रण कक्ष 112 और निकटतम पुलिस उपाधीक्षक को तत्काल घटना स्थल पर भेजा जा रहा है।" },
-      { sender: "Victim", text: "हमारे कई रिश्तेदार घायल हो गए हैं, वो लोग कह रहे हैं कि इस गाँव में दलित दूल्हा घोड़ी नहीं चढ़ सकता! कोई एम्बुलेंस और फ़ोर्स भेजो जल्दी!" },
-      { sender: "SVI AI", text: "अलवर जिला पुलिस नियंत्रण कक्ष एवं 108 एम्बुलेंस सेवा को तत्काल आपातकालीन संदेश प्रेषित कर दिया गया है। पुलिस उपाधीक्षक मय जाब्ता मौके के लिए रवाना हो चुके हैं।" }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 12:18:15", details: "Classified as Critical (Score: 97/100). Extreme vocal distress & mass violence alert." },
-      { action: "Emergency Escalated", actor: "Supervisor K. Patel", timestamp: "2026-09-21 12:20:00", details: "QRT mobilized with SP Alwar and 108 ambulance dispatch." }
-    ]
-  },
-  {
-    id: "SVI-2026-9045",
-    channel: "Chatbot",
+    victimName: "Kailash Meghwal",
+    channel: "SVI Chatbot",
     channelIcon: "message-square",
-    riskLevel: "Low",
-    riskScore: 22,
-    language: "English",
-    flaggedAt: "52 mins ago",
-    timestamp: "2026-09-21T12:04:00Z",
-    status: "Resolved",
-    assignedTo: "Officer M. Sen",
-    voiceConsented: false,
-    audioUrl: null,
-    violationTags: ["PoA Rules Rule 12(4)"],
-    indicators: [
-      { name: "Victim Compensation Inquiry", severity: "low", confidence: 95 },
-      { name: "Procedural Clarification", severity: "low", confidence: 91 }
-    ],
-    vocalSignals: null,
-    recommendedPathway: "Direct Benefit Transfer (DBT) Relief Guideline Sharing & District Social Welfare Portal Guidance",
-    transcript: [
-      { sender: "Victim", text: "Hello SVI, our FIR under Section 3(1)(r) was registered last week at the Special Atrocities Police Station. I wanted to understand the process to apply for interim compensation under Rule 12(4)." },
-      { sender: "SVI AI", text: "Under Rule 12(4) of the SC/ST (PoA) Rules, you are entitled to 25% of the statutory relief fund upon FIR registration and charge-sheet stage via DBT. Here are the required bank details and verification steps." },
-      { sender: "Victim", text: "Thank you, that is very clear. Do I need to visit the District Collectorate in person?" },
-      { sender: "SVI AI", text: "The District Welfare Officer processes this directly through the Special Court report. You can track your sanction order online using your FIR docket number on the state DBT portal." }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 12:04:05", details: "Classified as Low (Score: 22/100). Informational assistance query." },
-      { action: "Resolved & Closed", actor: "Officer M. Sen", timestamp: "2026-09-21 12:12:30", details: "Provided official PoA Rule 12(4) compensation schedule documentation." }
-    ]
-  },
-  {
-    id: "SVI-2026-9046",
-    channel: "Helpline (14566)",
-    channelIcon: "phone",
     riskLevel: "High",
-    riskScore: 84,
-    language: "Tamil",
-    flaggedAt: "1 hour ago",
-    timestamp: "2026-09-21T11:50:00Z",
-    status: "In Review",
-    assignedTo: "Officer P. Muthu (ID: 308)",
-    voiceConsented: true,
-    audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(u)", "PoA Act Sec 3(1)(r)", "BNS Sec 351"],
-    indicators: [
-      { name: "Inter-Caste Marriage Persecution", severity: "high", confidence: 94 },
-      { name: "Katta Panchayat Death Threat", severity: "critical", confidence: 89 },
-      { name: "Acute Helplessness & Panic", severity: "high", confidence: 86 }
-    ],
-    vocalSignals: {
-      tremorScore: "0.76 (Elevated)",
-      pitchVariation: "Trembling / rapid pitch drops",
-      speechRate: "Stammering / tearful"
-    },
-    recommendedPathway: "Immediate Safehouse Shelter Transfer via District Protection Officer + Police Protection Order",
-    transcript: [
-      { sender: "Victim", text: "வணக்கம் ஐயா... நாங்கள் கலப்பு திருமணம் செய்து கொண்டோம். என் மனைவியின் குடும்பத்தினர் மற்றும் ஊர் கட்டப்பஞ்சாயத்து எங்களை கொன்றுவிடுவதாக மிரட்டுகிறார்கள். நாங்கள் இப்போது ஒரு மறைவிடத்தில் இருக்கிறோம்." },
-      { sender: "SVI AI", text: "உங்கள் பாதுகாப்பே எங்களின் முதல் முன்னுரிமை. உச்ச நீதிமன்ற வழிகாட்டுதலின்படி கலப்பு தம்பதிகளுக்கு அரசு காப்பகமும் போலீஸ் பாதுகாப்பும் வழங்கப்பட வேண்டும். உங்கள் தற்போதைய இடத்தை பகிருங்கள்." },
-      { sender: "Victim", text: "எங்கள் பெற்றோரை அவர்கள் வீட்டில் அடைத்து வைத்து துன்புறுத்துகிறார்கள். தயவுசெய்து எங்களையும் என் பெற்றோர்களையும் காப்பாற்றுங்கள்." },
-      { sender: "SVI AI", text: "மதுரை மாவட்ட காவல் கண்காணிப்பாளர் மற்றும் சிறப்பு பிரிவுக்கு அவசர பாதுகாப்பு கோரிக்கை அனுப்பப்பட்டுள்ளது. பாதுகாப்பான அரசு காப்பகத்திற்கு மாற்ற ஏற்பாடு செய்யப்படுகிறது." }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 11:50:11", details: "Classified as High (Score: 84/100). Inter-caste honour violence indicators verified." },
-      { action: "Case Claimed", actor: "Officer P. Muthu", timestamp: "2026-09-21 11:56:00", details: "Coordinating safehouse transfer with District Social Welfare Officer." }
-    ]
-  },
-  {
-    id: "SVI-2026-9047",
-    channel: "IVRS Voice",
-    channelIcon: "mic",
-    riskLevel: "Critical",
-    riskScore: 96,
-    language: "Telugu",
-    flaggedAt: "1 hour ago",
-    timestamp: "2026-09-21T11:32:00Z",
-    status: "Escalated",
-    assignedTo: "Supervisor A. Reddy",
-    voiceConsented: true,
-    audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(w)(i)", "PoA Act Sec 3(2)(v)", "BNS Sec 74"],
-    indicators: [
-      { name: "Sexual Assault & Intimidation", severity: "critical", confidence: 97 },
-      { name: "Police Station FIR Refusal", severity: "high", confidence: 91 },
-      { name: "Profound Traumatic Shock", severity: "critical", confidence: 95 }
-    ],
-    vocalSignals: {
-      tremorScore: "0.91 (Severe)",
-      pitchVariation: "Sharp acoustic turbulence / weeping",
-      speechRate: "Choked / breathless"
-    },
-    recommendedPathway: "Direct Escalation to DIG / SP Guntur + Mahila Police Station FIR Mandate under Lalita Kumari Guidelines",
-    transcript: [
-      { sender: "Victim", text: "నమస్కారం సార్... పొలంలో కూలి పని చేస్తుండగా భూయజమాని నాపై లైంగిక దాడికి యత్నించాడు. కులం పేరుతో దూషిస్తూ ఎవరికైనా చెబితే చంపేస్తానని బెదిరించాడు. స్థానిక స్టేషన్‌కి వెళ్తే పోలీసులు కేసు రాయడం లేదు." },
-      { sender: "SVI AI", text: "మేము మీతో ఉన్నాము. ఎస్సీ/ఎస్టీ చట్టం మరియు సుప్రీం కోర్టు ఆదేశాల ప్రకారం ఎఫ్ఐఆర్ నమోదు చేయడం పోలీసుల బాధ్యత. రాజీ పడాల్సిన అవసరం లేదు." },
-      { sender: "Victim", text: "నన్ను స్టేషన్ బయటే కూర్చోబెట్టారు, అవతలి వాళ్ళు వచ్చి బెదిరిస్తున్నారు. నాకు రక్షణ కావాలి." },
-      { sender: "SVI AI", text: "గుంటూరు జిల్లా ఎస్పీ మరియు మహిళా రక్షక్ టీమ్‌కు తక్షణ అత్యవసర నివేదిక పంపబడింది. డీఎస్పీ స్థాయి అధికారి విచారణకు ఆదేశించబడింది." }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 11:32:09", details: "Classified as Critical (Score: 96/100). Sexual violence & dereliction of duty flagged." },
-      { action: "Emergency Escalated", actor: "Supervisor A. Reddy", timestamp: "2026-09-21 11:35:40", details: "Escalated to Guntur SP & AP Women's Commission for immediate FIR enforcement." }
-    ]
-  },
-  {
-    id: "SVI-2026-9048",
-    channel: "Web Portal",
-    channelIcon: "globe",
-    riskLevel: "Moderate",
-    riskScore: 56,
-    language: "Bengali",
-    flaggedAt: "2 hours ago",
-    timestamp: "2026-09-21T10:45:00Z",
-    status: "In Review",
-    assignedTo: "Officer B. Banerjee (ID: 219)",
-    voiceConsented: false,
-    audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(f)", "PoA Act Sec 3(1)(g)", "Forest Rights Act"],
-    indicators: [
-      { name: "Dispossession of Tribal Patta Land", severity: "high", confidence: 91 },
-      { name: "Destruction of Standing Crops", severity: "medium", confidence: 84 },
-      { name: "Livelihood Insecurity Distress", severity: "medium", confidence: 79 }
-    ],
-    vocalSignals: null,
-    recommendedPathway: "District Land Revenue Officer (DLRO) Spot Inspection + Special Atrocities Court Compensation Petiton",
-    transcript: [
-      { sender: "Victim", text: "আমরা পুরুলিয়ার সাঁওতাল আদিবাসী পরিবার। বন অধিকার আইনের পাট্টা জমিতে আমরা চাষ করছিলাম। বালি মাফিয়ারা আমাদের ফসল কেটে ফেলে জোর করে জমি দখল করছে এবং বাধা দিলে বন্দুক দেখিয়ে হুমকি দিচ্ছে।" },
-      { sender: "SVI AI", text: "তপশিলি উপজাতি (PoA) আইনের ধারা ৩(১)(f) এবং ৩(১)(g) অনুযায়ী আদিবাসীদের জমি অবৈধভাবে দখল বা উচ্ছেদ করা গুরুতর শাস্তিযোগ্য অপরাধ। আমরা প্রয়োজনীয় প্রমাণ নথিবদ্ধ করছি।" },
-      { sender: "Victim", text: "আমাদের কাছে জমির বৈধ পাট্টা ও রসিদ আছে। অবিলম্বে জমি পুনরুদ্ধার এবং ক্ষতিপূরণের জন্য সরকারি সাহায্য প্রার্থনা করছি।" },
-      { sender: "SVI AI", text: "আপনার সমস্ত নথি সহ জেলা শাসক (DM) এবং পুলিশ সুপারিনের কাছে আনুষ্ঠানিক অভিযোগপত্র পাঠানো হচ্ছে। একজন আধিকারিক শীঘ্রই আপনার সাথে যোগাযোগ করবেন।" }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 10:45:18", details: "Classified as Moderate (Score: 56/100). Land alienation under Sec 3(1)(g) confirmed." },
-      { action: "Case Claimed", actor: "Officer B. Banerjee", timestamp: "2026-09-21 11:05:00", details: "Cross-verifying Patta records with Purulia DLRO office." }
-    ]
-  },
-  {
-    id: "SVI-2026-9049",
-    channel: "Helpline (14566)",
-    channelIcon: "phone",
-    riskLevel: "High",
-    riskScore: 81,
-    language: "Gujarati",
-    flaggedAt: "2 hours ago",
-    timestamp: "2026-09-21T10:15:00Z",
-    status: "In Review",
-    assignedTo: "Officer J. Patel (ID: 504)",
-    voiceConsented: true,
-    audioUrl: null,
-    violationTags: ["PCR Act Sec 7", "PoA Act Sec 3(1)(zc)"],
-    indicators: [
-      { name: "Economic & Social Boycott", severity: "high", confidence: 95 },
-      { name: "Denial of Essential Provisions", severity: "high", confidence: 89 },
-      { name: "Community-Wide Anxiety", severity: "medium", confidence: 83 }
-    ],
-    vocalSignals: {
-      tremorScore: "0.71 (Moderate)",
-      pitchVariation: "Strained / suppressed indignation",
-      speechRate: "Cautious / whispered"
-    },
-    recommendedPathway: "District Magistrate Section 144 Imposition + Joint Peace Committee Formation + Section 3(1)(zc) FIR",
-    transcript: [
-      { sender: "Victim", text: "સુરેન્દ્રનગર જિલ્લાના અમારા ગામમાં પંચાયતે દલિત સમાજનો હુક્કા-પાણી બંધ (સામાજિક બહિષ્કાર) જાહેર કર્યો છે. કરિયાણાની દુકાનોમાંથી રાશન આપવાની ના પાડી દીધી છે અને દૂધ ડેરીમાં દૂધ લેતા નથી." },
-      { sender: "SVI AI", text: "સામાજિક કે આર્થિક બહિષ્કાર લાદવો એ PoA કાયદાની કલમ ૩(૧)(zc) અને નાગરિક અધિકાર સંરક્ષણ અધિનિયમ હેઠળ સખત ગુનો છે. અમે તાત્કાલિક વહીવટી તંત્રને જાણ કરી રહ્યા છીએ." },
-      { sender: "Victim", text: "અમારા બાળકોને સ્કૂલની રિક્ષામાં બેસવા દેતા નથી. ગામમાં ભારે તણાવ છે, જો તરત જ અધિકારીઓ નહીં આવે તો પરિસ્થિતિ વણસી શકે છે." },
-      { sender: "SVI AI", text: "કલેક્ટર અને ડીવાયએસપીને તાત્કાલિક ગ્રામ્ય મુલાકાત માટે નોટિસ મોકલી દેવામાં આવી છે. તમને રક્ષણ અને રાશન પુરવઠો સુનિશ્ચિત કરવામાં આવશે." }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 10:15:10", details: "Classified as High (Score: 81/100). Systematic social boycott detected." },
-      { action: "Case Claimed", actor: "Officer J. Patel", timestamp: "2026-09-21 10:28:15", details: "Connecting with Surendranagar District Collectorate & Social Justice Officer." }
-    ]
-  },
-  {
-    id: "SVI-2026-9050",
-    channel: "Chatbot",
-    channelIcon: "message-square",
-    riskLevel: "Critical",
-    riskScore: 93,
+    riskScore: 74,
     language: "Hindi",
-    flaggedAt: "3 hours ago",
-    timestamp: "2026-09-21T09:40:00Z",
-    status: "Escalated",
-    assignedTo: "Supervisor K. Patel",
-    voiceConsented: false,
-    audioUrl: null,
-    violationTags: ["PoA Act Section 4", "PoA Act Sec 3(1)(p)", "PoA Act Sec 3(1)(r)"],
-    indicators: [
-      { name: "Police Neglect of Duty (Sec 4)", severity: "critical", confidence: 96 },
-      { name: "Coerced False Counter-Complaint", severity: "high", confidence: 92 },
-      { name: "Threat of Custodial Torture", severity: "critical", confidence: 94 }
-    ],
-    vocalSignals: null,
-    recommendedPathway: "State Vigilance Commission Escalation + DIG Range Intervention + Video-Recorded Statement under Sec 164 CrPC",
-    transcript: [
-      { sender: "Victim", text: "मैं गया (बिहार) से लिख रहा हूँ। दबंग मुखिया ने मनरेगा मजदूरी मांगने पर मुझे पीटा। जब मैं थाने गया तो SHO ने मेरी FIR दर्ज करने से मना कर दिया और उल्टे मुझे हवालात में बंद करने और चोरी का झूठा केस लगाने की धमकी दी।" },
-      { sender: "SVI AI", text: "PoA एक्ट की धारा 4 के तहत लोक सेवक (पुलिस अधिकारी) द्वारा अपने कर्तव्य में लापरवाही करना या शिकायत दर्ज न करना स्वयं एक गैर-जमानती अपराध है जिसमें 1 वर्ष तक के कारावास का प्रावधान है।" },
-      { sender: "Victim", text: "SHO मुखिया का रिश्तेदार है। मुझे डर है कि वे लोग रात में मुझे या मेरे परिवार को उठा लेंगे। मेरी जान बचाइए।" },
-      { sender: "SVI AI", text: "आपकी शिकायत की प्रति सीधे पुलिस महानिदेशक (DGP) बिहार, आईजी मानवाधिकार तथा राष्ट्रीय अनुसूचित जाति आयोग (NCSC) को उच्च प्राथमिकता के साथ अग्रेषित कर दी गई है।" }
-    ],
-    auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 09:40:08", details: "Classified as Critical (Score: 93/100). Statutory Section 4 violation & police coercion." },
-      { action: "Emergency Escalated", actor: "Supervisor K. Patel", timestamp: "2026-09-21 09:45:00", details: "DGP Control Room alerted for departmental inquiry against erring SHO." }
-    ]
-  },
-  {
-    id: "SVI-2026-9051",
-    channel: "Web Portal",
-    channelIcon: "globe",
-    riskLevel: "Moderate",
-    riskScore: 61,
-    language: "Hindi",
-    flaggedAt: "3 hours ago",
-    timestamp: "2026-09-21T09:12:00Z",
+    flaggedAt: "50 mins ago",
+    timestamp: "2026-09-21T12:05:00Z",
     status: "New",
     assignedTo: null,
     voiceConsented: false,
     audioUrl: null,
-    violationTags: ["PoA Act Sec 3(1)(za)(D)", "PCR Act Sec 3"],
+    violationTags: ["PoA Act Sec 3(1)(g)", "PoA Act Sec 3(1)(f)", "PoA Act Sec 3(1)(r)"],
     indicators: [
-      { name: "Denial of Cremation Ground Access", severity: "high", confidence: 94 },
-      { name: "Grave Emotional Desecration", severity: "high", confidence: 87 },
-      { name: "Public Roadside Blockade", severity: "medium", confidence: 79 }
+      { name: "Unlawful Land Encroachment", severity: "high", confidence: 93 },
+      { name: "Standing Crop Destruction", severity: "high", confidence: 90 },
+      { name: "Public Intimidation & Caste Abuses", severity: "medium", confidence: 85 }
     ],
     vocalSignals: null,
-    recommendedPathway: "Sub-Divisional Magistrate (SDM) Immediate Police Force Dispatch for Dignified Last Rites",
+    recommendedPathway: "Sub-Divisional Magistrate (SDM) Demarcation Order + Revenue Department Injunction",
     transcript: [
-      { sender: "Victim", text: "सागर (मध्य प्रदेश) के हमारे गाँव में मेरे 72 वर्षीय पिता का देहांत हो गया। भारी बारिश के कारण हमारे पारंपरिक स्थान पर पानी भरा है, लेकिन सार्वजनिक मुक्तिधाम में गाँव के अन्य लोग शवदाह करने से रोक रहे हैं।" },
-      { sender: "SVI AI", text: "मृत्यु के उपरांत सम्मानजनक अंतिम संस्कार का अधिकार संविधान के अनुच्छेद 21 का अभिन्न अंग है और मुक्तिधाम पर रोक लगाना PoA एक्ट की धारा 3(1)(za)(D) के तहत अपराध है।" },
-      { sender: "Victim", text: "हम पिछले 6 घंटे से शव लेकर सड़क पर बारिश में खड़े हैं। कृपया तत्काल एसडीएम साहब को निर्देश दिलवाएं ताकि अंतिम संस्कार शांतिपूर्ण हो सके।" },
-      { sender: "SVI AI", text: "एसडीएम सागर एवं स्थानीय तहसीलदार को त्वरित पुलिस बल के साथ मौके पर पहुँचकर सम्मानजनक दाह-संस्कार सुनिश्चित करने हेतु फ़्लैश अलर्ट भेजा गया है।" }
+      { sender: "Victim", text: "गाँव के दबंगों ने हमारी पट्टा शुदा पुश्तैनी ज़मीन पर जबरन ट्रैक्टर चलाकर हमारी खड़ी मक्का और बाजरे की फसल बर्बाद कर दी है और चारदीवारी तोड़ दी है।" },
+      { sender: "SVI AI", text: "अनुसूचित जाति के व्यक्ति की भूमि से बेदखली या फसल का विनाश PoA अधिनियम की धारा 3(1)(g) के तहत दंडनीय अपराध है जिसमें न्यूनतम ₹4,00,000 की वैधानिक राहत देय है।" },
+      { sender: "Victim", text: "वे लोग जातिसूचक शब्दों का प्रयोग कर कह रहे हैं कि इस ज़मीन पर तुम्हारा कोई हक़ नहीं है, दोबारा यहाँ दिखे तो जान से हाथ धोना पड़ेगा।" },
+      { sender: "SVI AI", text: "राजस्व तहसीलदार और उपमंडल दंडाधिकारी (SDM) को स्थगन आदेश और सुरक्षा सुनिश्चित करने हेतु मामला दर्ज कर अग्रसारित किया गया है।" }
     ],
     auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 09:12:15", details: "Classified as Moderate (Score: 61/100). Cremation ground discrimination flagged." }
+      { action: "Chatbot Intake Completed", actor: "SVI Conversational Agent", timestamp: "2026-09-21 12:05:30", details: "Land alienation & Section 3(1)(g) violation tagged. Class: High (74/100)." }
     ]
   },
+
+  // 5. MODERATE - SPEECH (Helpline 14566)
   {
-    id: "SVI-2026-9052",
+    id: "SVI-2026-9045",
+    victimName: "M. Murugan",
+    channel: "Helpline (14566)",
+    channelIcon: "phone",
+    riskLevel: "Moderate",
+    riskScore: 54,
+    language: "Tamil",
+    flaggedAt: "1 hour ago",
+    timestamp: "2026-09-21T11:45:00Z",
+    status: "New",
+    assignedTo: null,
+    voiceConsented: true,
+    audioUrl: null,
+    violationTags: ["PoA Act Sec 3(1)(za)(B)", "PCR Act Sec 3"],
+    indicators: [
+      { name: "Temple Entry & Community Space Denial", severity: "medium", confidence: 92 },
+      { name: "Customary Festival Exclusion", severity: "medium", confidence: 88 }
+    ],
+    vocalSignals: {
+      tremorScore: "0.42 (Controlled Distress)",
+      pitchVariation: "Mild pitch tension, stable speech cadence",
+      speechRate: "Normal conversational pace"
+    },
+    recommendedPathway: "District Social Welfare Officer Conciliation + Revenue Divisional Officer (RDO) Mandate",
+    transcript: [
+      { sender: "Victim", text: "வணக்கம். எங்கள் கிராமத்து பொது மாரியம்மன் கோயில் திருவிழாவில் எங்கள் பகுதி மக்களை வழிபட விடாமல் ஊர் பெரியவர்கள் தடுத்து நிறுத்துகிறார்கள்." },
+      { sender: "SVI AI", text: "பொது வழிபாட்டுத் தலங்களில் வழிபடத் தடை விதிப்பது குடிமை உரிமைகள் பாதுகாப்புச் சட்டம் பிரிவு 3 மற்றும் PoA சட்டத்தின்படி சட்டவிரோதமாகும்." },
+      { sender: "Victim", text: "நாங்கள் அமைதியான முறையில் பங்குபெற விரும்புகிறோம், ஆனால் அவர்கள் வழிபாட்டு மண்டபத்திற்கு பூட்டு போட்டு விட்டனர்." },
+      { sender: "SVI AI", text: "வருவாய்க் கோட்டாட்சியர் மற்றும் சமூக நீதிப் பிரிவு கண்காணிப்பாளருக்கு உடனடி தலையீடு கோரி அறிவிப்பு அனுப்பப்பட்டுள்ளது." }
+    ],
+    auditTrail: [
+      { action: "Helpline Call Audio Analysed", actor: "SVI Voice Engine", timestamp: "2026-09-21 11:45:15", details: "Temple exclusion logged under PCR Sec 3. Vocal stress controlled (0.42)." }
+    ]
+  },
+
+  // 6. MODERATE - AI CHATBOT
+  {
+    id: "SVI-2026-9046",
+    victimName: "Deepak Rajak",
+    channel: "SVI Chatbot",
+    channelIcon: "message-square",
+    riskLevel: "Moderate",
+    riskScore: 48,
+    language: "English",
+    flaggedAt: "1.5 hours ago",
+    timestamp: "2026-09-21T11:15:00Z",
+    status: "New",
+    assignedTo: null,
+    voiceConsented: false,
+    audioUrl: null,
+    violationTags: ["PoA Act Sec 3(1)(r)", "PoA Act Sec 3(1)(s)"],
+    indicators: [
+      { name: "Public Workplace Caste Harassment", severity: "medium", confidence: 91 },
+      { name: "Derogatory Verbal Insult in Public View", severity: "medium", confidence: 87 }
+    ],
+    vocalSignals: null,
+    recommendedPathway: "Internal Complaints Committee (ICC) Escalation + District Vigilance Officer Inquiry",
+    transcript: [
+      { sender: "Victim", text: "I work at a municipal department office. During the staff review meeting yesterday, a senior supervisor used casteist slurs against me in front of all colleagues because of a file delay." },
+      { sender: "SVI AI", text: "Under Section 3(1)(r) of the SC/ST PoA Act, intentional insult or intimidation with intent to humiliate in any place within public view is a cognizable offense." },
+      { sender: "Victim", text: "I submitted an internal memo to the Municipal Commissioner, but no action was taken and the supervisor is now mocking me publicly." },
+      { sender: "SVI AI", text: "We are logging a formal administrative complaint record with the State SC/ST Commission and Municipal Oversight Board for formal disciplinary hearing." }
+    ],
+    auditTrail: [
+      { action: "Chatbot Triage Completed", actor: "SVI NLP Engine v2.5", timestamp: "2026-09-21 11:15:40", details: "Workplace insult in public view tagged under Sec 3(1)(r). Score: 48/100." }
+    ]
+  },
+
+  // 7. LOW - SPEECH (Helpline 14566)
+  {
+    id: "SVI-2026-9047",
+    victimName: "Adv. Devendra Prakash",
     channel: "Helpline (14566)",
     channelIcon: "phone",
     riskLevel: "Low",
-    riskScore: 26,
+    riskScore: 24,
     language: "English",
-    flaggedAt: "4 hours ago",
-    timestamp: "2026-09-21T08:30:00Z",
-    status: "Resolved",
-    assignedTo: "Officer M. Sen",
-    voiceConsented: false,
+    flaggedAt: "2 hours ago",
+    timestamp: "2026-09-21T10:30:00Z",
+    status: "New",
+    assignedTo: null,
+    voiceConsented: true,
     audioUrl: null,
-    violationTags: ["Legal Services Auth. Act Sec 12"],
+    violationTags: ["Legal Services Authorities Act Sec 12", "PoA Rules Rule 15(5)"],
     indicators: [
-      { name: "Special Public Prosecutor Request", severity: "low", confidence: 94 },
-      { name: "Witness Protection Inquiries", severity: "low", confidence: 88 }
+      { name: "Legal Aid Advocate Requisition", severity: "low", confidence: 96 },
+      { name: "Witness Allowance / TA-DA Procedural Inquiry", severity: "low", confidence: 91 }
     ],
-    vocalSignals: null,
-    recommendedPathway: "District Legal Services Authority (DLSA) Empanelled Special Counsel Nomination",
+    vocalSignals: {
+      tremorScore: "0.14 (Calm / Baseline)",
+      pitchVariation: "Composed, steady cadence without vocal strain",
+      speechRate: "Standard professional cadence"
+    },
+    recommendedPathway: "District Legal Services Authority (DLSA) Empanelled Special Counsel Nomination + Form IV Assistance",
     transcript: [
-      { sender: "Victim", text: "Good morning. Our case is pending before the Special Atrocities Court in Hyderabad. We wish to engage a senior empanelled advocate under Section 15(5) of the PoA Act. What is the procedure?" },
-      { sender: "SVI AI", text: "Under Section 15(5) of the PoA Act, the District Magistrate is empowered to engage an eminent Senior Advocate of the victim's choice at state expense. You can submit form Form-IV to the DLSA Secretary." },
-      { sender: "Victim", text: "That is extremely helpful. Does the government also provide witness travel allowances for court appearances?" },
-      { sender: "SVI AI", text: "Yes, under Rule 11 of the SC/ST (PoA) Rules, full TA/DA and daily maintenance allowance are reimbursable by the Special Court Nazir for all hearing dates." }
+      { sender: "Victim", text: "Hello, good morning. Our pending court matter is scheduled for hearing next month in the Special Atrocities Court. We wish to appoint an empanelled senior counsel under Rule 15(5). What is the official procedure?" },
+      { sender: "SVI AI", text: "Under Rule 15(5) of the SC/ST PoA Rules, the District Magistrate is empowered to engage an eminent Senior Advocate of the victim's choice at state expense. You can submit Form IV to the DLSA Secretary." },
+      { sender: "Victim", text: "Does the department also cover witness travel and food allowances for family members who need to testify?" },
+      { sender: "SVI AI", text: "Yes, under Rule 11 of the PoA Rules, daily maintenance allowance and travel reimbursement are directly provided through the Special Court Nazir for all hearing dates." }
     ],
     auditTrail: [
-      { action: "AI Assessment Completed", actor: "SVI AI Engine v2", timestamp: "2026-09-21 08:30:04", details: "Classified as Low (Score: 26/100). Legal procedural guidance fulfilled." },
-      { action: "Resolved & Closed", actor: "Officer M. Sen", timestamp: "2026-09-21 08:42:10", details: "Form-IV legal aid requisition template shared with complainant." }
+      { action: "Helpline Inquiry Logged", actor: "SVI Acoustic Engine v2", timestamp: "2026-09-21 10:30:20", details: "Procedural legal guidance request. Vocal tremor baseline (0.14). Low Risk (24/100)." }
+    ]
+  },
+
+  // 8. LOW - AI CHATBOT
+  {
+    id: "SVI-2026-9048",
+    victimName: "Pooja Jatav",
+    channel: "SVI Chatbot",
+    channelIcon: "message-square",
+    riskLevel: "Low",
+    riskScore: 20,
+    language: "Hindi",
+    flaggedAt: "2.5 hours ago",
+    timestamp: "2026-09-21T10:00:00Z",
+    status: "New",
+    assignedTo: null,
+    voiceConsented: false,
+    audioUrl: null,
+    violationTags: ["MoSJE Central Sector Scheme Guidelines"],
+    indicators: [
+      { name: "Scholarship & Education Grant Inquiry", severity: "low", confidence: 98 },
+      { name: "Central Portal Certificate Authentication", severity: "low", confidence: 94 }
+    ],
+    vocalSignals: null,
+    recommendedPathway: "Ministry of Social Justice & Empowerment (MoSJE) Portal Guidance + Welfare Desk",
+    transcript: [
+      { sender: "Victim", text: "नमस्ते। अनुसूचित जाति के विद्यार्थियों के लिए उच्च शिक्षा पोस्ट-मैट्रिक स्कॉलरशिप स्कीम और कोचिंग योजना के लिए आवेदन करने की अंतिम तिथि और पात्रता की जानकारी चाहिए।" },
+      { sender: "SVI AI", text: "MoSJE नेशनल स्कॉलरशिप पोर्टल (scholarships.gov.in) पर पोस्ट-मैट्रिक स्कॉलरशिप के आवेदन खुले हैं। पारिवारिक वार्षिक आय सीमा ₹2.5 लाख तक होनी चाहिए।" },
+      { sender: "Victim", text: "क्या जाति प्रमाण पत्र के डिजिटल सत्यापन के लिए तहसील जाने की आवश्यकता है या ऑनलाइन हो जाता है?" },
+      { sender: "SVI AI", text: "डिजीलॉकर और स्टेट सर्विस पोर्टल के माध्यम से डिजिटल जाति प्रमाण पत्र का स्वतः सत्यापन हो जाता है। आप ऑनलाइन आवेदन पत्र डाउनलोड कर सकते हैं।" }
+    ],
+    auditTrail: [
+      { action: "Chatbot Guidance Fulfilled", actor: "SVI NLP Engine v2.5", timestamp: "2026-09-21 10:00:15", details: "Educational scheme informational assistance provided. Low Risk (20/100)." }
     ]
   }
 ];
