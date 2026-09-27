@@ -15,7 +15,7 @@ export default function WelcomeSplash() {
     // Ensure splash is visible
     setIsVisible(true);
 
-    const DURATION = 1000; // 1 second
+    const DURATION = 2000; // 2 seconds
     const INTERVAL = 30; // update every 30ms
     const totalSteps = DURATION / INTERVAL;
     let currentStep = 0;
