@@ -718,6 +718,12 @@ export default function ChatWidget() {
   };
 
   const recognitionRef = useRef(null);
+  const inputMessageRef = useRef(inputMessage);
+
+  // Keep the ref always in sync with the latest inputMessage state
+  useEffect(() => {
+    inputMessageRef.current = inputMessage;
+  }, [inputMessage]);
 
   const hasUserComplaint = messages.some((m) => m.sender === 'user' && m.text?.trim());
 
@@ -757,8 +763,13 @@ export default function ChatWidget() {
     try {
       const recognition = new SpeechRecognition();
       recognition.lang = speechCode;
-      recognition.continuous = false;
+      recognition.continuous = true;
       recognition.interimResults = true;
+
+      // Snapshot the text already in the input box at mic-start using the ref
+      // so new speech is always appended after the existing text
+      const baseText = (inputMessageRef.current || '').trim();
+      const prefix = baseText ? baseText + ' ' : '';
 
       recognition.onstart = () => {
         setIsRecording(true);
@@ -768,7 +779,7 @@ export default function ChatWidget() {
         const transcript = Array.from(event.results)
           .map((result) => result[0].transcript)
           .join('');
-        setInputMessage(transcript);
+        setInputMessage(prefix + transcript);
       };
 
       recognition.onerror = (event) => {
