@@ -1,7 +1,7 @@
 <h1 align="center"> Smart Victim Intelligence (SVI) </h1>
 
 <p align="center">
-  <img src="./assets/Chat bot.jpeg" alt="Smart Victim Intelligence workflow" width="100%">
+  <img src="/./assets/Chat bot.jpeg" alt="Smart Victim Intelligence workflow" width="100%">
 </p>
 
 <h3 align="center">From Listening to Meaningful Support</h3>
